@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>InfoVis 2019.1</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  <!-- Plotly.js -->
+  <script src="js/plotly-latest.min.js"></script>
+  <!-- Vue.js -->
+  <script src="js/vue.min.js"></script>
+</head>
+<body>
+  
+  <div class="parallax-container">
+    <div class="parallax"><img src="img/parallax1.jpg"></div>
+  </div>
+  
+  <!-- Título do trabalho -->
+  <div class="section white no-pad-bot" id="index-banner">
+    <div class="container">
+      <div class="row">
+          <h2>Introdução</h2>
+          <h5 class="header col s12 light justify">
+              O Exame Nacional de Desempenho de Estudantes (ENADE) é um dos principais instrumentos de avaliação do rendimento dos concluintes das
+              Instituições de Ensino Superior (IES). Aplicado anualmente pelo Ministério da Educação, o ENADE visa avaliar os cursos em relação:
+
+              <ol>
+                  <li> aos conteúdos programáticos; </li>
+                  <li> às habilidades e competências gerais e específicas desenvolvidas pelos estudantes ao longo de sua formação; e</li>
+                  <li> ao nível de atualização dos estudantes com relação à realidade brasileira e mundial.</li>
+              </ol>
+
+              Os cursos de nível superior são divididos em três áreas, onde cada área é avaliada trienalmente. Além disso,
+              vale mencionar que a avaliação busca, através de um questionário, coletar as informações socieconômicas  dos alunos a fim de
+              fornecer issumos para pesquisas científicas. <br><br>
+
+              Diante disso, apresentamos uma análise sobre o perfil e desempenho dos alunos de Ensino Superior que realizaram o ENADE em 2017, 
+              que avaliou os cursos nas áreas de Ciências Exatas e afins, além dos cursos de Licenciatura de diferentes áreas. <br><br>
+              
+              Esta pesquisa deseja contribuir com a melhoria da qualidade do Ensino Superior brasileiro sendo uma fonte de consultas tanto para a sociedade quanto para o governo, que poderá aprimorar o desenvolvimento e a aplicação de políticas públicas 
+              que contribuam com o Ensino Superior.
+
+            </h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="parallax-container">
+    <div class="parallax"><img src="img/parallax2.jpg"></div>
+  </div>
+
+  <!-- Perguntas e Visualizações -->
+  <div class="container">
+    <div class="section white" id="app-vue">
+    	<div class="visualization" v-for="(visualization, index) in visualizations" v-if="visualization.question">
+	    	<p v-if="visualization.introduction" v-html="visualization.introduction" style="font-size:26px;"></p>
+        <h4>
+          {{index + 1}}<i class="material-icons">keyboard_arrow_right</i> {{visualization.question}}
+        </h4>
+	    	<p v-if="visualization.comment" v-html="visualization.comment" style="font-size:18px;"></p>
+	    	<div :id="'visualization'+index"></div>
+        <br/><br/>
+        
+      </div>
+    </div>
+  </div>
+  
+  <div class="parallax-container">
+    <div class="parallax"><img src="img/parallax4.jpg"></div>
+  </div>
+
+  <!-- Conclusão do trabalho -->
+  <div class="section white no-pad-bot">
+    <div class="container">
+      <div class="row">
+        <h2>Conclusão</h2>
+          <h5 class="header col s12 light justify">
+            Esta pesquisa apresentou um breve retrato do cenário atual do Ensino Superior brasileiro 
+            através da elaboração de perguntas e visualizações de dados estatísticos referentes ao ENADE 2017.
+            As perguntas e visualizações foram dividas em duas principais categorias que buscavam  
+            apresentar o perfil dos concluintes e seu desempenho, respectivamente.
+            <br><br>
+            A primeira seção apresentou uma série de questões e visualizações sobre alguns aspectos do perfil dos 
+            concluintes e sobre como esses aspectos estão distribuídos em diferentes categorias. A segunda seção, 
+            por sua vez, apresentou uma série de perguntas e visualizações que levam em consideração a nota geral 
+            dos concluintes, buscando identificar as influências que os diferentes aspectos do perfil dos estudantes 
+            exercem sobre o seu desempenho no curso.
+            <br><br>
+            Mais do que somente responder perguntas, esta apresentação deseja, sobretudo, levantar dúvidas 
+            e inspirar a elaboração de novos questionamentos que nos ajudem a compreender e avaliar melhor 
+            o Ensino Superior do nosso país, desenvolvendo maneiras mais eficientes de aprimorá-lo.
+            <br><br>
+            <b>Dúvidas? Sugestões? Entre em contato conosco!</b>
+          </h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer class="page-footer" style="background-color: #1f77b4">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Análise do Perfil e do Desempenho dos Alunos do Ensino Superior Brasileiro</h5>
+          <p class="grey-text text-lighten-4">Realizado em 2019.1 durante a disciplina de Visualização de Informação oferecida pela professora <a href="http://www-di.inf.puc-rio.br/~simone/" target="_blank" style="color: white; font-weight: bold;">Simone Diniz Junqueira Barbosa</a> do <a href="http://www.inf.puc-rio.br/" target="_blank" style="color: white; font-weight: bold;">Departamento de Informática</a> da PUC-Rio.</p>
+
+
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Alunos</h5>
+          <ul>
+            <li class="white-text">Dieinison Jack<br>(E-mail: dbraga@inf.puc-rio.br)</li>
+            <li class="white-text">Raul de Araújo<br>(E-mail: rlima@inf.puc-rio.br)</li>
+          </ul>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Links Úteis</h5>
+          <ul>
+            <li><a class="white-text" href="http://inep.gov.br/enade" target="_blank">Portal do ENADE</a></li>
+            <li><a class="white-text" href="http://portal.inep.gov.br/microdados" target="_blank">Portal de Microdados</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Pontifícia Universidade Católica do Rio de Janeiro - 2019
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+  <script src="materialize_init.js"></script>
+  <script src="visualizations.js"></script>
+  <script src="app.js"></script>
+
+  </body>
+</html>
