@@ -398,7 +398,39 @@ section {
 }
 
 /*--------------------------------------------------------------
-# Akills
+# Teaching
+--------------------------------------------------------------*/
+.teaching th, td {
+  border: 1px solid black;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+.teaching table .hidden-cell {
+  border: none;
+}
+
+.teaching table .table-header {
+  background-color: orangered;
+  color: white;
+}
+
+.teaching table .table-line-header {
+  background-color: orange;
+  font-size: 12px;
+}
+
+.teaching table .class-code {
+  font-size: 10px;
+  font-weight: bolder;
+}
+
+.teaching table .class-name {
+  font-size: 14px;
+}
+
+/*--------------------------------------------------------------
+# Skills
 --------------------------------------------------------------*/
 .skills .progress {
   height: 50px;
