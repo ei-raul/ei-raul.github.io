@@ -328,6 +328,10 @@ section {
   color: #173b6c;
 }
 
+.about .content p {
+  text-align: justify;
+}
+
 .about .content ul {
   list-style: none;
   padding: 0;
@@ -418,6 +422,7 @@ section {
 .teaching table .table-line-header {
   background-color: orange;
   font-size: 12px;
+  font-weight: bolder;
 }
 
 .teaching table .class-code {
