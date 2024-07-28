@@ -434,6 +434,35 @@ section {
   font-size: 14px;
 }
 
+.teaching .content {
+  margin-top: 30px;
+}
+
+.teaching .content h3 {
+  font-weight: 700;
+  font-size: 26px;
+  color: #173b6c;
+}
+
+.teaching .content p {
+  text-align: justify;
+}
+
+.teaching .content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.teaching .content ul li {
+  padding-bottom: 10px;
+}
+
+.teaching .content ul i {
+  font-size: 20px;
+  padding-right: 2px;
+  color: #149ddd;
+}
+
 /*--------------------------------------------------------------
 # Skills
 --------------------------------------------------------------*/
