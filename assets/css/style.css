@@ -416,34 +416,72 @@ section {
 /*--------------------------------------------------------------
 # Teaching
 --------------------------------------------------------------*/
-.teaching th, td {
-  border: 1px solid black;
-  padding: 5px 10px;
+.teaching .table-content {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(20, 157, 221, 0.10);
+}
+
+.teaching table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Open Sans", sans-serif;
+}
+
+.teaching th,
+.teaching td {
+  border: 1px solid #d0e8f5;
+  padding: 10px 14px;
   text-align: center;
+  vertical-align: middle;
 }
 
 .teaching table .hidden-cell {
   border: none;
+  background: transparent;
 }
 
 .teaching table .table-header {
-  background-color: orangered;
-  color: white;
+  background-color: #173b6c;
+  color: #fff;
+  font-family: "Raleway", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 12px 10px;
 }
 
 .teaching table .table-line-header {
-  background-color: orange;
+  background-color: #e8f4fb;
+  color: #173b6c;
   font-size: 12px;
-  font-weight: bolder;
+  font-weight: 700;
+  white-space: nowrap;
+  border-right: 2px solid #149ddd;
 }
 
 .teaching table .class-code {
-  font-size: 10px;
-  font-weight: bolder;
+  display: inline-block;
+  background-color: #149ddd;
+  color: #fff;
+  font-size: 0.7em;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+  letter-spacing: 0.05em;
 }
 
 .teaching table .class-name {
-  font-size: 14px;
+  font-size: 13px;
+  color: #272829;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.teaching table .empty-cell {
+  color: #bcd4e6;
+  font-size: 18px;
 }
 
 .teaching .content {
@@ -473,10 +511,6 @@ section {
   font-size: 20px;
   padding-right: 2px;
   color: #149ddd;
-}
-
-.teaching .table-content {
-  overflow-x: auto;
 }
 
 /*--------------------------------------------------------------
