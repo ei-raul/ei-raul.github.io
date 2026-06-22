@@ -1196,6 +1196,122 @@ section {
   #footer {
     position: static;
     width: auto;
-    padding-right: 20px 15px;
+    padding: 15px;
+  }
+}
+
+/* ============================================================
+   Responsive — Mobile & Small Screens
+   ============================================================ */
+
+/* Overlay when mobile nav is open */
+.mobile-nav-ovl {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(4, 11, 20, 0.65);
+  z-index: 9996;
+  cursor: pointer;
+}
+
+.mobile-nav-active .mobile-nav-ovl {
+  display: block;
+}
+
+.mobile-nav-active .back-to-top {
+  display: none !important;
+}
+
+/* --- Hero --- */
+@media (max-width: 768px) {
+  #hero h1 {
+    font-size: 36px;
+    line-height: 44px;
+  }
+  #hero p {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 400px) {
+  #hero h1 {
+    font-size: 26px;
+    line-height: 32px;
+  }
+  #hero p {
+    font-size: 15px;
+  }
+}
+
+/* --- Section titles --- */
+@media (max-width: 768px) {
+  .section-title h2 {
+    font-size: 22px;
+    line-height: 30px;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+  }
+}
+
+/* --- Publications: excessive vertical padding --- */
+@media (max-width: 768px) {
+  .publications {
+    padding: 60px 0;
+  }
+}
+
+/* --- Resume: education logos --- */
+.resume .icon-block img {
+  max-height: 160px;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 576px) {
+  .resume .icon-block img {
+    max-height: 100px;
+  }
+  .resume .resume-item h4 {
+    font-size: 15px;
+  }
+  .resume .resume-item h5 {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+}
+
+/* --- About: email/URL overflow --- */
+@media (max-width: 576px) {
+  .about .content ul li,
+  .about .content ul li a {
+    overflow-wrap: break-word;
+    word-break: break-all;
+  }
+}
+
+/* --- Teaching: long title + compact table --- */
+@media (max-width: 768px) {
+  #teaching .section-title h2 {
+    font-size: 17px;
+    line-height: 24px;
+  }
+  .teaching th,
+  .teaching td {
+    padding: 8px 7px;
+  }
+  .teaching table .table-header {
+    font-size: 12px;
+    padding: 10px 6px;
+  }
+  .teaching table .table-line-header {
+    font-size: 11px;
+  }
+  .teaching table .class-name {
+    font-size: 12px;
   }
 }

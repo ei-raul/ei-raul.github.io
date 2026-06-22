@@ -125,6 +125,12 @@
       margin-bottom: 18px;
       line-height: 1.6;
     }
+    @media (max-width: 480px) {
+      .pub-venue {
+        white-space: normal;
+        margin-bottom: 4px;
+      }
+    }
   </style>
 
   <!-- =======================================================
@@ -136,6 +142,9 @@
 </head>
 
 <body>
+
+  <!-- Overlay for mobile nav -->
+  <div class="mobile-nav-ovl" aria-hidden="true"></div>
 
   <!-- ======= Mobile nav toggle button ======= -->
   <button type="button" class="mobile-nav-toggle d-xl-none"><i class="icofont-navigation-menu"></i></button>
