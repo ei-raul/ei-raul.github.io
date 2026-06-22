@@ -418,6 +418,7 @@ section {
 --------------------------------------------------------------*/
 .teaching .table-content {
   overflow-x: auto;
+  overflow-y: hidden;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(20, 157, 221, 0.10);
 }
