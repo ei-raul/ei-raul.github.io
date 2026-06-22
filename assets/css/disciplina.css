@@ -1,0 +1,209 @@
+/*
+  Disciplina pages — shared stylesheet
+  Palette mirrors the main portfolio site.
+*/
+
+:root {
+  --primary:      #149ddd;
+  --primary-dark: #173b6c;
+  --primary-mid:  #1f5297;
+  --border:       #d0e8f5;
+  --bg-section:   #f5f8fd;
+  --text:         #272829;
+  --text-muted:   #666;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Open Sans", sans-serif;
+  color: var(--text);
+  background: var(--bg-section);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: #37b3ed; }
+
+/* ── Header ─────────────────────────────────────────── */
+.disc-header {
+  background: #040b14;
+  color: #fff;
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.disc-header-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.back-link {
+  color: #a8a9b4;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.back-link svg { flex-shrink: 0; }
+.back-link:hover { color: var(--primary); }
+
+.disc-header-divider {
+  width: 1px;
+  height: 32px;
+  background: #2c2f3f;
+  flex-shrink: 0;
+}
+
+.disc-info { flex: 1; min-width: 0; }
+
+.disc-title {
+  font-family: "Raleway", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.disc-meta {
+  font-size: 12px;
+  color: #a8a9b4;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.disc-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Main ────────────────────────────────────────────── */
+.disc-main {
+  flex: 1;
+  padding: 36px 24px 48px;
+}
+
+.disc-container {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Material groups ─────────────────────────────────── */
+.material-group {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.material-group-title {
+  font-family: "Raleway", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  padding: 14px 22px;
+  background: var(--bg-section);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.material-icon {
+  font-size: 20px;
+  color: var(--primary);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.material-list { list-style: none; }
+
+.material-item { border-bottom: 1px solid #f0f5fb; }
+.material-item:last-child { border-bottom: none; }
+
+.material-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 22px;
+  color: var(--text);
+  transition: background 0.15s;
+}
+.material-link:hover { background: #f0f7fd; color: var(--text); }
+.material-link:hover .material-name { color: var(--primary); }
+
+.material-type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.material-type.arquivo { background: #dff3fc; color: #0d6e9a; }
+.material-type.video   { background: #fde8d8; color: #b04010; }
+.material-type.link    { background: #e4edf9; color: var(--primary-dark); }
+.material-type.pdf     { background: #fce8e8; color: #a01010; }
+
+.material-name { flex: 1; font-size: 14px; }
+
+.material-empty {
+  padding: 20px 22px;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* ── Footer ──────────────────────────────────────────── */
+.disc-footer {
+  background: #040b14;
+  color: #a8a9b4;
+  text-align: center;
+  padding: 14px 24px;
+  font-size: 12px;
+}
+.disc-footer a { color: var(--primary); }
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .disc-header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .disc-header-divider { display: none; }
+  .disc-title { font-size: 17px; white-space: normal; }
+  .material-group-title { font-size: 14px; padding: 12px 16px; }
+  .material-link { padding: 12px 16px; }
+  .material-empty { padding: 16px; }
+}
