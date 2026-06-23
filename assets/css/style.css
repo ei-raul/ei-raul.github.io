@@ -8,6 +8,10 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+html {
+  scroll-behavior: auto;
+}
+
 body {
   font-family: "Open Sans", sans-serif;
   color: #272829;
@@ -1464,7 +1468,7 @@ section {
 }
 
 /* --- About responsive --- */
-@media (max-width: 576px) {
+@media (max-width: 768px) {
   .about-profile-links {
     grid-template-columns: 1fr;
   }
