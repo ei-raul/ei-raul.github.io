@@ -96,42 +96,183 @@
 
   <!-- Custom overrides -->
   <style>
+    /* ── Publications grid ─────────────────────────────── */
+    #publications .content ul,
+    #misc .content ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .pub-item {
+      display: grid;
+      grid-template-columns: 118px 3fr 2fr 2fr 170px;
+      align-items: start;
+      column-gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f5fb;
+      margin-bottom: 0;
+    }
+
+    .pub-item:last-child { border-bottom: none; }
+
     .pub-venue {
       display: inline-block;
       background-color: #149ddd;
       color: #fff;
-      font-size: 0.72em;
-      font-weight: 600;
-      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
       border-radius: 12px;
-      margin-right: 6px;
-      vertical-align: middle;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
       white-space: nowrap;
-    }
-    .pub-authors {
-      color: #666;
-      font-size: 0.88em;
-      display: block;
       margin-top: 2px;
     }
+
+    .pub-title {
+      display: block;
+      font-family: "Raleway", sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #173b6c;
+      line-height: 1.4;
+    }
+
+    .pub-authors {
+      display: block;
+      color: #666;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     .pub-desc {
+      display: block;
       font-style: italic;
       color: #555;
-      font-size: 0.88em;
-      margin-top: 3px;
-      display: block;
+      font-size: 13px;
+      line-height: 1.5;
     }
-    #publications .content ul li {
-      margin-bottom: 18px;
-      line-height: 1.6;
+
+    .pub-doi-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      color: #149ddd;
     }
-    @media (max-width: 480px) {
-      .pub-venue {
-        white-space: normal;
-        margin-bottom: 4px;
+
+    .pub-doi-link:hover { color: #37b3ed; text-decoration: none; }
+
+    .pub-doi-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #0d6e9a;
+      background: #dff3fc;
+      padding: 1px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .pub-doi-num {
+      font-size: 12px;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    @media (max-width: 768px) {
+      .pub-item {
+        grid-template-columns: 1fr;
+        gap: 5px 0;
+        padding: 14px 0;
+      }
+      .pub-doi-link {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 2px;
       }
     }
+
+    /* ── Misc / Extras cards ───────────────────────────── */
+    .misc-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e8f0f9;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+
+    .misc-card:hover {
+      box-shadow: 0 6px 24px rgba(20, 157, 221, 0.13);
+      transform: translateY(-3px);
+    }
+
+    .misc-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .misc-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: #149ddd;
+      color: #fff;
+    }
+
+    .misc-tag.misc-tag-secondary {
+      background: #dff3fc;
+      color: #0d6e9a;
+    }
+
+    .misc-card-title {
+      font-family: "Raleway", sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #173b6c;
+      margin-bottom: 10px;
+    }
+
+    .misc-card-desc {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 18px;
+    }
+
+    .misc-card-footer {
+      margin-top: auto;
+      border-top: 1px solid #f0f5fb;
+      padding-top: 14px;
+    }
+
+    .misc-card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #149ddd;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .misc-card-link:hover {
+      color: #0d6e9a;
+      text-decoration: none;
+    }
+
+    .misc-card-link i { font-size: 15px; }
   </style>
 
   <!-- =======================================================
@@ -167,7 +308,7 @@
 
       <nav class="nav-menu">
         <ul>
-          <li class="active"><a href="index.html"><i class="bx bx-home"></i> <span> Home</span></a></li>
+          <li class="active"><a href="#hero"><i class="bx bx-home"></i> <span> Home</span></a></li>
           <li><a href="#about"><i class="bx bx-user"></i> <span> Sobre</span></a></li>
           <li><a href="#resume"><i class='bx bxs-graduation'></i> <span> Formação e Experiência</span></a></li>
           <!-- <li><a href="#skills"><i class='bx bx-badge-check'></i> Habilidades</a></li> -->
@@ -203,6 +344,7 @@
 
         <div class="row">
           <div class="col-lg-12 pt-4 pt-lg-0 content" data-aos="fade-left">
+
             <h3>Informações Básicas</h3>
             <p class="font-italic">
               Mestre em Informática pela PUC-Rio e Bacharel em Ciência da Computação pela UFC, atua na intersecção entre Ciência de Dados, Visualização da Informação e desenvolvimento de software.
@@ -213,39 +355,72 @@
             <div class="row">
               <div class="col-lg-6">
                 <ul>
-                  <li><i class="icofont-rounded-right"></i> <strong>Nascimento:</strong> 21/02/1997</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Cidade:</strong> Quixadá - CE, Brasil</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Grau:</strong> Mestre em Informática</li>
+                  <li><i class="bx bx-cake"></i> <strong>Nascimento:</strong> 21/02/1997</li>
+                  <li><i class="bx bx-map-pin"></i> <strong>Cidade:</strong> Quixadá - CE, Brasil</li>
+                  <li><i class="bx bx-book-reader"></i> <strong>Grau:</strong> Mestre em Informática</li>
                 </ul>
               </div>
               <div class="col-lg-6">
                 <ul>
-                  <li><i class="icofont-rounded-right"></i> <strong>Interesses:</strong> ML, Data Science, InfoVis</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Idiomas:</strong> Português (nativo), Inglês (avançado)</li>
+                  <li><i class="bx bx-bulb"></i> <strong>Interesses:</strong> ML, Data Science, InfoVis</li>
+                  <li><i class="bx bx-globe"></i> <strong>Idiomas:</strong> Português (nativo), Inglês (avançado)</li>
                 </ul>
               </div>
             </div>
-            <hr/>
+
             <h3>Contato</h3>
-            <div class="row">
-              <div class="col-lg-6">
-                <ul>
-                  <li><i class="icofont-rounded-right"></i> <strong>E-mails:</strong>
-                    <li>rauldearaujolima@gmail.com</li>
-                    <li>raul.lima@datamint.com.br</li>
+            <div class="row align-items-start">
+              <div class="col-lg-5 col-md-6">
+                <ul class="about-email-list">
+                  <li>
+                    <i class="bx bx-envelope"></i>
+                    <div>
+                      <span class="about-email-label">Pessoal</span>
+                      <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a>
+                    </div>
                   </li>
-                  <li><i class="icofont-rounded-right"></i> <strong><a href="https://www.linkedin.com/in/raul-de-araújo-b8943810b" target="_blank">LinkedIn <i class='bx bx-link-external'></i></a></strong></li>
-                  <li><i class="icofont-rounded-right"></i> <strong><a href="https://github.com/ei-raul" target="_blank">GitHub <i class='bx bx-link-external'></i></a></strong></li>
-                  <li><i class="icofont-rounded-right"></i> <strong><a href="http://lattes.cnpq.br/7030455287051977" target="_blank">Lattes <i class='bx bx-link-external'></i></a></strong></li>
-                  <li><i class="icofont-rounded-right"></i> <strong><a href="https://www.researchgate.net/profile/Raul_Lima6" target="_blank">ResearchGate <i class='bx bx-link-external'></i></a></strong></li>
+                  <li>
+                    <i class="bx bx-envelope"></i>
+                    <div>
+                      <span class="about-email-label">Datamint</span>
+                      <a href="mailto:raul.lima@datamint.com.br">raul.lima@datamint.com.br</a>
+                    </div>
+                  </li>
+                  <li>
+                    <i class="bx bx-envelope"></i>
+                    <div>
+                      <span class="about-email-label">UniCatólica</span>
+                      <a href="mailto:rauldearaujo@unicatolicaquixada.edu.br">rauldearaujo@unicatolicaquixada.edu.br</a>
+                    </div>
+                  </li>
                 </ul>
               </div>
+              <div class="col-lg-7 col-md-6 mt-3 mt-md-0">
+                <div class="about-profile-links">
+                  <a href="https://www.linkedin.com/in/raul-de-araújo-b8943810b" class="about-profile-link" target="_blank">
+                    <i class="bx bxl-linkedin"></i>
+                    <span>LinkedIn</span>
+                    <i class="bx bx-chevron-right about-link-arrow"></i>
+                  </a>
+                  <a href="https://github.com/ei-raul" class="about-profile-link" target="_blank">
+                    <i class="bx bxl-github"></i>
+                    <span>GitHub</span>
+                    <i class="bx bx-chevron-right about-link-arrow"></i>
+                  </a>
+                  <a href="http://lattes.cnpq.br/7030455287051977" class="about-profile-link" target="_blank">
+                    <i class="bx bx-id-card"></i>
+                    <span>Lattes</span>
+                    <i class="bx bx-chevron-right about-link-arrow"></i>
+                  </a>
+                  <a href="https://www.researchgate.net/profile/Raul_Lima6" class="about-profile-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 24" width="1.167em" height="1em" fill="currentColor" aria-hidden="true" style="display:inline-block;vertical-align:-.125em;flex-shrink:0"><text text-anchor="middle" x="14" y="19" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="19" letter-spacing="-0.5">RG</text></svg>
+                    <span>ResearchGate</span>
+                    <i class="bx bx-chevron-right about-link-arrow"></i>
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
-            <!--<p>
-              Officiis eligendi itaque labore et dolorum mollitia officiis optio vero. Quisquam sunt adipisci omnis et ut. Nulla accusantium dolor incidunt officia tempore. Et eius omnis.
-              Cupiditate ut dicta maxime officiis quidem quia. Sed et consectetur qui quia repellendus itaque neque. Aliquid amet quidem ut quaerat cupiditate. Ab et eum qui repellendus omnis culpa magni laudantium dolores.
-            </p>-->
+
           </div>
         </div>
 
@@ -620,60 +795,75 @@
         
         <div class="content">
           <ul>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">INTERACT 2025</span>
-              <strong>Arcano: Generating Data Questions to Support Non-Expert Analysts in Hypothesis Formulation</strong>
+              <strong class="pub-title">Arcano: Generating Data Questions to Support Non-Expert Analysts in Hypothesis Formulation</strong>
               <span class="pub-authors">Braga, D.; Lima, R.; Santos, J. D. L.; Oliveira, G. M.; Silva, C. M.; Barbosa, S.D.J. — <em>Lecture Notes in Computer Science, vol 16111. Springer.</em></span>
               <span class="pub-desc">Ferramenta que gera perguntas sobre dados para auxiliar analistas não-especialistas na formulação de hipóteses exploratórias.</span>
-              DOI: <a href="https://link.springer.com/chapter/10.1007/978-3-032-05008-3_20" target="_blank">10.1007/978-3-032-05008-3_20 <i class='bx bx-link-external'></i></a>
+              <a class="pub-doi-link" href="https://link.springer.com/chapter/10.1007/978-3-032-05008-3_20" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.1007/978-3-032-05008-3_20 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">IHC 2024</span>
-              <strong>VisStoryMaker: supporting non-expert analysts in visually exploring datasets and communicating insights with visual annotations and data stories</strong>
+              <strong class="pub-title">VisStoryMaker: supporting non-expert analysts in visually exploring datasets and communicating insights with visual annotations and data stories</strong>
               <span class="pub-authors">Braga, D.; Silva, M.; Lima, R.; Barbosa, G.D.J.; Barbosa, S.D.J. — <em>23rd Brazilian Symposium on Human Factors in Computing Systems. ACM.</em></span>
               <span class="pub-desc">Sistema para exploração visual de conjuntos de dados e comunicação de insights por meio de anotações visuais e data stories — laureado com o Selo de Inovação SBC 2022.</span>
-              DOI: <a href="https://dl.acm.org/doi/10.1145/3702038.3702113" target="_blank">10.1145/3702038.3702113 <i class='bx bx-link-external'></i></a>
+              <a class="pub-doi-link" href="https://dl.acm.org/doi/10.1145/3702038.3702113" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.1145/3702038.3702113 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">Dissertação 2020</span>
-              <strong>VisMaker: a Question-Oriented Visualization Recommender System for Data Exploration</strong>
+              <strong class="pub-title">VisMaker: a Question-Oriented Visualization Recommender System for Data Exploration</strong>
               <span class="pub-authors">Lima, R. A., & Barbosa, S. D. J. — <em>Dissertação de Mestrado, PUC-Rio.</em></span>
               <span class="pub-desc">Sistema recomendador de visualizações orientado a perguntas, desenvolvido para apoiar a exploração de dados por analistas com diferentes níveis de expertise.</span>
-              DOI: <a href="https://doi.org/10.17771/PUCRio.acad.49414" target="_blank">10.17771/PUCRio.acad.49414 <i class='bx bx-link-external'></i></a>
+              <a class="pub-doi-link" href="https://doi.org/10.17771/PUCRio.acad.49414" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.17771/PUCRio.acad.49414 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">AVI 2020</span>
-              <strong>A Question-Oriented Visualization Recommendation Approach for Data Exploration</strong>
+              <strong class="pub-title">A Question-Oriented Visualization Recommendation Approach for Data Exploration</strong>
               <span class="pub-authors">Lima, R. A., & Barbosa, S. D. J. — <em>International Conference on Advanced Visual Interfaces. ACM.</em></span>
-              DOI: <a href="https://doi.org/10.1145/3399715.3399849" target="_blank">10.1145/3399715.3399849 <i class='bx bx-link-external'></i></a>
+              <span class="pub-desc"></span>
+              <a class="pub-doi-link" href="https://doi.org/10.1145/3399715.3399849" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.1145/3399715.3399849 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">HCII 2020</span>
-              <strong>Revisiting Visualization Task Taxonomies: Specifying Functions for the Data Transformations Stage</strong>
+              <strong class="pub-title">Revisiting Visualization Task Taxonomies: Specifying Functions for the Data Transformations Stage</strong>
               <span class="pub-authors">Rodrigues, A. M. B.; Barbosa, G. D. J.; Lima, R. de A.; Braga, D. J. F.; Lopes, H.; Barbosa, S. D. J. — <em>22nd International Conference on Human-Computer Interaction. Springer.</em></span>
               <span class="pub-desc">Revisão e extensão de taxonomias de tarefas de visualização, com ênfase nas funções de transformação de dados.</span>
-              DOI: <a href="https://doi.org/10.1007/978-3-030-49059-1_48" target="_blank">10.1007/978-3-030-49059-1_48 <i class='bx bx-link-external'></i></a>
+              <a class="pub-doi-link" href="https://doi.org/10.1007/978-3-030-49059-1_48" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.1007/978-3-030-49059-1_48 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">BRACIS 2020</span>
-              <strong>Brazilian Lyrics-Based Music Genre Classification Using a BLSTM Network</strong>
+              <strong class="pub-title">Brazilian Lyrics-Based Music Genre Classification Using a BLSTM Network</strong>
               <span class="pub-authors">Lima, R. A.; Sousa, R. C. C.; Barbosa, S. D. J.; Lopes, H. C. V. — <em>Brazilian Conference on Intelligent Systems. Springer.</em></span>
               <span class="pub-desc">Classificação de gêneros musicais brasileiros com base em letras de músicas, utilizando redes neurais BLSTM.</span>
-              DOI: <a href="https://doi.org/10.1007/978-3-030-61401-0_49" target="_blank">10.1007/978-3-030-61401-0_49 <i class='bx bx-link-external'></i></a>
+              <a class="pub-doi-link" href="https://doi.org/10.1007/978-3-030-61401-0_49" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.1007/978-3-030-61401-0_49 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
-            <li>
-              <i class="icofont-rounded-right"></i>
+            <li class="pub-item">
               <span class="pub-venue">ENIAC 2018</span>
-              <strong>An Analysis of the Sentiment Classification of Short Messages Using Word2Vec</strong>
+              <strong class="pub-title">An Analysis of the Sentiment Classification of Short Messages Using Word2Vec</strong>
               <span class="pub-authors">Lima, R., & Guerra, P. — <em>XV Encontro Nacional de Inteligência Artificial e Computacional. SBC.</em></span>
               <span class="pub-desc">Análise comparativa de métodos de classificação de sentimentos em textos curtos em língua portuguesa, com uso de embeddings Word2Vec.</span>
-              DOI: <a href="https://doi.org/10.5753/eniac.2018.4436" target="_blank">10.5753/eniac.2018.4436 <i class='bx bx-link-external'></i></a>
+              <a class="pub-doi-link" href="https://doi.org/10.5753/eniac.2018.4436" target="_blank">
+                <span class="pub-doi-badge">DOI</span>
+                <span class="pub-doi-num">10.5753/eniac.2018.4436 <i class="bx bx-link-external"></i></span>
+              </a>
             </li>
           </ul>
         </div>
@@ -683,21 +873,50 @@
     <!-- End Publications Section -->
 
     <!-- ======= Misc Section ======= -->
-    <section id="misc" class="about publications">
+    <section id="misc" class="section-bg">
       <div class="container">
 
         <div class="section-title">
-          <h2>Extras</h2>
+          <h2>Projetos & Extras</h2>
+          <p>Projetos de software e trabalhos práticos desenvolvidos ao longo da trajetória acadêmica e profissional.</p>
         </div>
-        
-        <div class="content">
-          <ul>
-            <li><i class="icofont-rounded-right"></i> <strong><a href="infovis-2019-1/index.html" target="_blank">InfoVis - 2019.1 <i class='bx bx-link-external'></i></a></strong>
-              Análise do Perfil e do Desempenho dos Alunos do Ensino Superior Brasileiro através de Visualizações dos Dados do ENADE 2017.
-            </li>
-          </ul>
+
+        <div class="row">
+
+          <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up">
+            <div class="misc-card">
+              <div class="misc-card-header">
+                <span class="misc-tag">Visualização de Dados</span>
+                <span class="misc-tag misc-tag-secondary">Projeto Acadêmico</span>
+              </div>
+              <h5 class="misc-card-title">InfoVis — 2019.1</h5>
+              <p class="misc-card-desc">Análise do Perfil e do Desempenho dos Alunos do Ensino Superior Brasileiro através de Visualizações dos Dados do ENADE 2017.</p>
+              <div class="misc-card-footer">
+                <a href="infovis-2019-1/index.html" target="_blank" class="misc-card-link">
+                  <i class='bx bx-globe'></i> Acessar projeto <i class='bx bx-link-external'></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="misc-card">
+              <div class="misc-card-header">
+                <span class="misc-tag">HCI · Análise de Dados</span>
+                <span class="misc-tag misc-tag-secondary">Pesquisa — INTERACT 2025</span>
+              </div>
+              <h5 class="misc-card-title">Arcano</h5>
+              <p class="misc-card-desc">Ferramenta web que gera perguntas sobre dados para auxiliar analistas não-especialistas na formulação de hipóteses exploratórias. Desenvolvido como parte da pesquisa publicada no INTERACT 2025.</p>
+              <div class="misc-card-footer">
+                <a href="https://arcano-801975.gitlab.io/" target="_blank" class="misc-card-link">
+                  <i class='bx bx-globe'></i> Acessar projeto <i class='bx bx-link-external'></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
         </div>
-        
+
       </div>
     </section>
     <!-- End Misc Section -->

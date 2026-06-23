@@ -29,9 +29,7 @@
 
         var scrollto = target.offset().top;
 
-        $('html, body').animate({
-          scrollTop: scrollto
-        }, 1500, 'easeInOutExpo');
+        $('html, body').scrollTop(scrollto);
 
         if ($(this).parents('.nav-menu, .mobile-nav').length) {
           $('.nav-menu .active, .mobile-nav .active').removeClass('active');
@@ -95,9 +93,7 @@
   });
 
   $('.back-to-top').click(function() {
-    $('html, body').animate({
-      scrollTop: 0
-    }, 1500, 'easeInOutExpo');
+    $('html, body').scrollTop(0);
     return false;
   });
 

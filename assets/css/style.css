@@ -135,6 +135,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Desktop Navigation */
 .nav-menu {
   padding-top: 30px;
+  margin-right: -15px;
 }
 
 .nav-menu * {
@@ -164,9 +165,17 @@ h1, h2, h3, h4, h5, h6 {
   color: #6f7180;
 }
 
-.nav-menu a:hover, .nav-menu .active > a, .nav-menu li:hover > a {
+.nav-menu a:hover, .nav-menu li:hover > a {
   text-decoration: none;
   color: #fff;
+}
+
+.nav-menu .active > a {
+  text-decoration: none;
+  color: #fff;
+  background: rgba(20, 157, 221, 0.12);
+  border-left: 3px solid #149ddd;
+  padding-left: 12px;
 }
 
 .nav-menu a:hover i, .nav-menu .active > a i, .nav-menu li:hover > a i {
@@ -290,6 +299,7 @@ h1, h2, h3, h4, h5, h6 {
 section {
   padding: 60px 0;
   overflow: hidden;
+  min-height: 100vh;
 }
 
 .section-bg {
@@ -335,9 +345,31 @@ section {
 # About
 --------------------------------------------------------------*/
 .about .content h3 {
+  font-family: "Raleway", sans-serif;
+  font-size: 20px;
   font-weight: 700;
-  font-size: 26px;
   color: #173b6c;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #d0e8f5;
+  margin-top: 28px;
+  margin-bottom: 22px;
+}
+
+.about .content h3::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 22px;
+  background: #149ddd;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.about .content h3:first-of-type {
+  margin-top: 0;
 }
 
 .about .content p {
@@ -350,17 +382,116 @@ section {
 }
 
 .about .content ul li {
-  padding-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f0f5fb;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.about .content ul i {
-  font-size: 20px;
-  padding-right: 2px;
+.about .content ul li:last-child {
+  border-bottom: none;
+}
+
+.about .content ul li > i {
+  font-size: 18px;
+  padding-right: 0;
   color: #149ddd;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .about .content p:last-child {
   margin-bottom: 0;
+}
+
+/* ── About: email list ───────────────────────────────── */
+.about-email-list {
+  list-style: none;
+  padding: 0;
+}
+
+.about-email-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f0f5fb;
+}
+
+.about-email-list li:last-child {
+  border-bottom: none;
+}
+
+.about-email-list li > i {
+  font-size: 18px;
+  color: #149ddd;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.about-email-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0d6e9a;
+  background: #dff3fc;
+  padding: 1px 8px;
+  border-radius: 8px;
+  margin-bottom: 3px;
+  letter-spacing: 0.04em;
+}
+
+.about-email-list a {
+  font-size: 13px;
+  color: #272829;
+  display: block;
+}
+
+.about-email-list a:hover { color: #149ddd; }
+
+/* ── About: profile link cards ───────────────────────── */
+.about-profile-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.about-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid #d0e8f5;
+  border-radius: 8px;
+  color: #173b6c;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+
+.about-profile-link:hover {
+  background: #f0f7fd;
+  color: #149ddd;
+  border-color: #b8d8ef;
+  text-decoration: none;
+}
+
+.about-profile-link > i:first-child,
+.about-profile-link > svg {
+  font-size: 20px;
+  color: #149ddd;
+  flex-shrink: 0;
+}
+
+.about-link-arrow {
+  margin-left: auto;
+  font-size: 18px;
+  color: #c0ccd8;
 }
 
 /*--------------------------------------------------------------
@@ -1332,10 +1463,12 @@ section {
   }
 }
 
-/* --- About: email/URL overflow --- */
+/* --- About responsive --- */
 @media (max-width: 576px) {
-  .about .content ul li,
-  .about .content ul li a {
+  .about-profile-links {
+    grid-template-columns: 1fr;
+  }
+  .about-email-list a {
     overflow-wrap: break-word;
     word-break: break-all;
   }
