@@ -196,6 +196,90 @@ a:hover { color: #37b3ed; }
   margin-bottom: 12px;
 }
 
+/* ── Cronograma ──────────────────────────────────────── */
+.schedule-wrapper {
+  overflow-x: auto;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.schedule-table thead th {
+  text-align: left;
+  font-family: "Raleway", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: var(--bg-section);
+  padding: 10px 22px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.schedule-th-week { width: 90px; }
+.schedule-th-date { width: 90px; }
+
+.schedule-table tbody td {
+  padding: 11px 22px;
+  border-bottom: 1px solid #f0f5fb;
+  color: var(--text);
+  vertical-align: middle;
+}
+.schedule-table tbody tr:last-child td { border-bottom: none; }
+.schedule-table tbody tr:hover td { background: #f0f7fd; }
+
+.schedule-table tbody td:last-child {
+  white-space: nowrap;
+}
+
+.schedule-date {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--primary-dark);
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-week {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.schedule-holiday td { background: #f7f7f7; }
+.schedule-holiday td:first-child .schedule-week { background: #8a8a8a; }
+.schedule-holiday td:nth-child(2) { color: var(--text-muted); font-style: italic; }
+.schedule-holiday .schedule-date { color: var(--text-muted); background: #eee; border-color: #e0e0e0; }
+
+.schedule-eval td { background: #fff8e6; }
+.schedule-eval td:first-child .schedule-week { background: #b8860b; }
+.schedule-eval td:nth-child(2) { font-weight: 600; }
+.schedule-eval .schedule-date {
+  color: #fff;
+  background: #b8860b;
+  border-color: #b8860b;
+  font-size: 13.5px;
+}
+
+.month-start td { border-top: 2px solid var(--primary-mid); }
+
 /* ── Livros ──────────────────────────────────────────── */
 .book-list { list-style: none; }
 
@@ -416,4 +500,8 @@ details[open] .video-accordion-icon { transform: rotate(180deg); }
   .material-empty { padding: 16px; }
   .video-accordion > summary { padding: 12px 16px; }
   .video-accordion-body { padding: 0 16px 16px; }
+  .schedule-table thead th { padding: 10px 16px; }
+  .schedule-table tbody td { padding: 10px 16px; }
+  .plan-body { padding: 16px; }
+  .book-item { padding: 16px; }
 }
