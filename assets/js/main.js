@@ -23,16 +23,38 @@
   // Smooth scroll for the navigation menu and links with .scrollto classes
   var scrolling = false;
 
+  function scrollToSection(hash, instant) {
+    var target = $(hash);
+    if (!target.length) return false;
+
+    var scrollto = target.offset().top;
+
+    $('.nav-menu .active, .mobile-nav .active').removeClass('active');
+    $('.nav-menu, #mobile-nav').find('a[href="' + hash + '"]').closest('li').addClass('active');
+
+    if (instant) {
+      $('html, body').scrollTop(scrollto);
+    } else {
+      scrolling = true;
+      $('html, body').animate({ scrollTop: scrollto }, 500, 'swing', function() {
+        scrolling = false;
+      });
+    }
+
+    return true;
+  }
+
   $(document).on('click', '.nav-menu a, .scrollto', function(e) {
     if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
       e.preventDefault();
-      var target = $(this.hash);
-      if (target.length) {
-        var scrollto = target.offset().top;
 
-        if ($(this).parents('.nav-menu, .mobile-nav').length) {
-          $('.nav-menu .active, .mobile-nav .active').removeClass('active');
-          $(this).closest('li').addClass('active');
+      if (scrollToSection(this.hash)) {
+        // Update the address bar so the section can be shared/bookmarked,
+        // without triggering the browser's own (jumpy) hash navigation.
+        if (history.pushState) {
+          history.pushState(null, '', this.hash);
+        } else {
+          location.hash = this.hash;
         }
 
         if ($('body').hasClass('mobile-nav-active')) {
@@ -40,15 +62,18 @@
           $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
         }
 
-        scrolling = true;
-        $('html, body').animate({ scrollTop: scrollto }, 500, 'swing', function() {
-          scrolling = false;
-        });
-
         return false;
       }
     }
   });
+
+  // If the page was opened with a section hash in the URL (e.g. a shared
+  // link to index.html#teaching), jump straight to that section.
+  if (location.hash) {
+    $(window).on('load', function() {
+      scrollToSection(location.hash, true);
+    });
+  }
 
   $(document).on('click', '.mobile-nav-toggle', function(e) {
     $('body').toggleClass('mobile-nav-active');
