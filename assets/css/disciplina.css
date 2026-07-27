@@ -184,6 +184,63 @@ a:hover { color: #37b3ed; }
   font-size: 14px;
 }
 
+/* ── Plano da disciplina ─────────────────────────────── */
+.plan-body {
+  padding: 18px 22px;
+}
+
+.plan-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* ── Livros ──────────────────────────────────────────── */
+.book-list { list-style: none; }
+
+.book-item {
+  display: flex;
+  gap: 18px;
+  padding: 18px 22px;
+  border-bottom: 1px solid #f0f5fb;
+}
+.book-item:last-child { border-bottom: none; }
+
+.book-cover {
+  width: 90px;
+  height: auto;
+  flex-shrink: 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.book-info { flex: 1; min-width: 0; }
+
+.book-ref {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.book-ref strong { color: var(--text); }
+.book-ref a { word-break: break-word; }
+
+.book-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 7px 14px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.book-open-btn:hover { background: var(--primary-mid); color: #fff; }
+.book-open-btn i { font-size: 15px; }
+
 /* ── Footer ──────────────────────────────────────────── */
 .disc-footer {
   background: #040b14;
