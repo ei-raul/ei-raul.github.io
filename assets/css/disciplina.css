@@ -278,6 +278,11 @@ a:hover { color: #37b3ed; }
   font-size: 13.5px;
 }
 
+.schedule-event td { background: #eaf6fb; }
+.schedule-event td:first-child .schedule-week { background: #1f8aa8; }
+.schedule-event td:nth-child(2) { font-style: italic; }
+.schedule-event .schedule-date { color: #fff; background: #1f8aa8; border-color: #1f8aa8; }
+
 .month-start td { border-top: 2px solid var(--primary-mid); }
 
 /* ── Livros ──────────────────────────────────────────── */
@@ -285,6 +290,7 @@ a:hover { color: #37b3ed; }
 
 .book-item {
   display: flex;
+  align-items: flex-start;
   gap: 18px;
   padding: 18px 22px;
   border-bottom: 1px solid #f0f5fb;
