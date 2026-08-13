@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descomplica AI — Projeto de Extensão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF4EC;          /* warm oat */
+    --surface:#FFFFFF;
+    --ink:#221A2B;         /* deep plum-black */
+    --muted:#6E6478;
+    --line:#EEE1D3;        /* warm hairline */
+    --orange:#E8641A;      /* confirmado */
+    --orange-soft:#FBE3D0;
+    --orange-ink:#9C3D07;
+    --violet:#6B49B6;      /* sugerido */
+    --violet-soft:#EBE3F8;
+    --violet-ink:#4A2E86;
+    --shadow:0 1px 2px rgba(34,26,43,.05), 0 10px 30px -18px rgba(34,26,43,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:76px}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .mono{font-family:"Space Mono",ui-monospace,monospace}
+
+  /* ---------- top nav ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,244,236,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+  .brand{display:flex;align-items:baseline;gap:8px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:18px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+  .brand .ai{color:var(--orange);font-style:italic}
+  .nav-links{display:flex;gap:4px}
+  .nav-links a{
+    font-size:13.5px;font-weight:500;color:var(--muted);text-decoration:none;
+    padding:8px 12px;border-radius:999px;transition:color .2s,background .2s;white-space:nowrap;
+  }
+  .nav-links a:hover{color:var(--ink);background:#00000008}
+  .nav-links a.active{color:var(--orange-ink);background:var(--orange-soft)}
+  .nav-toggle{display:none}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:88px 0 64px;overflow:hidden}
+  .hero .glow{position:absolute;inset:0;pointer-events:none;z-index:0}
+  .hero .glow::before{content:"";position:absolute;width:520px;height:520px;right:-140px;top:-160px;background:radial-gradient(circle,rgba(232,100,26,.18),transparent 62%);border-radius:50%}
+  .hero .glow::after{content:"";position:absolute;width:460px;height:460px;left:-160px;top:120px;background:radial-gradient(circle,rgba(107,73,182,.16),transparent 62%);border-radius:50%}
+  .hero-inner{position:relative;z-index:1}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 4px var(--orange-soft)}
+  h1.title{
+    font-family:"Bricolage Grotesque",sans-serif;font-weight:800;letter-spacing:-.035em;line-height:.95;
+    font-size:clamp(54px,10vw,116px);margin:22px 0 6px;
+  }
+  h1.title .word{display:inline-block}
+  h1.title .ai{position:relative;color:var(--orange);font-style:italic}
+  h1.title .ai::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:3px;background:repeating-linear-gradient(90deg,var(--orange) 0 8px,transparent 8px 14px)}
+  .dual{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+  .dual span{font-family:"Space Mono",monospace;font-size:12.5px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+  .dual b{color:var(--orange-ink)}
+  .subtitle{font-size:clamp(18px,2.4vw,23px);max-width:640px;color:var(--ink);margin-top:12px;font-weight:500}
+  .subtitle .em{color:var(--violet-ink);font-weight:700}
+
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+  .fact{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+  .fact .k{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .fact .v{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:26px;margin-top:2px;letter-spacing:-.02em}
+  .fact .v small{font-size:13px;font-weight:600;color:var(--muted)}
+
+  /* ---------- sections ---------- */
+  section{padding:66px 0;border-top:1px solid var(--line)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:30px}
+  .sec-num{font-family:"Space Mono",monospace;font-size:13px;color:var(--orange);font-weight:700;padding-top:6px}
+  .sec-head h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(28px,4vw,40px);letter-spacing:-.03em;line-height:1.05}
+  .sec-head p{color:var(--muted);max-width:560px;margin-top:6px;font-size:15px}
+
+  .lead{font-size:18px;max-width:760px;color:var(--ink)}
+  .lead + .lead{margin-top:16px}
+  .lead b{color:var(--violet-ink)}
+
+  /* objetivos */
+  .goal-general{background:var(--ink);color:#fff;border-radius:var(--radius);padding:30px 32px;margin-bottom:26px;position:relative;overflow:hidden}
+  .goal-general::before{content:"";position:absolute;right:-60px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(232,100,26,.4),transparent 65%)}
+  .goal-general .lbl{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e8641a;position:relative}
+  .goal-general p{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:clamp(19px,2.6vw,25px);line-height:1.34;margin-top:10px;letter-spacing:-.01em;position:relative}
+  .goal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .goal{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .goal .n{font-family:"Space Mono",monospace;font-weight:700;color:var(--orange);font-size:14px;flex:none;padding-top:1px}
+  .goal p{font-size:14.5px}
+
+  /* frentes */
+  .frentes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .frente{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative}
+  .frente:hover{transform:translateY(-3px);box-shadow:0 1px 2px rgba(34,26,43,.05),0 22px 40px -20px rgba(34,26,43,.5)}
+  .frente .tag{display:inline-block;width:34px;height:34px;border-radius:10px;margin-bottom:14px;position:relative}
+  .frente h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:18px;letter-spacing:-.02em}
+  .frente .role{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:2px 0 10px}
+  .frente p{font-size:14px;color:var(--ink)}
+  .frente .more{max-height:0;overflow:hidden;transition:max-height .35s ease;font-size:13.5px;color:var(--muted)}
+  .frente .more p{color:var(--muted);margin-top:10px}
+  .frente.open .more{max-height:220px}
+  .frente .toggle{position:absolute;top:20px;right:20px;font-family:"Space Mono",monospace;font-size:18px;color:var(--muted);line-height:1;transition:transform .3s}
+  .frente.open .toggle{transform:rotate(45deg)}
+
+  /* publico + locais */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+  .panel h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+  .panel h3 .pin{width:8px;height:8px;border-radius:50%;background:var(--violet)}
+  .panel p{font-size:14.5px;color:var(--ink)}
+  .panel p + p{margin-top:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chips span{font-size:12.5px;font-family:"Space Mono",monospace;padding:5px 11px;border-radius:999px;background:var(--violet-soft);color:var(--violet-ink)}
+
+  /* ---------- cronograma (signature) ---------- */
+  .tl-controls{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;justify-content:space-between;margin-bottom:26px}
+  .filter-group .fg-label{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .segbar{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;gap:2px;box-shadow:var(--shadow)}
+  .seg{border:none;background:none;font-family:"Inter",sans-serif;font-size:13px;font-weight:600;color:var(--muted);padding:7px 15px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .18s}
+  .seg .swatch{width:10px;height:10px;border-radius:3px}
+  .seg[data-track="confirmado"] .swatch{background:var(--orange)}
+  .seg[data-track="sugerido"] .swatch{background:var(--violet);border:1.5px dashed var(--violet);background:transparent}
+  .seg:hover{color:var(--ink)}
+  .seg.active{color:#fff;background:var(--ink)}
+  .seg.active[data-track="confirmado"]{background:var(--orange)}
+  .seg.active[data-track="sugerido"]{background:var(--violet)}
+  .seg.active .swatch{background:#fff}
+  .seg.active[data-track="sugerido"] .swatch{border-color:#fff;background:transparent}
+
+  .frente-filter{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;max-width:520px}
+  .ff{border:1px solid var(--line);background:var(--surface);font-size:12px;font-family:"Space Mono",monospace;padding:5px 11px;border-radius:999px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:6px;transition:all .18s}
+  .ff .d{width:8px;height:8px;border-radius:50%}
+  .ff:hover{border-color:var(--muted)}
+  .ff.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .legend-note{font-size:12.5px;color:var(--muted);margin-bottom:22px}
+  .legend-note b.o{color:var(--orange-ink)}
+  .legend-note b.v{color:var(--violet-ink)}
+
+  .timeline{position:relative;padding-left:0}
+  .timeline::before{content:"";position:absolute;left:118px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--orange),var(--violet));opacity:.28}
+  .tl-item{display:grid;grid-template-columns:104px 1fr;gap:26px;position:relative;padding:9px 0;transition:opacity .3s,transform .3s}
+  .tl-item.hide{display:none}
+  .tl-date{font-family:"Space Mono",monospace;font-size:12.5px;color:var(--muted);text-align:right;padding-top:16px;line-height:1.35}
+  .tl-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px 16px 22px;box-shadow:var(--shadow)}
+  .tl-card::before{content:"";position:absolute;left:-30px;top:20px;width:14px;height:14px;border-radius:50%;background:var(--bg);z-index:2}
+  .tl-item[data-track="confirmado"] .tl-card{border-left:4px solid var(--orange)}
+  .tl-item[data-track="confirmado"] .tl-card::before{border:3px solid var(--orange);background:var(--orange)}
+  .tl-item[data-track="sugerido"] .tl-card{border-left:4px dashed var(--violet)}
+  .tl-item[data-track="sugerido"] .tl-card::before{border:2.5px dashed var(--violet);background:var(--bg)}
+  .tl-meta{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:5px}
+  .tl-badge{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:6px;font-weight:700}
+  .tl-badge.confirmado{background:var(--orange-soft);color:var(--orange-ink)}
+  .tl-badge.sugerido{background:var(--violet-soft);color:var(--violet-ink)}
+  .tl-frente{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .tl-frente .d{width:8px;height:8px;border-radius:50%}
+  .tl-card h4{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;letter-spacing:-.01em;margin-bottom:3px}
+  .tl-card p{font-size:13.5px;color:var(--muted)}
+  .tl-carga{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:8px;display:inline-block;border:1px solid var(--line);padding:2px 8px;border-radius:6px}
+  .tl-empty{text-align:center;color:var(--muted);padding:40px;font-size:14px;display:none}
+
+  /* resultados / metas */
+  .metas{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;box-shadow:var(--shadow)}
+  .metric .big{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:40px;letter-spacing:-.03em;line-height:1;color:var(--orange)}
+  .metric .lbl{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .result-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .rescol{border-top:3px solid var(--violet);padding-top:14px}
+  .rescol h4{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+  .rescol p{font-size:14px;color:var(--muted)}
+
+  /* avaliacao */
+  .eval{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .ecard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .ecard .num{font-family:"Space Mono",monospace;color:var(--violet);font-weight:700;font-size:13px}
+  .ecard h4{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16px;margin:6px 0 8px}
+  .ecard ul{list-style:none;font-size:13.5px;color:var(--muted)}
+  .ecard li{padding-left:16px;position:relative;margin-bottom:5px}
+  .ecard li::before{content:"→";position:absolute;left:0;color:var(--orange)}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:44px 0 60px;margin-top:20px}
+  .foot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:30px}
+  .foot-grid .fk{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .foot-grid .fv{font-size:14.5px;font-weight:600;margin-top:3px}
+  .foot-brand{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:22px;letter-spacing:-.02em}
+  .foot-brand .ai{color:var(--orange);font-style:italic}
+  .foot-note{font-size:12.5px;color:var(--muted);margin-top:6px}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:860px){
+    .facts,.metas{grid-template-columns:repeat(2,1fr)}
+    .goal-grid,.frentes,.split,.result-cols,.eval,.foot-grid{grid-template-columns:1fr}
+    .frentes{grid-template-columns:1fr 1fr}
+    .nav-links{display:none}
+    .tl-controls{flex-direction:column;align-items:stretch}
+    .frente-filter{justify-content:flex-start;max-width:none}
+  }
+  @media (max-width:560px){
+    .frentes{grid-template-columns:1fr}
+    .timeline::before{left:9px}
+    .tl-item{grid-template-columns:1fr;gap:6px}
+    .tl-date{text-align:left;padding-top:0;padding-left:34px}
+    .tl-card{margin-left:0}
+    .tl-card::before{left:2px;top:-22px}
+    .tl-item .tl-card{margin-left:0}
+    .timeline{padding-left:26px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none;transition:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#topo" class="brand">Descomplica <span class="ai">AI</span></a>
+    <nav class="nav-links">
+      <a href="#sobre">Visão geral</a>
+      <a href="#objetivos">Objetivos</a>
+      <a href="#frentes">Frentes</a>
+      <a href="#cronograma">Cronograma</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#avaliacao">Avaliação</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero" id="topo">
+  <div class="glow"></div>
+  <div class="wrap hero-inner">
+    <span class="eyebrow"><span class="dot"></span>Projeto de Extensão · Sistemas de Informação · UniCatólica</span>
+    <h1 class="title"><span class="word">Descomplica</span> <span class="word ai">AI</span></h1>
+    <div class="dual">
+      <span><b>AI</b> · inteligência artificial</span>
+      <span>“descomplica <b>aí</b>” · o jeito da gente</span>
+    </div>
+    <p class="subtitle">Descomplicando o futuro que já chegou: levar a IA da universidade para a <span class="em">escola e a comunidade</span> de Quixadá — de forma acessível, prática e crítica.</p>
+
+    <div class="facts">
+      <div class="fact reveal"><div class="k">Público estimado</div><div class="v" data-count="500">0</div></div>
+      <div class="fact reveal"><div class="k">Frentes de ação</div><div class="v">5</div></div>
+      <div class="fact reveal"><div class="k">Executado por</div><div class="v">Calouros <small>1º–2º sem.</small></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">01</span>
+      <div><h2>O que é o projeto</h2><p>Uma ação coordenada que aproxima a sociedade de um tema em alta.</p></div>
+    </div>
+    <p class="lead reveal">A IA já está no cotidiano, mas o entendimento público não acompanhou. Falta o essencial: <b>usar a tecnologia de forma consciente, ética e segura.</b></p>
+    <p class="lead reveal">O <b>Descomplica AI</b> ocupa esse espaço: calouros de Sistemas de Informação levam IA para escolas e para a comunidade, traduzindo conceitos complexos em experiências simples — formação, serviço à comunidade e convite à universidade, tudo ao mesmo tempo.</p>
+  </div>
+</section>
+
+<!-- OBJETIVOS -->
+<section id="objetivos">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">02</span>
+      <div><h2>Objetivos</h2><p>Um objetivo geral que orienta e sete objetivos específicos que o tornam concreto.</p></div>
+    </div>
+    <div class="goal-general reveal">
+      <div class="lbl">Objetivo geral</div>
+      <p>Promover a compreensão crítica e prática da IA no ensino médio e na comunidade de Quixadá, por meio de ações de alunos de Sistemas de Informação — aproximando sociedade e universidade.</p>
+    </div>
+    <div class="goal-grid">
+      <div class="goal reveal"><span class="n">01</span><p>Desmistificar conceitos de IA com linguagem acessível e exemplos do cotidiano.</p></div>
+      <div class="goal reveal"><span class="n">02</span><p>Ensinar o ensino médio a usar IA de forma proveitosa e responsável nos estudos.</p></div>
+      <div class="goal reveal"><span class="n">03</span><p>Refletir sobre ética: desinformação, vieses, privacidade e mundo do trabalho.</p></div>
+      <div class="goal reveal"><span class="n">04</span><p>Alertar sobre riscos do uso mal-intencionado da IA, como deepfakes e golpes.</p></div>
+      <div class="goal reveal"><span class="n">05</span><p>Produzir conteúdo educativo em mídias sociais, ampliando o alcance.</p></div>
+      <div class="goal reveal"><span class="n">06</span><p>Desenvolver nos executores comunicação, trabalho em equipe e responsabilidade social.</p></div>
+      <div class="goal reveal" style="grid-column:1/-1"><span class="n">07</span><p>Aproximar o ensino médio da universidade, despertando interesse pela área de tecnologia.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FRENTES -->
+<section id="frentes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">03</span>
+      <div><h2>Frentes de trabalho</h2><p>Um programa guarda-chuva com equipes pequenas. Cada frente tem um roteiro pronto — toque para ver como funciona.</p></div>
+    </div>
+    <div class="frentes">
+      <div class="frente reveal" data-frente="oficinas">
+        <span class="toggle">+</span>
+        <span class="tag" style="background:var(--orange-soft)"></span>
+        <h3>Oficinas “Mão na IA”</h3>
+        <div class="role">Nas escolas · o coração</div>
+        <p>Atividades práticas de 1h–1h30, em duplas, ensinando a usar IA para estudar e entender como a máquina “pensa”.</p>
+        <div class="more"><p>Roteiro pronto entregue às equipes. Temas rotativos por semestre: IA para estudar, ética e deepfakes, profissões do futuro.</p></div>
+      </div>
+      <div class="frente reveal" data-frente="conteudo">
+        <span class="toggle">+</span>
+        <span class="tag" style="background:var(--violet-soft)"></span>
+        <h3>Estúdio de Conteúdo</h3>
+        <div class="role">Redes sociais · vitrine</div>
+        <p>Reels e cards curtos no Instagram e TikTok — “o que é um deepfake?”, “3 formas de usar IA para estudar”.</p>
+        <div class="more"><p>Amplia o alcance além do presencial. Meta de publicação semanal nos períodos letivos.</p></div>
+      </div>
+      <div class="frente reveal" data-frente="rodas">
+        <span class="toggle">+</span>
+        <span class="tag" style="background:#DCEBE4"></span>
+        <h3>Rodas de Conversa</h3>
+        <div class="role">Reflexão · diálogo</div>
+        <p>Encontros sobre ética, desinformação, vieses e futuro do trabalho — formato de conversa, não de palestra.</p>
+        <div class="more"><p>Duas rodas por edição: “ética e desinformação” e “IA e o mundo do trabalho”. Os debates viram conteúdo para as redes.</p></div>
+      </div>
+      <div class="frente reveal" data-frente="evento">
+        <span class="toggle">+</span>
+        <span class="tag" style="background:var(--orange-soft)"></span>
+        <h3>Evento no Campus / SATI</h3>
+        <div class="role">O evento-âncora</div>
+        <p>Feira de IA na UniCatólica: estandes, demonstrações, minioficinas e tour pelos laboratórios para as escolas visitantes.</p>
+        <div class="more"><p>É aqui que o adolescente pisa no campus e se imagina ali — o momento mais forte para despertar o desejo de ingressar.</p></div>
+      </div>
+      <div class="frente reveal" data-frente="seguranca">
+        <span class="toggle">+</span>
+        <span class="tag" style="background:#F3DDE0"></span>
+        <h3>IA &amp; Segurança</h3>
+        <div class="role">Comunidade · opcional</div>
+        <p>Ações sobre golpes com IA — voz clonada, mensagens falsas — para famílias e idosos, com paróquias e associações.</p>
+        <div class="more"><p>Alto impacto social e reforça a dimensão de transformação do projeto.</p></div>
+      </div>
+      <div class="frente reveal" data-frente="coord">
+        <span class="toggle">+</span>
+        <span class="tag" style="background:var(--ink)"></span>
+        <h3>Coordenação &amp; Gestão</h3>
+        <div class="role">Cross-cutting · bastidores</div>
+        <p>Estruturação das equipes, parcerias com escolas e avaliação contínua que mantém o projeto melhorando a cada ciclo.</p>
+        <div class="more"><p>Times pequenos com um líder cada, ensaio-geral antes de ir a campo e supervisão docente em todas as etapas.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLICO E LOCAIS -->
+<section id="publico">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">04</span>
+      <div><h2>Público &amp; locais</h2><p>Quem o projeto alcança e onde as ações acontecem.</p></div>
+    </div>
+    <div class="split">
+      <div class="panel reveal">
+        <h3><span class="pin"></span>Quem alcançamos</h3>
+        <p><b>Prioritário:</b> estudantes do ensino médio (≈15–18 anos) de Quixadá, em fase de escolha do futuro acadêmico.</p>
+        <p><b>Complementar:</b> famílias e idosos, mais vulneráveis a golpes e desinformação com IA.</p>
+        <p><b>E também:</b> os alunos de SI, executores <em>e</em> beneficiários da vivência.</p>
+      </div>
+      <div class="panel reveal">
+        <h3><span class="pin"></span>Onde acontece</h3>
+        <div class="chips">
+          <span>Escolas de ensino médio</span>
+          <span>Campus da UniCatólica</span>
+          <span>Instagram &amp; TikTok</span>
+          <span>Paróquias &amp; associações</span>
+        </div>
+        <p style="margin-top:14px">Oficinas e rodas nas escolas; evento-âncora no campus; conteúdo no digital; segurança em espaços comunitários.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRONOGRAMA (signature) -->
+<section id="cronograma">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">05</span>
+      <div><h2>Cronograma em duas trilhas</h2><p>O que já está planejado e o que sugerimos acrescentar. Filtre por trilha e por frente.</p></div>
+    </div>
+
+    <p class="legend-note reveal"><b class="o">■ Confirmado</b> — marcos e datas já planejados (aproximados, ainda ajustáveis). &nbsp; <b class="v">▢ Sugerido</b> — ações que agregam valor ao projeto.</p>
+
+    <div class="tl-controls reveal">
+      <div class="filter-group">
+        <div class="fg-label">Trilha</div>
+        <div class="segbar" id="trackBar">
+          <button class="seg active" data-track="all">Tudo</button>
+          <button class="seg" data-track="confirmado"><span class="swatch"></span>Confirmado</button>
+          <button class="seg" data-track="sugerido"><span class="swatch"></span>Sugerido</button>
+        </div>
+      </div>
+      <div class="filter-group" style="flex:1">
+        <div class="fg-label">Frente</div>
+        <div class="frente-filter" id="frenteBar"></div>
+      </div>
+    </div>
+
+    <div class="timeline" id="timeline"></div>
+    <div class="tl-empty" id="tlEmpty">Nenhuma ação com esses filtros.</div>
+  </div>
+</section>
+
+<!-- RESULTADOS -->
+<section id="resultados">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">06</span>
+      <div><h2>Resultados esperados</h2><p>Metas concretas e o que muda para cada público.</p></div>
+    </div>
+    <div class="metas">
+      <div class="metric reveal"><div class="big" data-count="6">0</div><div class="lbl">escolas parceiras por edição</div></div>
+      <div class="metric reveal"><div class="big" data-count="10">0</div><div class="lbl">oficinas “Mão na IA” realizadas</div></div>
+      <div class="metric reveal"><div class="big" data-count="200">0</div><div class="lbl">estudantes do ensino médio alcançados</div></div>
+      <div class="metric reveal"><div class="big" data-count="1">0</div><div class="lbl">evento-âncora no campus</div></div>
+    </div>
+    <div class="result-cols">
+      <div class="rescol reveal"><h4>Para a comunidade</h4><p>Mais compreensão sobre IA e população mais atenta a golpes e desinformação.</p></div>
+      <div class="rescol reveal"><h4>Para os alunos de SI</h4><p>Comunicação, trabalho em equipe e autoconfiança desde o início do curso.</p></div>
+      <div class="rescol reveal"><h4>Para a instituição</h4><p>Vínculo com as escolas e interesse de jovens pela formação em tecnologia.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- AVALIACAO -->
+<section id="avaliacao">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">07</span>
+      <div><h2>Como avaliamos</h2><p>Avaliação contínua e processual em três dimensões.</p></div>
+    </div>
+    <div class="eval">
+      <div class="ecard reveal">
+        <div class="num">01</div><h4>Impacto no público</h4>
+        <ul>
+          <li>Nº de escolas e de pessoas atendidas</li>
+          <li>Alcance e engajamento nas redes</li>
+          <li>Satisfação por QR code ao fim das ações</li>
+          <li>Percepção antes × depois das oficinas</li>
+        </ul>
+      </div>
+      <div class="ecard reveal">
+        <div class="num">02</div><h4>Formação dos executores</h4>
+        <ul>
+          <li>Comprometimento e qualidade da atuação</li>
+          <li>Competências extensionistas desenvolvidas</li>
+          <li>Autoavaliação e avaliação entre pares</li>
+          <li>Rodas de feedback a cada ciclo</li>
+        </ul>
+      </div>
+      <div class="ecard reveal">
+        <div class="num">03</div><h4>Gestão do projeto</h4>
+        <ul>
+          <li>Reuniões periódicas de acompanhamento</li>
+          <li>Balanço ao fim de cada semestre</li>
+          <li>Registros: relatórios, fotos, depoimentos</li>
+          <li>Base para a prestação de contas e a 2ª edição</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid" style="grid-template-columns:1fr">
+      <div><div class="fk">Proponente</div><div class="fv">Raul de Araujo Lima</div></div>
+    </div>
+    <div class="foot-brand">Descomplica <span class="ai">AI</span></div>
+    <div class="foot-note">Projeto de Extensão · Curso de Sistemas de Informação · UniCatólica</div>
+    <div class="foot-note" style="margin-top:10px">Página criada com o auxílio do Claude por <a href="../index.html" style="color:var(--orange-ink);font-weight:600;text-decoration:none">Raul de Araújo Lima</a>.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- data: as duas trilhas do cronograma ---------- */
+  var FRENTES = {
+    coord:      {label:"Coordenação",  color:"#221A2B"},
+    oficinas:   {label:"Oficinas",     color:"#E8641A"},
+    conteudo:   {label:"Conteúdo",     color:"#6B49B6"},
+    rodas:      {label:"Rodas",        color:"#3F9D74"},
+    evento:     {label:"Evento/SATI",  color:"#D98A1E"},
+    seguranca:  {label:"Segurança",    color:"#C0556B"}
+  };
+
+  var ITEMS = [
+    {sort:20260828, date:"28 ago – 17 set<br>2026", track:"confirmado", frente:"coord",
+      title:"Estruturação e capacitação da equipe", desc:"Definição das equipes e líderes e formação inicial dos alunos executores.", carga:"8h"},
+    {sort:20260910, date:"set – out<br>2026", track:"sugerido", frente:"conteudo",
+      title:"Identidade visual da marca", desc:"Logo, cores e assinatura — explorando o duplo sentido AI / “aí”.", carga:""},
+    {sort:20260924, date:"24 set<br>2026", track:"confirmado", frente:"coord",
+      title:"Reunião de estruturação", desc:"Apresentação do projeto e definição de equipes e líderes.", carga:""},
+    {sort:20261008, date:"08 out<br>2026", track:"confirmado", frente:"coord",
+      title:"Capacitação das equipes", desc:"Formação dos alunos que irão compor as equipes de trabalho.", carga:""},
+    {sort:20261015, date:"out<br>2026", track:"sugerido", frente:"oficinas",
+      title:"Ensaio-geral / oficina-piloto", desc:"As equipes apresentam a oficina entre si antes de ir a campo.", carga:""},
+    {sort:20261029, date:"29 out<br>2026", track:"confirmado", frente:"coord",
+      title:"Firmar parcerias com escolas", desc:"Identificar escolas e setores, elaborar ofícios e agendar as ações.", carga:"4h"},
+    {sort:20261101, date:"out – nov<br>2026", track:"sugerido", frente:"conteudo",
+      title:"Lançar o canal nas redes", desc:"Estúdio de Conteúdo no ar, com meta de publicação semanal.", carga:""},
+    {sort:20261105, date:"05 nov<br>2026", track:"confirmado", frente:"oficinas",
+      title:"1º ciclo de oficinas nas escolas", desc:"Visitas às escolas para compartilhar conhecimentos e experiências.", carga:"8h"},
+    {sort:20261110, date:"nov<br>2026", track:"sugerido", frente:"coord",
+      title:"Levantamento de expectativas", desc:"Ouvir o público: o que já sabem e o que querem aprender sobre IA.", carga:""},
+    {sort:20261126, date:"12 – 26 nov<br>2026", track:"confirmado", frente:"evento",
+      title:"Descomplica AI na SATI", desc:"Ações do projeto na Semana Acadêmica, no campus da UniCatólica.", carga:"4h"},
+    {sort:20270301, date:"mar<br>2027", track:"sugerido", frente:"rodas",
+      title:"Roda de conversa: ética e desinformação", desc:"Debate reflexivo com o público; o conteúdo vira material para as redes.", carga:""},
+    {sort:20270315, date:"mar – mai<br>2027", track:"sugerido", frente:"oficinas",
+      title:"Rotação temática das oficinas", desc:"IA para estudar · ética e deepfakes · profissões do futuro.", carga:""},
+    {sort:20270325, date:"04 fev – 25 mar<br>2027", track:"confirmado", frente:"evento",
+      title:"Evento de IA no campus", desc:"Planejamento e realização do evento na UniCatólica com o ensino médio.", carga:"8h"},
+    {sort:20270326, date:"25 mar<br>2027", track:"confirmado", frente:"oficinas",
+      title:"Novas ações em outras escolas", desc:"Planejar e realizar o segundo ciclo, ampliando o alcance.", carga:""},
+    {sort:20270410, date:"abr<br>2027", track:"sugerido", frente:"seguranca",
+      title:"IA e Segurança para a comunidade", desc:"Ação sobre golpes com IA, voltada a famílias e idosos (opcional).", carga:""},
+    {sort:20270510, date:"mai<br>2027", track:"sugerido", frente:"rodas",
+      title:"Roda de conversa: IA e o trabalho", desc:"As profissões vão acabar? Reflexão sobre o futuro do mundo do trabalho.", carga:""},
+    {sort:20270701, date:"jun – jul<br>2027", track:"sugerido", frente:"coord",
+      title:"Avaliação e 2ª edição", desc:"Consolidar indicadores, relatório final e planejar o próximo ciclo.", carga:""}
+  ];
+
+  /* ---------- render timeline ---------- */
+  var timelineEl = document.getElementById("timeline");
+  var emptyEl = document.getElementById("tlEmpty");
+  ITEMS.sort(function(a,b){return a.sort-b.sort;});
+
+  ITEMS.forEach(function(it){
+    var f = FRENTES[it.frente];
+    var el = document.createElement("div");
+    el.className = "tl-item";
+    el.setAttribute("data-track", it.track);
+    el.setAttribute("data-frente", it.frente);
+    el.innerHTML =
+      '<div class="tl-date">'+it.date+'</div>'+
+      '<div class="tl-card">'+
+        '<div class="tl-meta">'+
+          '<span class="tl-badge '+it.track+'">'+(it.track==="confirmado"?"Confirmado":"Sugerido")+'</span>'+
+          '<span class="tl-frente"><span class="d" style="background:'+f.color+'"></span>'+f.label+'</span>'+
+        '</div>'+
+        '<h4>'+it.title+'</h4>'+
+        '<p>'+it.desc+'</p>'+
+        (it.carga?'<span class="tl-carga">carga · '+it.carga+'</span>':'')+
+      '</div>';
+    timelineEl.appendChild(el);
+  });
+
+  /* ---------- frente filter buttons ---------- */
+  var frenteBar = document.getElementById("frenteBar");
+  var allBtn = document.createElement("button");
+  allBtn.className = "ff active"; allBtn.setAttribute("data-frente","all");
+  allBtn.textContent = "Todas";
+  frenteBar.appendChild(allBtn);
+  Object.keys(FRENTES).forEach(function(key){
+    var f = FRENTES[key];
+    var b = document.createElement("button");
+    b.className = "ff"; b.setAttribute("data-frente", key);
+    b.innerHTML = '<span class="d" style="background:'+f.color+'"></span>'+f.label;
+    frenteBar.appendChild(b);
+  });
+
+  /* ---------- filtering logic ---------- */
+  var curTrack = "all", curFrente = "all";
+  function applyFilters(){
+    var items = timelineEl.querySelectorAll(".tl-item");
+    var shown = 0;
+    items.forEach(function(el){
+      var okT = (curTrack==="all") || el.getAttribute("data-track")===curTrack;
+      var okF = (curFrente==="all") || el.getAttribute("data-frente")===curFrente;
+      if(okT && okF){ el.classList.remove("hide"); shown++; }
+      else { el.classList.add("hide"); }
+    });
+    emptyEl.style.display = shown===0 ? "block" : "none";
+    timelineEl.style.display = shown===0 ? "none" : "";
+  }
+
+  document.getElementById("trackBar").addEventListener("click", function(e){
+    var btn = e.target.closest(".seg"); if(!btn) return;
+    this.querySelectorAll(".seg").forEach(function(s){s.classList.remove("active");});
+    btn.classList.add("active");
+    curTrack = btn.getAttribute("data-track");
+    applyFilters();
+  });
+  frenteBar.addEventListener("click", function(e){
+    var btn = e.target.closest(".ff"); if(!btn) return;
+    this.querySelectorAll(".ff").forEach(function(s){s.classList.remove("active");});
+    btn.classList.add("active");
+    curFrente = btn.getAttribute("data-frente");
+    applyFilters();
+  });
+
+  /* ---------- frentes cards expand ---------- */
+  document.querySelectorAll(".frente").forEach(function(card){
+    card.addEventListener("click", function(){ card.classList.toggle("open");
+      card.querySelector(".toggle").textContent = card.classList.contains("open")?"+":"+";
+    });
+  });
+
+  /* ---------- active nav link on scroll ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+  var secs = links.map(function(a){return document.querySelector(a.getAttribute("href"));});
+  function onScroll(){
+    var pos = window.scrollY + 90;
+    var idx = 0;
+    for(var i=0;i<secs.length;i++){ if(secs[i] && secs[i].offsetTop<=pos) idx=i; }
+    links.forEach(function(l){l.classList.remove("active");});
+    if(links[idx]) links[idx].classList.add("active");
+  }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+
+  /* ---------- reveal on scroll ---------- */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!reduce && "IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target);} });
+    },{threshold:.12});
+    document.querySelectorAll(".reveal").forEach(function(el){io.observe(el);});
+  } else {
+    document.querySelectorAll(".reveal").forEach(function(el){el.classList.add("in");});
+  }
+
+  /* ---------- count-up on numbers ---------- */
+  function countUp(el){
+    var target = parseInt(el.getAttribute("data-count"),10);
+    if(reduce){ el.textContent = target; return; }
+    var start = null, dur = 1100;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts-start)/dur,1);
+      var eased = 1-Math.pow(1-p,3);
+      el.textContent = Math.round(eased*target);
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if("IntersectionObserver" in window){
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ countUp(en.target); io2.unobserve(en.target);} });
+    },{threshold:.5});
+    document.querySelectorAll("[data-count]").forEach(function(el){io2.observe(el);});
+  } else {
+    document.querySelectorAll("[data-count]").forEach(function(el){el.textContent=el.getAttribute("data-count");});
+  }
+})();
+</script>
+</body>
+</html>

@@ -202,7 +202,17 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+      position: relative;
+      overflow: hidden;
       transition: box-shadow 0.25s, transform 0.25s;
+    }
+
+    .misc-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--misc-accent, #149ddd);
     }
 
     .misc-card:hover {
@@ -224,7 +234,7 @@
       letter-spacing: 0.04em;
       padding: 3px 10px;
       border-radius: 12px;
-      background: #149ddd;
+      background: var(--misc-accent, #149ddd);
       color: #fff;
     }
 
@@ -237,7 +247,7 @@
       font-family: "Raleway", sans-serif;
       font-size: 17px;
       font-weight: 700;
-      color: #173b6c;
+      color: var(--misc-accent-dark, #173b6c);
       margin-bottom: 10px;
     }
 
@@ -261,17 +271,25 @@
       gap: 6px;
       font-size: 13px;
       font-weight: 600;
-      color: #149ddd;
+      color: var(--misc-accent, #149ddd);
       text-decoration: none;
       transition: color 0.2s;
     }
 
     .misc-card-link:hover {
-      color: #0d6e9a;
+      color: var(--misc-accent-dark, #0d6e9a);
       text-decoration: none;
     }
 
     .misc-card-link i { font-size: 15px; }
+
+    /* Tema por projeto — reflete a identidade visual de cada página */
+    .misc-card.theme-infovis        { --misc-accent: #1f77b4; --misc-accent-dark: #144d73; }
+    .misc-card.theme-arcano         { --misc-accent: #ca662c; --misc-accent-dark: #8a441c; }
+    .misc-card.theme-pokedex        { --misc-accent: #cc0000; --misc-accent-dark: #8f0000; }
+    .misc-card.theme-datastructures { --misc-accent: #8b5cf6; --misc-accent-dark: #5b21b6; }
+    .misc-card.theme-impostor       { --misc-accent: #7c3aed; --misc-accent-dark: #4c1d95; }
+    .misc-card.theme-descomplica    { --misc-accent: #e8641a; --misc-accent-dark: #9c3d07; }
   </style>
 
   <!-- =======================================================
@@ -763,7 +781,7 @@
         <div class="row">
 
           <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up">
-            <div class="misc-card">
+            <div class="misc-card theme-infovis">
               <div class="misc-card-header">
                 <span class="misc-tag">Visualização de Dados</span>
                 <span class="misc-tag misc-tag-secondary">Projeto Acadêmico</span>
@@ -779,7 +797,7 @@
           </div>
 
           <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="misc-card">
+            <div class="misc-card theme-arcano">
               <div class="misc-card-header">
                 <span class="misc-tag">HCI · Análise de Dados</span>
                 <span class="misc-tag misc-tag-secondary">Pesquisa — INTERACT 2025</span>
@@ -795,7 +813,7 @@
           </div>
 
           <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up">
-            <div class="misc-card">
+            <div class="misc-card theme-pokedex">
               <div class="misc-card-header">
                 <span class="misc-tag">Desenvolvimento Web</span>
                 <span class="misc-tag misc-tag-secondary">Projeto Pessoal</span>
@@ -811,7 +829,7 @@
           </div>
 
           <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="misc-card">
+            <div class="misc-card theme-datastructures">
               <div class="misc-card-header">
                 <span class="misc-tag">Estruturas de Dados</span>
                 <span class="misc-tag misc-tag-secondary">Projeto Pessoal</span>
@@ -827,7 +845,7 @@
           </div>
 
           <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up">
-            <div class="misc-card">
+            <div class="misc-card theme-impostor">
               <div class="misc-card-header">
                 <span class="misc-tag">Jogos</span>
                 <span class="misc-tag misc-tag-secondary">Projeto Pessoal</span>
@@ -836,6 +854,22 @@
               <p class="misc-card-desc">Jogo web inspirado em Among Us, no qual jogadores tentam identificar o impostor entre eles através de perguntas e respostas.</p>
               <div class="misc-card-footer">
                 <a href="https://ei-raul.github.io/impostor/" target="_blank" class="misc-card-link">
+                  <i class='bx bx-globe'></i> Acessar projeto <i class='bx bx-link-external'></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 d-flex align-items-stretch mb-4" data-aos="fade-up">
+            <div class="misc-card theme-descomplica">
+              <div class="misc-card-header">
+                <span class="misc-tag">Extensão Universitária</span>
+                <span class="misc-tag misc-tag-secondary">UniCatólica</span>
+              </div>
+              <h5 class="misc-card-title">Descomplica <span style="color:var(--misc-accent);font-style:italic">AI</span></h5>
+              <p class="misc-card-desc">Projeto de extensão que leva a inteligência artificial da universidade para escolas de ensino médio e para a comunidade de Quixadá, com oficinas práticas e conteúdo educativo.</p>
+              <div class="misc-card-footer">
+                <a href="descomplica-ai/descomplica-ai.html" target="_blank" class="misc-card-link">
                   <i class='bx bx-globe'></i> Acessar projeto <i class='bx bx-link-external'></i>
                 </a>
               </div>
