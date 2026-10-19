@@ -93,205 +93,9 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
-  <!-- Custom overrides -->
-  <style>
-    /* ── Publications grid ─────────────────────────────── */
-    #publications .content ul,
-    #misc .content ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .pub-item {
-      display: grid;
-      grid-template-columns: 118px 3fr 2fr 2fr 170px;
-      align-items: start;
-      column-gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid #f0f5fb;
-      margin-bottom: 0;
-    }
-
-    .pub-item:last-child { border-bottom: none; }
-
-    .pub-venue {
-      display: inline-block;
-      background-color: #149ddd;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 12px;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-      margin-top: 2px;
-    }
-
-    .pub-title {
-      display: block;
-      font-family: "Raleway", sans-serif;
-      font-size: 14.5px;
-      font-weight: 700;
-      color: #173b6c;
-      line-height: 1.4;
-    }
-
-    .pub-authors {
-      display: block;
-      color: #666;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .pub-desc {
-      display: block;
-      font-style: italic;
-      color: #555;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .pub-doi-link {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      text-decoration: none;
-      color: #149ddd;
-    }
-
-    .pub-doi-link:hover { color: #37b3ed; text-decoration: none; }
-
-    .pub-doi-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      color: #0d6e9a;
-      background: #dff3fc;
-      padding: 1px 7px;
-      border-radius: 6px;
-      letter-spacing: 0.05em;
-    }
-
-    .pub-doi-num {
-      font-size: 12px;
-      line-height: 1.4;
-      word-break: break-all;
-    }
-
-    @media (max-width: 768px) {
-      .pub-item {
-        grid-template-columns: 1fr;
-        gap: 5px 0;
-        padding: 14px 0;
-      }
-      .pub-doi-link {
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-        margin-top: 2px;
-      }
-    }
-
-    /* ── Misc / Extras cards ───────────────────────────── */
-    .misc-card {
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e8f0f9;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-      transition: box-shadow 0.25s, transform 0.25s;
-    }
-
-    .misc-card::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: var(--misc-accent, #149ddd);
-    }
-
-    .misc-card:hover {
-      box-shadow: 0 6px 24px rgba(20, 157, 221, 0.13);
-      transform: translateY(-3px);
-    }
-
-    .misc-card-header {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-
-    .misc-tag {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      padding: 3px 10px;
-      border-radius: 12px;
-      background: var(--misc-accent, #149ddd);
-      color: #fff;
-    }
-
-    .misc-tag.misc-tag-secondary {
-      background: #dff3fc;
-      color: #0d6e9a;
-    }
-
-    .misc-card-title {
-      font-family: "Raleway", sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--misc-accent-dark, #173b6c);
-      margin-bottom: 10px;
-    }
-
-    .misc-card-desc {
-      font-size: 14px;
-      color: #555;
-      line-height: 1.6;
-      flex: 1;
-      margin-bottom: 18px;
-    }
-
-    .misc-card-footer {
-      margin-top: auto;
-      border-top: 1px solid #f0f5fb;
-      padding-top: 14px;
-    }
-
-    .misc-card-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--misc-accent, #149ddd);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .misc-card-link:hover {
-      color: var(--misc-accent-dark, #0d6e9a);
-      text-decoration: none;
-    }
-
-    .misc-card-link i { font-size: 15px; }
-
-    /* Tema por projeto — reflete a identidade visual de cada página */
-    .misc-card.theme-infovis        { --misc-accent: #1f77b4; --misc-accent-dark: #144d73; }
-    .misc-card.theme-arcano         { --misc-accent: #ca662c; --misc-accent-dark: #8a441c; }
-    .misc-card.theme-pokedex        { --misc-accent: #cc0000; --misc-accent-dark: #8f0000; }
-    .misc-card.theme-datastructures { --misc-accent: #8b5cf6; --misc-accent-dark: #5b21b6; }
-    .misc-card.theme-impostor       { --misc-accent: #7c3aed; --misc-accent-dark: #4c1d95; }
-    .misc-card.theme-enade          { --misc-accent: #0d9488; --misc-accent-dark: #115e59; }
-    .misc-card.theme-descomplica    { --misc-accent: #e8641a; --misc-accent-dark: #9c3d07; }
-  </style>
+  <!-- Section styles -->
+  <link href="assets/css/publications.css" rel="stylesheet">
+  <link href="assets/css/misc.css" rel="stylesheet">
 
   <!-- =======================================================
   * Template Name: iPortfolio - v1.2.1
@@ -319,7 +123,7 @@
         <div class="social-links mt-3 text-center">
           <a href="https://www.linkedin.com/in/raul-de-araújo-b8943810b" class="linkedin" title="LinkedIn" target="_blank"><i class="bx bxl-linkedin"></i></a>
           <a href="https://github.com/ei-raul" class="github" title="GitHub" target="_blank"><i class="bx bxl-github"></i></a>
-          <a href="https://www.researchgate.net/profile/Raul_Lima6" class="google-plus" title="ResearchGate" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 24" width="1.167em" height="1em" fill="currentColor" aria-hidden="true" style="display:inline-block;vertical-align:-.125em"><text text-anchor="middle" x="14" y="19" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="19" letter-spacing="-0.5">RG</text></svg></a>
+          <a href="https://www.researchgate.net/profile/Raul_Lima6" class="google-plus" title="ResearchGate" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 24" width="1.167em" height="1em" fill="currentColor" aria-hidden="true" class="icon-rg"><text text-anchor="middle" x="14" y="19" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="19" letter-spacing="-0.5">RG</text></svg></a>
           <a href="http://lattes.cnpq.br/7030455287051977" class="twitter" title="Lattes CNPq" target="_blank"><i class="bx bx-id-card"></i></a>
         </div>
       </div>
@@ -365,10 +169,9 @@
 
             <h3>Informações Básicas</h3>
             <p class="font-italic">
-              Mestre em Informática pela PUC-Rio e Bacharel em Ciência da Computação pela UFC, atua na intersecção entre Ciência de Dados, Visualização da Informação e desenvolvimento de software.
+              Mestre em Informática pela PUC-Rio e Bacharel em Ciência da Computação pela UFC, já atuou como desenvolvedor de software utilizando diversas linguagens e frameworks desde o back-end até o front-end. Tem interesse nas áreas de Ciência de Dados, Visualização da Informação e Inteligência Artificial aplicada.
               Em 2022, recebeu o <a href="https://www.sbc.org.br/institucional-3/selo-de-inovacao-sbc" target="_blank">Selo de Inovação da Sociedade Brasileira de Computação (SBC)</a> pelo VisStoryMaker — ferramenta de exploração visual e comunicação de dados desenvolvida em colaboração com colegas de pesquisa na PUC-Rio.
-              Atualmente é Desenvolvedor e Cientista de Dados na <a href="https://datamint.com.br/" target="_blank">Datamint</a>, onde trabalha em toda a stack de produto, e Professor do curso de Sistemas de Informação na <a href="https://unicatolicaquixada.edu.br/" target="_blank">UniCatólica</a> (Quixadá, CE).
-              Suas principais áreas de interesse são Aprendizado de Máquina, Ciência de Dados e Visualização da Informação.
+              Atualmente atua como líder técnico na <a href="https://datamint.com.br/" target="_blank">Datamint</a>, onde trabalha em toda a stack de produto; e atua também professor do curso de Sistemas de Informação na <a href="https://unicatolicaquixada.edu.br/" target="_blank">UniCatólica</a> em Quixadá, CE.
             </p>
             <div class="row">
               <div class="col-lg-6">
@@ -431,7 +234,7 @@
                     <i class="bx bx-chevron-right about-link-arrow"></i>
                   </a>
                   <a href="https://www.researchgate.net/profile/Raul_Lima6" class="about-profile-link" target="_blank">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 24" width="1.167em" height="1em" fill="currentColor" aria-hidden="true" style="display:inline-block;vertical-align:-.125em;flex-shrink:0"><text text-anchor="middle" x="14" y="19" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="19" letter-spacing="-0.5">RG</text></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 24" width="1.167em" height="1em" fill="currentColor" aria-hidden="true" class="icon-rg"><text text-anchor="middle" x="14" y="19" font-family="'Arial Black',Arial,sans-serif" font-weight="900" font-size="19" letter-spacing="-0.5">RG</text></svg>
                     <span>ResearchGate</span>
                     <i class="bx bx-chevron-right about-link-arrow"></i>
                   </a>
@@ -867,7 +670,7 @@
                 <span class="misc-tag">Extensão Universitária</span>
                 <span class="misc-tag misc-tag-secondary">UniCatólica</span>
               </div>
-              <h5 class="misc-card-title">Descomplica <span style="color:var(--misc-accent);font-style:italic">AI</span></h5>
+              <h5 class="misc-card-title">Descomplica <span class="misc-title-accent">AI</span></h5>
               <p class="misc-card-desc">Projeto de extensão que leva a inteligência artificial da universidade para escolas de ensino médio e para a comunidade de Quixadá, com oficinas práticas e conteúdo educativo.</p>
               <div class="misc-card-footer">
                 <a href="misc/descomplica-ai/descomplica-ai.html" target="_blank" class="misc-card-link">
