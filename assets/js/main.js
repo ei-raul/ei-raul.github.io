@@ -8,17 +8,31 @@
   "use strict";
 
   // Hero typed
-  if ($('.typed').length) {
-    var typed_strings = $(".typed").data('typed-items');
-    typed_strings = typed_strings.split(',')
-    new Typed('.typed', {
-      strings: typed_strings,
+  var typed;
+
+  function initTyped() {
+    if (typed) typed.destroy();
+    // .attr() rather than .data(): jQuery caches data-* values, which would go stale on language change
+    $('.typed').empty();
+    typed = new Typed('.typed', {
+      strings: $('.typed').attr('data-typed-items').split(','),
       loop: true,
       typeSpeed: 100,
       backSpeed: 50,
       backDelay: 2000
     });
   }
+
+  if ($('.typed').length) {
+    initTyped();
+  }
+
+  // Language switch: restart the typing animation with the new strings and
+  // re-measure AOS/scroll offsets, since translated text changes section heights.
+  $(document).on('i18n:change', function() {
+    if ($('.typed').length) initTyped();
+    AOS.refreshHard();
+  });
 
   // Smooth scroll for the navigation menu and links with .scrollto classes
   var scrolling = false;

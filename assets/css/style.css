@@ -120,6 +120,43 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 
+/* Language switch (segmented control, same palette as the social buttons) */
+#header .lang-switch {
+  display: flex;
+  width: 96px;
+  margin: 16px auto 0;
+  padding: 3px;
+  background: #212431;
+  border-radius: 20px;
+}
+
+#header .lang-switch button {
+  flex: 1;
+  border: 0;
+  padding: 5px 0;
+  border-radius: 17px;
+  background: transparent;
+  color: #a8a9b4;
+  font: 600 12px/1 "Poppins", sans-serif;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#header .lang-switch button:hover {
+  color: #fff;
+}
+
+#header .lang-switch button[aria-pressed="true"] {
+  background: #149ddd;
+  color: #fff;
+}
+
+#header .lang-switch button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
 #main {
   margin-left: 300px;
 }

@@ -1,0 +1,97 @@
+/* ── Publications grid ─────────────────────────────── */
+#publications .content ul,
+#misc .content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pub-item {
+  display: grid;
+  grid-template-columns: 118px 3fr 2fr 2fr 170px;
+  align-items: start;
+  column-gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f5fb;
+  margin-bottom: 0;
+}
+
+.pub-item:last-child { border-bottom: none; }
+
+.pub-venue {
+  display: inline-block;
+  background-color: #149ddd;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.pub-title {
+  display: block;
+  font-family: "Raleway", sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #173b6c;
+  line-height: 1.4;
+}
+
+.pub-authors {
+  display: block;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pub-desc {
+  display: block;
+  font-style: italic;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pub-doi-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-decoration: none;
+  color: #149ddd;
+}
+
+.pub-doi-link:hover { color: #37b3ed; text-decoration: none; }
+
+.pub-doi-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #0d6e9a;
+  background: #dff3fc;
+  padding: 1px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.pub-doi-num {
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+@media (max-width: 768px) {
+  .pub-item {
+    grid-template-columns: 1fr;
+    gap: 5px 0;
+    padding: 14px 0;
+  }
+  .pub-doi-link {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+}
