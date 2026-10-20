@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strings, listas, matrizes, tuplas e dicionários — Lógica de Programação</title>
+  <meta name="description" content="Aula interativa de Lógica de Programação: Strings, listas, matrizes, tuplas e dicionários. Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../logica-de-programacao.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Lógica de Programação
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Coleções em Python</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck">
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Strings, listas, matrizes, tuplas e dicionários</h1>
+  <p class="sub">Até agora cada variável guardou um único valor. Hoje vamos guardar vários valores sob um mesmo nome e aprender a escolher a estrutura certa para cada situação.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="str" style="color:var(--c-str)"><span class="sym">"abc"</span><span class="nm">String</span><span class="ds">sequência de caracteres</span></a>
+    <a href="#" data-goto="list" style="color:var(--c-list)"><span class="sym">[1, 2, 3]</span><span class="nm">Lista</span><span class="ds">sequência que pode mudar</span></a>
+    <a href="#" data-goto="mat" style="color:var(--c-mat)"><span class="sym">[[1, 2], [3, 4]]</span><span class="nm">Matriz</span><span class="ds">lista de listas: linhas e colunas</span></a>
+    <a href="#" data-goto="tup" style="color:var(--c-tup)"><span class="sym">(1, 2)</span><span class="nm">Tupla</span><span class="ds">sequência que não muda</span></a>
+    <a href="#" data-goto="dict" style="color:var(--c-dict)"><span class="sym">{"k": v}</span><span class="nm">Dicionário</span><span class="ds">valores acessados por chave</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">Nos desafios e exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas e mostra o que está certo e o que falta.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Por que precisamos de coleções?">
+  <h2>Por que precisamos de coleções?</h2>
+  <div class="cols">
+    <div>
+      <p>Imagine guardar as notas de uma turma de 40 alunos. Com o que vimos até agora, seriam 40 variáveis: <code>nota1</code>, <code>nota2</code>, …, <code>nota40</code>.</p>
+      <p>Para calcular a média, precisaríamos escrever todas elas na conta. E se a turma tiver 41 alunos amanhã?</p>
+      <p>Uma <strong>coleção</strong> guarda vários valores sob um único nome. O programa passa a funcionar para qualquer quantidade de dados.</p>
+      <div class="note">Antes de executar, pergunte à turma: qual das duas versões continuaria funcionando com mil notas sem alterar nenhuma linha de cálculo?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="motivacao.py">
+# Sem coleções: uma variável para cada nota
+nota1 = 7.5
+nota2 = 8.0
+nota3 = 6.5
+media = (nota1 + nota2 + nota3) / 3
+print("Média:", media)
+
+# Com uma lista: um único nome guarda todas as notas
+notas = [7.5, 8.0, 6.5, 9.0, 5.5]
+media = sum(notas) / len(notas)
+print("Média:", media)
+print("Quantidade de notas:", len(notas))
+</textarea>
+      <div class="minis"><span class="mini">len([7, 8, 6]) <b>→</b> 3</span><span class="mini">sum([7, 8, 6]) <b>→</b> 21</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STRINGS ===================== -->
+<section class="slide" data-mod="str" data-title="Strings: texto é uma sequência">
+  <h2>Strings: texto é uma sequência</h2>
+  <div class="cols">
+    <div>
+      <p>Você já usa strings desde a primeira aula. A novidade de hoje: uma string é uma <strong>sequência de caracteres</strong>, em ordem, e podemos acessar cada um deles.</p>
+      <p>Podemos criar strings com aspas simples, duplas ou triplas (para várias linhas). O resultado é o mesmo tipo: <code>str</code>.</p>
+      <p>A função <code>len()</code> devolve o tamanho de uma sequência, ou seja, quantos elementos ela tem. Espaços também contam.</p>
+      <div class="minis"><span class="mini">len("casa") <b>→</b> 4</span><span class="mini">len("a b") <b>→</b> 3</span><span class="mini">len("") <b>→</b> 0</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="strings.py">
+nome = "Ana Clara"
+curso = 'Sistemas de Informação'
+frase = """Texto com
+várias linhas"""
+
+print(nome)
+print(curso)
+print(frase)
+print(len(nome))      # conta os caracteres, inclusive o espaço
+print(type(nome))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Índices: a posição de cada caractere">
+  <h2>Índices: a posição de cada caractere</h2>
+  <p class="lead">Cada caractere ocupa uma posição numerada. A contagem começa em <strong>0</strong>. Também dá para contar de trás para frente com índices negativos: <code>-1</code> é o último.</p>
+  <div class="seqviz" data-mode="index" data-text="PYTHON"></div>
+  <div class="cols even">
+    <div>
+      <p>Para acessar um caractere: <code>texto[posição]</code>.</p>
+      <p>Se a string tem tamanho <code>n</code>, os índices válidos vão de <code>0</code> até <code>n - 1</code> (ou de <code>-n</code> até <code>-1</code>).</p>
+      <div class="note warn">A última linha do exemplo pede o índice 6 de uma string com 6 caracteres. Peça para a turma prever o que vai acontecer antes de executar.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="indices.py">
+s = "PYTHON"
+print(s[0])           # primeiro caractere
+print(s[3])
+print(s[-1])          # último caractere
+print(s[-2])
+print(s[len(s) - 1])  # outra forma de pegar o último
+print(s[6])           # existe índice 6? Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Fatiamento: pedaços de uma sequência">
+  <h2>Fatiamento: pedaços de uma sequência</h2>
+  <p class="lead"><code>texto[início:fim:passo]</code> devolve um pedaço. O <strong>início entra</strong>, o <strong>fim fica de fora</strong>. Qualquer parte pode ser omitida.</p>
+  <div class="seqviz" data-mode="slice" data-text="Quixadá" data-start="0" data-stop="4" data-step=""></div>
+  <div class="cols even">
+    <div>
+      <table class="tbl">
+        <tr><th>Omitido</th><th>Valor assumido</th></tr>
+        <tr><td>início</td><td>começo da sequência</td></tr>
+        <tr><td>fim</td><td>até o final</td></tr>
+        <tr><td>passo</td><td>1 (de um em um)</td></tr>
+      </table>
+      <p>Passo negativo percorre de trás para frente. Por isso <code>s[::-1]</code> inverte a string.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="fatiamento.py">
+s = "Quixadá"
+print(s[0:4])    # do índice 0 até o 3 (o 4 fica de fora)
+print(s[:4])     # início omitido: começa do 0
+print(s[4:])     # fim omitido: vai até o final
+print(s[-3:])    # os três últimos
+print(s[::2])    # de 2 em 2
+print(s[::-1])   # invertida
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Operadores e percurso com for">
+  <h2>Operadores e percurso com <code>for</code></h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Operador</th><th>O que faz</th><th>Exemplo</th></tr>
+        <tr><td><code>+</code></td><td>junta (concatena)</td><td><code>"ab" + "cd"</code> → <code>"abcd"</code></td></tr>
+        <tr><td><code>*</code></td><td>repete</td><td><code>"ab" * 3</code> → <code>"ababab"</code></td></tr>
+        <tr><td><code>in</code></td><td>verifica se está contido</td><td><code>"as" in "casa"</code> → <code>True</code></td></tr>
+        <tr><td><code>not in</code></td><td>verifica se não está</td><td><code>"x" not in "casa"</code> → <code>True</code></td></tr>
+      </table>
+      <p>O <code>for</code> percorre uma sequência elemento por elemento. Em uma string, a variável do laço recebe um caractere por vez.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="operadores.py">
+primeiro = "Lógica"
+segundo = "Programação"
+print(primeiro + " de " + segundo)   # concatenação
+print("-" * 20)                      # repetição
+print("gica" in primeiro)            # está contido?
+print("z" in primeiro)
+
+for letra in "UNI":
+    print("Letra:", letra)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Métodos de string">
+  <h2>Métodos de string</h2>
+  <div class="cols">
+    <div>
+      <p>Um <strong>método</strong> é uma ação que o próprio valor sabe executar. Escrevemos o valor, um ponto e o nome da ação com parênteses: <code>texto.upper()</code>.</p>
+      <p>Métodos de string <strong>devolvem uma string nova</strong>. A original continua igual; para guardar o resultado, use uma variável.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Método</th><th>Exemplo</th><th>Resultado</th></tr>
+        <tr><td><code>upper()</code> / <code>lower()</code></td><td><code>"Oi".upper()</code></td><td><code>"OI"</code></td></tr>
+        <tr><td><code>strip()</code></td><td><code>"  oi ".strip()</code></td><td><code>"oi"</code></td></tr>
+        <tr><td><code>replace(a, b)</code></td><td><code>"gato".replace("g", "p")</code></td><td><code>"pato"</code></td></tr>
+        <tr><td><code>count(x)</code></td><td><code>"banana".count("a")</code></td><td><code>3</code></td></tr>
+        <tr><td><code>find(x)</code></td><td><code>"banana".find("n")</code></td><td><code>2</code> (ou <code>-1</code>)</td></tr>
+        <tr><td><code>startswith(x)</code></td><td><code>"Python".startswith("Py")</code></td><td><code>True</code></td></tr>
+        <tr><td><code>isdigit()</code></td><td><code>"2026".isdigit()</code></td><td><code>True</code></td></tr>
+      </table></div>
+    </div>
+    <div>
+<textarea class="py" data-label="metodos.py">
+texto = "  Lógica de Programação  "
+limpo = texto.strip()              # remove espaços das pontas
+print(limpo)
+print(limpo.upper())
+print(limpo.lower())
+print(limpo.replace("Lógica", "Estrutura"))
+print(limpo.count("a"))            # quantas vezes "a" aparece
+print(limpo.find("de"))            # posição da 1ª ocorrência
+print(limpo.startswith("Lóg"))
+print("2026".isdigit())
+print("[" + texto + "]")           # o original não mudou
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Construindo strings: o padrão acumulador">
+  <h2>Construindo strings: o padrão acumulador</h2>
+
+  <p class="lead">Como strings não mudam, para “montar” um texto começamos com a string vazia <code>""</code> e vamos juntando pedaços. É o mesmo padrão do acumulador numérico, agora com texto.</p>
+  <div class="trace" data-code="palavra = &quot;casa&quot;
+invertida = &quot;&quot;
+for letra in palavra:
+    invertida = letra + invertida
+print(invertida)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;invertida&quot;: &quot;&#x27;&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;c&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;letra recebe &#x27;c&#x27;&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;c&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;c&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;&#x27;c&#x27; + &#x27;&#x27; → &#x27;c&#x27;&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;a&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;c&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;letra recebe &#x27;a&#x27;&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;a&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;ac&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;&#x27;a&#x27; + &#x27;c&#x27; → &#x27;ac&#x27;&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;s&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;ac&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;letra recebe &#x27;s&#x27;&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;s&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;sac&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;&#x27;s&#x27; + &#x27;ac&#x27; → &#x27;sac&#x27;&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;a&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;sac&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;letra recebe &#x27;a&#x27;&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;a&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;asac&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;&#x27;a&#x27; + &#x27;sac&#x27; → &#x27;asac&#x27;&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;a&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;asac&#x27;&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;a sequência acabou: sai do for&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;letra&quot;: &quot;&#x27;a&#x27;&quot;, &quot;invertida&quot;: &quot;&#x27;asac&#x27;&quot;}, &quot;out&quot;: &quot;asac\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;letra&quot;, &quot;invertida&quot;]"></div>
+  <div class="cols">
+    <div>
+      <p><code>letra + invertida</code> coloca a letra nova <strong>na frente</strong>; <code>invertida + letra</code> colocaria <strong>atrás</strong> e copiaria a palavra igual.</p>
+      <p>Com um <code>if</code> dentro do laço, escolhemos <strong>quais</strong> caracteres entram no resultado (um filtro) ou <strong>quantos</strong> atendem a uma condição (um contador).</p>
+      <div class="minis"><span class="mini">&quot;a&quot;.isupper() <b>→</b> False</span><span class="mini">&quot;A&quot;.isupper() <b>→</b> True</span><span class="mini">&quot;7&quot;.isdigit() <b>→</b> True</span></div>
+      <div class="note"><strong>Experimente:</strong> troque cada espaço da frase por <code>"_"</code> sem usar <code>replace()</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="acumulando.py">
+frase = &quot;Programar em Python&quot;
+
+sem_vogais = &quot;&quot;
+for letra in frase:
+    if letra.lower() not in &quot;aeiou&quot;:
+        sem_vogais += letra        # só entra o que passa no filtro
+print(sem_vogais)
+
+maiusculas = 0
+for letra in frase:
+    if letra.isupper():
+        maiusculas += 1
+print(&quot;Letras maiúsculas:&quot;, maiusculas)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Tratando o texto digitado">
+  <h2>Tratando o texto digitado</h2>
+
+  <div class="cols">
+    <div>
+      <p>Pessoas digitam de jeitos diferentes: <code>"Sim"</code>, <code>" sim "</code>, <code>"SIM"</code>. Antes de comparar, <strong>padronize</strong> o texto.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Problema</th><th>Solução</th></tr>
+        <tr><td>espaços sobrando nas pontas</td><td><code>.strip()</code></td></tr>
+        <tr><td>maiúsculas e minúsculas misturadas</td><td><code>.lower()</code></td></tr>
+        <tr><td>texto que deveria ser número</td><td>testar <code>.isdigit()</code> antes do <code>int()</code></td></tr>
+      </table></div>
+      <p>Métodos podem ser <strong>encadeados</strong>: cada um age sobre o resultado do anterior, da esquerda para a direita.</p>
+      <div class="minis"><span class="mini">&quot;  SIM &quot;.strip().lower() <b>→</b> &#x27;sim&#x27;</span></div>
+      <div class="note warn"><code>isdigit()</code> só aceita dígitos: <code>"-5".isdigit()</code> e <code>"3.5".isdigit()</code> dão <code>False</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="tratando.py" data-stdin="  SIM 
+vinte
+20">
+resposta = input(&quot;Deseja continuar? (s/n) &quot;)
+resposta = resposta.strip().lower()     # &quot;  SIM &quot; vira &quot;sim&quot;
+if resposta == &quot;s&quot; or resposta == &quot;sim&quot;:
+    print(&quot;Continuando...&quot;)
+else:
+    print(&quot;Encerrando.&quot;)
+
+idade = input(&quot;Idade: &quot;)
+while not idade.isdigit():              # repete até vir só dígitos
+    print(&quot;Digite apenas números.&quot;)
+    idade = input(&quot;Idade: &quot;)
+idade = int(idade)
+print(&quot;Ano que vem você terá&quot;, idade + 1)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="split e join: da string para a lista e de volta">
+  <h2><code>split</code> e <code>join</code>: da string para a lista e de volta</h2>
+  <div class="cols">
+    <div>
+      <p><code>split()</code> quebra uma string em pedaços e devolve uma <strong>lista</strong>. Sem argumento, separa pelos espaços.</p>
+      <p><code>join()</code> faz o caminho inverso: junta os itens de uma lista usando a string como separador.</p>
+      <div class="minis"><span class="mini">"a,b,c".split(",") <b>→</b> ['a', 'b', 'c']</span><span class="mini">"-".join(['a', 'b']) <b>→</b> 'a-b'</span><span class="mini">int("10") <b>→</b> 10</span></div>
+      <div class="note">Este é o jeito mais comum de ler vários valores digitados na mesma linha. Os pedaços continuam sendo texto: converta com <code>int()</code> ou <code>float()</code> antes de fazer contas.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="split_join.py">
+linha = "maçã,banana,uva,manga"
+frutas = linha.split(",")      # quebra a string em uma LISTA
+print(frutas)
+print(len(frutas))
+
+frase = "python é uma linguagem legal"
+palavras = frase.split()       # sem argumento: separa pelos espaços
+print(palavras)
+
+print(" - ".join(frutas))      # junta a lista em uma string
+
+numeros = "10 20 30"
+partes = numeros.split()
+print(partes)                  # ainda são strings!
+print(partes[0] + partes[1])   # junta textos
+print(int(partes[0]) + int(partes[1]))   # soma números
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Strings são imutáveis">
+  <h2>Strings são imutáveis</h2>
+  <p class="lead">Não é possível alterar um caractere de uma string existente. Para “modificar” um texto, criamos uma string nova a partir da antiga.</p>
+  <div class="cols even">
+    <div>
+      <h3>Tentativa de alterar</h3>
+<textarea class="py" data-label="imutavel_erro.py">
+palavra = "gato"
+palavra[0] = "p"     # tentar trocar a primeira letra
+print(palavra)
+</textarea>
+    </div>
+    <div>
+      <h3>Criando uma nova string</h3>
+<textarea class="py" data-label="imutavel_ok.py">
+palavra = "gato"
+nova = "p" + palavra[1:]   # "p" + "ato"
+print(nova)
+print(palavra)             # a original continua igual
+
+palavra = palavra.replace("g", "r")   # reatribuir é permitido
+print(palavra)
+</textarea>
+    </div>
+  </div>
+  <div class="note">Reatribuir a variável (<code>palavra = ...</code>) é diferente de alterar a string: a variável passa a apontar para outro texto. Guarde esta ideia; ela volta em listas e tuplas.</div>
+</section>
+
+<section class="slide" data-mod="str" data-title="Desafio: vogais e palíndromo">
+  <h2>Desafio: vogais e palíndromo</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Conte quantas vogais existem na frase.</li>
+        <li>Verifique se a frase é um palíndromo, isto é, se é lida igual de trás para frente. Ignore espaços e diferenças entre maiúsculas e minúsculas.</li>
+      </ol>
+      <p>Ferramentas úteis: <code>for</code>, <code>in</code>, <code>lower()</code>, <code>replace()</code> e <code>[::-1]</code>.</p>
+      <div class="minis"><span class="mini">"o" in "aeiou" <b>→</b> True</span><span class="mini">"ovo"[::-1] <b>→</b> 'ovo'</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_strings.py">
+frase = "Socorram me subi no onibus em Marrocos"
+
+# 1) Conte quantas vogais existem em frase
+
+
+# 2) Verifique se a frase é um palíndromo
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+frase = "Socorram me subi no onibus em Marrocos"
+
+vogais = 0
+for letra in frase.lower():
+    if letra in "aeiou":
+        vogais = vogais + 1
+print("Vogais:", vogais)
+
+limpa = frase.lower().replace(" ", "")
+if limpa == limpa[::-1]:
+    print("É palíndromo")
+else:
+    print("Não é palíndromo")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LISTAS ===================== -->
+<section class="slide" data-mod="list" data-title="Listas">
+  <h2>Listas</h2>
+  <div class="cols">
+    <div>
+      <p>Uma lista guarda vários valores em ordem, entre colchetes <code>[ ]</code> e separados por vírgula. Os valores podem ser de qualquer tipo, inclusive misturados.</p>
+      <p>Tudo o que vimos em strings vale aqui: índices, índices negativos, fatiamento, <code>len()</code>, <code>in</code> e percurso com <code>for</code>.</p>
+      <div class="seqviz" data-mode="index" data-list="Ana,Bruno,Carla,Davi" data-label="nomes"></div>
+    </div>
+    <div>
+<textarea class="py" data-label="listas.py">
+notas = [7.5, 8.0, 6.5]
+nomes = ["Ana", "Bruno", "Carla", "Davi"]
+misturada = ["texto", 10, 3.14, True]
+vazia = []
+
+print(notas)
+print(nomes[0])          # índices funcionam como nas strings
+print(nomes[-1])
+print(nomes[1:3])        # fatiamento também
+print(len(misturada))
+print(len(vazia))
+print("Bruno" in nomes)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Listas são mutáveis">
+  <h2>Listas são mutáveis</h2>
+  <p class="lead">Diferente das strings, uma lista pode ser alterada depois de criada: trocar, incluir e remover elementos.</p>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Operação</th><th>O que faz</th></tr>
+        <tr><td><code>lista[i] = x</code></td><td>troca o elemento da posição <code>i</code></td></tr>
+        <tr><td><code>lista.append(x)</code></td><td>adiciona <code>x</code> no final</td></tr>
+        <tr><td><code>lista.insert(i, x)</code></td><td>adiciona <code>x</code> na posição <code>i</code></td></tr>
+        <tr><td><code>lista.remove(x)</code></td><td>remove a primeira ocorrência do <strong>valor</strong> <code>x</code></td></tr>
+        <tr><td><code>lista.pop()</code></td><td>remove o último e devolve o valor removido</td></tr>
+        <tr><td><code>lista.pop(i)</code></td><td>remove a posição <code>i</code> e devolve o valor</td></tr>
+        <tr><td><code>del lista[i]</code></td><td>remove pela <strong>posição</strong></td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="mutavel.py">
+frutas = ["maçã", "banana", "uva"]
+frutas[1] = "manga"          # troca o elemento do índice 1
+print(frutas)
+
+frutas.append("kiwi")        # adiciona no final
+print(frutas)
+
+frutas.insert(0, "pera")     # adiciona na posição 0
+print(frutas)
+
+frutas.remove("uva")         # remove pelo VALOR
+print(frutas)
+
+ultimo = frutas.pop()        # remove o último e o devolve
+print("Removido:", ultimo)
+
+del frutas[0]                # remove pela POSIÇÃO
+print(frutas)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Mais operações com listas">
+  <h2>Mais operações com listas</h2>
+
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Operação</th><th>O que faz</th></tr>
+        <tr><td><code>a + b</code></td><td>nova lista com os elementos de <code>a</code> e de <code>b</code></td></tr>
+        <tr><td><code>[0] * 5</code></td><td>nova lista repetindo os elementos</td></tr>
+        <tr><td><code>a.extend(b)</code></td><td>acrescenta <strong>todos</strong> os elementos de <code>b</code> em <code>a</code></td></tr>
+        <tr><td><code>a.count(x)</code></td><td>quantas vezes <code>x</code> aparece</td></tr>
+        <tr><td><code>a.index(x)</code></td><td>posição da primeira ocorrência (erro se não existir)</td></tr>
+        <tr><td><code>a.reverse()</code></td><td>inverte a própria lista</td></tr>
+        <tr><td><code>a.clear()</code></td><td>esvazia a lista</td></tr>
+      </table>
+      <div class="note warn"><code>append(b)</code> acrescenta <code>b</code> como <strong>um</strong> elemento (uma lista dentro da lista); <code>extend(b)</code> acrescenta <strong>cada</strong> elemento de <code>b</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="operacoes_lista.py">
+a = [1, 2, 3]
+b = [4, 5]
+print(a + b)              # nova lista: a e b continuam iguais
+print([0] * 5)            # cinco zeros
+
+a.extend(b)               # acrescenta CADA elemento de b
+print(a)
+a.append([6, 7])          # acrescenta UM elemento (uma lista)
+print(a, len(a))
+
+letras = [&quot;b&quot;, &quot;a&quot;, &quot;n&quot;, &quot;a&quot;, &quot;n&quot;, &quot;a&quot;]
+print(letras.count(&quot;a&quot;))  # quantas vezes aparece
+print(letras.index(&quot;n&quot;))  # posição da primeira ocorrência
+letras.reverse()
+print(letras)
+print(letras.index(&quot;x&quot;))  # e se não existir? Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Percorrendo e resumindo listas">
+  <h2>Percorrendo e resumindo listas</h2>
+  <div class="cols even">
+    <div>
+<textarea class="py" data-label="resumo.py">
+notas = [7.5, 9.0, 6.0, 8.5, 5.0]
+
+for nota in notas:
+    print("Nota:", nota)
+
+print("Soma:", sum(notas))
+print("Maior:", max(notas))
+print("Menor:", min(notas))
+print("Média:", sum(notas) / len(notas))
+
+print(sorted(notas))   # devolve uma NOVA lista ordenada
+print(notas)           # a original não mudou
+notas.sort()           # ordena a PRÓPRIA lista
+print(notas)
+notas.sort(reverse=True)
+print(notas)
+</textarea>
+    </div>
+    <div>
+      <div class="minis"><span class="mini">max([3, 9, 4]) <b>→</b> 9</span><span class="mini">min([3, 9, 4]) <b>→</b> 3</span><span class="mini">sorted([3, 1, 2]) <b>→</b> [1, 2, 3]</span><span class="mini">list(range(3)) <b>→</b> [0, 1, 2]</span></div>
+      <p>Quando precisamos da <strong>posição</strong>, percorremos os índices com <code>range(len(lista))</code>:</p>
+<textarea class="py" data-label="com_indice.py">
+nomes = ["Ana", "Bruno", "Carla"]
+for i in range(len(nomes)):
+    print("Posição", i, "->", nomes[i])
+</textarea>
+      <div class="note"><code>sorted(lista)</code> cria uma lista nova; <code>lista.sort()</code> altera a própria lista e não devolve nada.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Busca em listas">
+  <h2>Busca em listas</h2>
+
+  <p class="lead">Buscar é percorrer a lista comparando cada elemento com o que procuramos. Quando achar, guardamos a posição e paramos com <code>break</code>. Se nunca achar, a posição continua <code>-1</code>.</p>
+  <div class="trace" data-code="nomes = [&quot;Ana&quot;, &quot;Bia&quot;, &quot;Caio&quot;, &quot;Davi&quot;]
+alvo = &quot;Caio&quot;
+posicao = -1
+for i in range(len(nomes)):
+    if nomes[i] == alvo:
+        posicao = i
+        break
+print(&quot;Posição:&quot;, posicao)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;i&quot;: &quot;0&quot;, &quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i recebe 0&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;i&quot;: &quot;0&quot;, &quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;nomes[0] == alvo → &#x27;Ana&#x27; == &#x27;Caio&#x27; → False&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i recebe 1&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;nomes[1] == alvo → &#x27;Bia&#x27; == &#x27;Caio&#x27; → False&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i recebe 2&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;posicao&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;nomes[2] == alvo → &#x27;Caio&#x27; == &#x27;Caio&#x27; → True&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;posicao&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;posicao&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;posicao&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;Posição: 2\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;i&quot;, &quot;posicao&quot;]"></div>
+  <div class="cols">
+    <div>
+      <p>Uma variação importante: em vez de procurar um valor conhecido, procurar a <strong>posição do maior</strong>. Guardamos o índice do melhor até agora e trocamos quando aparece alguém maior.</p>
+      <p>Com duas listas <strong>paralelas</strong> (mesma posição = mesmo registro), a posição encontrada em uma serve para consultar a outra.</p>
+      <div class="note">Esse raciocínio é a base da aula de <strong>Ordenação e Busca</strong>. <code>in</code>, <code>index()</code> e <code>max()</code> fazem exatamente isso por dentro.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="mais_quente.py">
+dias = [&quot;dom&quot;, &quot;seg&quot;, &quot;ter&quot;, &quot;qua&quot;, &quot;qui&quot;, &quot;sex&quot;, &quot;sáb&quot;]
+temperaturas = [31, 34, 29, 36, 33, 36, 30]
+
+pos_maior = 0                                 # o primeiro é o maior até agora
+for i in range(1, len(temperaturas)):
+    if temperaturas[i] &gt; temperaturas[pos_maior]:
+        pos_maior = i
+print(&quot;Mais quente:&quot;, dias[pos_maior], &quot;com&quot;, temperaturas[pos_maior], &quot;°C&quot;)
+
+# o mesmo resultado com funções prontas
+print(dias[temperaturas.index(max(temperaturas))])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Construindo listas com laços">
+  <h2>Construindo listas com laços</h2>
+  <div class="cols">
+    <div>
+      <p>Padrão muito comum: começar com uma lista vazia e ir acrescentando com <code>append()</code> dentro de um laço.</p>
+      <p>O operador <code>%</code> devolve o <strong>resto</strong> da divisão. Um número é par quando o resto da divisão por 2 é zero.</p>
+      <div class="minis"><span class="mini">7 % 2 <b>→</b> 1</span><span class="mini">8 % 2 <b>→</b> 0</span><span class="mini">list(range(1, 6)) <b>→</b> [1, 2, 3, 4, 5]</span></div>
+      <p>No segundo exemplo, os valores digitados podem ser escritos no campo <em>Entrada</em>, um por linha, antes de executar. Se o campo estiver vazio, o navegador abre uma caixa para digitar.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="construindo.py">
+quadrados = []                 # começa vazia
+for n in range(1, 6):
+    quadrados.append(n * n)
+print(quadrados)
+
+pares = []
+for n in range(1, 21):
+    if n % 2 == 0:             # resto da divisão por 2 é zero?
+        pares.append(n)
+print(pares)
+</textarea>
+<textarea class="py" data-label="lendo_valores.py" data-stdin="Ana
+Bruno
+Carla">
+nomes = []
+for i in range(3):
+    nome = input("Digite um nome: ")
+    nomes.append(nome)
+print("Lista final:", nomes)
+</textarea>
+      <details class="sol"><summary>Extra: a forma compacta (compreensão de lista)</summary>
+<textarea class="py" data-label="compreensao.py">
+quadrados = [n * n for n in range(1, 6)]
+pares = [n for n in range(1, 21) if n % 2 == 0]
+print(quadrados)
+print(pares)
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Cuidado: dois nomes, uma lista">
+  <h2>Cuidado: dois nomes, uma lista</h2>
+  <div class="cols">
+    <div>
+      <p><code>b = a</code> <strong>não copia</strong> a lista. As duas variáveis passam a apontar para a mesma lista na memória; alterar por um nome altera o que o outro enxerga.</p>
+      <svg class="diagram" viewBox="0 0 520 150" role="img" aria-label="Variáveis a e b apontando para a mesma lista">
+        <defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="d-ar"/></marker></defs>
+        <rect x="10" y="20" width="48" height="38" rx="8" class="d-var"/><text x="34" y="45" text-anchor="middle" class="d-vt">a</text>
+        <rect x="10" y="92" width="48" height="38" rx="8" class="d-var"/><text x="34" y="117" text-anchor="middle" class="d-vt">b</text>
+        <path d="M60,39 C120,39 140,70 196,72" class="d-ln" marker-end="url(#arw)"/>
+        <path d="M60,111 C120,111 140,82 196,80" class="d-ln" marker-end="url(#arw)"/>
+        <g>
+          <rect x="200" y="52" width="60" height="46" rx="6" class="d-box"/><text x="230" y="81" text-anchor="middle" class="d-t">1</text>
+          <rect x="262" y="52" width="60" height="46" rx="6" class="d-box"/><text x="292" y="81" text-anchor="middle" class="d-t">2</text>
+          <rect x="324" y="52" width="60" height="46" rx="6" class="d-box"/><text x="354" y="81" text-anchor="middle" class="d-t">3</text>
+          <rect x="386" y="52" width="60" height="46" rx="6" class="d-box"/><text x="416" y="81" text-anchor="middle" class="d-t">4</text>
+        </g>
+        <text x="200" y="125" class="d-cap">uma única lista na memória</text>
+      </svg>
+      <p>Para obter uma lista independente, use <code>a.copy()</code> (ou <code>a[:]</code>).</p>
+    </div>
+    <div>
+<textarea class="py" data-label="copia.py">
+a = [1, 2, 3]
+b = a            # b NÃO é uma cópia: é outro nome para a mesma lista
+b.append(4)
+print("a:", a)
+print("b:", b)
+
+c = a.copy()     # agora sim, uma cópia independente
+c.append(99)
+print("a:", a)
+print("c:", c)
+</textarea>
+      <div class="note warn">Com strings esse problema não aparece: como elas são imutáveis, nenhuma operação altera o texto compartilhado.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="list" data-title="Desafio: notas da turma">
+  <h2>Desafio: notas da turma</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Calcule e mostre a média da turma.</li>
+        <li>Monte uma nova lista apenas com as notas acima da média.</li>
+        <li>Mostre quantos alunos foram aprovados (nota maior ou igual a 7).</li>
+      </ol>
+      <p><code>round(valor, casas)</code> arredonda um número.</p>
+      <div class="minis"><span class="mini">round(7.2142, 2) <b>→</b> 7.21</span><span class="mini">round(3.14159, 1) <b>→</b> 3.1</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_listas.py">
+notas = [8.5, 4.0, 7.0, 9.5, 6.0, 5.5, 10.0]
+
+# 1) Calcule e mostre a média da turma
+
+# 2) Monte uma lista só com as notas acima da média
+
+# 3) Mostre quantos alunos foram aprovados (nota >= 7)
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+notas = [8.5, 4.0, 7.0, 9.5, 6.0, 5.5, 10.0]
+
+media = sum(notas) / len(notas)
+print("Média:", round(media, 2))
+
+acima = []
+aprovados = 0
+for nota in notas:
+    if nota > media:
+        acima.append(nota)
+    if nota >= 7:
+        aprovados = aprovados + 1
+
+print("Acima da média:", acima)
+print("Aprovados:", aprovados)
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="mat" data-title="Matrizes: listas de listas">
+  <h2>Matrizes: listas de listas</h2>
+
+  <p class="lead">Uma matriz é uma lista em que cada elemento é outra lista: <strong>uma linha</strong>. Para chegar a um valor usamos dois índices: <code>m[linha][coluna]</code>.</p>
+  <div class="matviz" data-label="m" data-rows="[[8, 7, 9], [5, 6, 4], [10, 9, 8]]"></div>
+  <div class="cols">
+    <div>
+      <p><code>m[1]</code> é a segunda linha inteira (uma lista). <code>m[1][2]</code> é o terceiro valor dessa linha.</p>
+      <p><code>len(m)</code> é o número de linhas; <code>len(m[0])</code>, o número de colunas.</p>
+      <p>Matrizes aparecem em tabuleiros (jogo da velha, xadrez), planilhas, notas de alunos por avaliação, assentos de um cinema e imagens (cada pixel é uma posição).</p>
+    </div>
+    <div>
+<textarea class="py" data-label="matriz.py">
+m = [
+    [8, 7, 9],
+    [5, 6, 4],
+    [10, 9, 8],
+]
+print(m[0])          # primeira linha inteira
+print(m[1][2])       # linha 1, coluna 2
+print(len(m))        # número de linhas
+print(len(m[0]))     # número de colunas
+m[2][0] = 0          # pode ser alterada
+print(m)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="mat" data-title="Percorrendo matrizes">
+  <h2>Percorrendo matrizes</h2>
+
+  <div class="cols">
+    <div>
+      <p>Percorrer uma matriz pede <strong>dois laços aninhados</strong>: o de fora anda pelas linhas e o de dentro pelas colunas de cada linha.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Queremos</th><th>Como</th></tr>
+        <tr><td>uma linha <code>i</code></td><td><code>m[i]</code> (já é uma lista: <code>sum(m[i])</code>)</td></tr>
+        <tr><td>uma coluna <code>j</code></td><td>percorrer as linhas pegando <code>m[i][j]</code></td></tr>
+        <tr><td>a diagonal principal</td><td><code>m[i][i]</code></td></tr>
+        <tr><td>todos os valores</td><td><code>for linha in m:</code> + <code>for valor in linha:</code></td></tr>
+      </table></div>
+      <div class="minis"><span class="mini">print(5, end=&quot;\t&quot;) <b>→</b> separa com tabulação</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="percorrendo_matriz.py">
+m = [
+    [8, 7, 9],
+    [5, 6, 4],
+    [10, 9, 8],
+]
+for linha in m:                  # cada linha é uma lista
+    for valor in linha:
+        print(valor, end=&quot;\t&quot;)   # \t = tabulação
+    print()
+
+total = 0
+for i in range(len(m)):          # índices das linhas
+    for j in range(len(m[i])):   # índices das colunas
+        total += m[i][j]
+print(&quot;Soma de todos:&quot;, total)
+</textarea>
+<textarea class="py" data-label="notas_turma.py">
+nomes = [&quot;Ana&quot;, &quot;Bruno&quot;, &quot;Carla&quot;]
+notas = [              # colunas: provas 1, 2 e 3
+    [8.0, 7.5, 9.0],   # Ana
+    [5.0, 6.5, 4.0],   # Bruno
+    [10.0, 9.0, 8.5],  # Carla
+]
+# média de cada LINHA (aluno)
+for i in range(len(notas)):
+    media = sum(notas[i]) / len(notas[i])
+    print(f&quot;{nomes[i]}: {media:.1f}&quot;)
+
+# média de cada COLUNA (prova)
+for j in range(len(notas[0])):
+    soma = 0
+    for i in range(len(notas)):
+        soma += notas[i][j]
+    print(f&quot;Prova {j + 1}: {soma / len(notas):.1f}&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="mat" data-title="Criando matrizes (e uma armadilha)">
+  <h2>Criando matrizes (e uma armadilha)</h2>
+
+  <div class="cols">
+    <div>
+      <p>Para criar uma matriz de tamanho conhecido, montamos <strong>uma lista nova para cada linha</strong> dentro de um laço.</p>
+      <div class="note warn">Atalho perigoso: <code>[[0] * 4] * 3</code> não cria três linhas, e sim <strong>três nomes para a mesma linha</strong>, como no slide “Cuidado: dois nomes, uma lista”. Alterar uma altera todas.</div>
+      <p>Para ler uma matriz do teclado, cada linha pode ser digitada de uma vez, com os valores separados por espaço, e quebrada com <code>split()</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="criando_matriz.py">
+linhas = 3
+colunas = 4
+
+m = []
+for i in range(linhas):
+    linha = []                 # uma lista NOVA a cada volta
+    for j in range(colunas):
+        linha.append(0)
+    m.append(linha)
+m[0][0] = 1
+print(m)
+
+errada = [[0] * colunas] * linhas   # a MESMA linha repetida 3 vezes
+errada[0][0] = 1
+print(errada)                       # o 1 apareceu em todas!
+</textarea>
+<textarea class="py" data-label="lendo_matriz.py" data-stdin="1 2 3
+4 5 6">
+m = []
+for i in range(2):
+    partes = input(f&quot;Linha {i + 1}: &quot;).split()
+    linha = []
+    for valor in partes:
+        linha.append(int(valor))
+    m.append(linha)
+print(m)
+print(&quot;Soma da primeira linha:&quot;, sum(m[0]))
+</textarea>
+      <details class="sol"><summary>Extra: a forma compacta</summary>
+<textarea class="py" data-label="solucao.py">
+linhas = 3
+colunas = 4
+m = [[0] * colunas for i in range(linhas)]   # compreensão de lista: uma linha nova por volta
+m[0][0] = 1
+print(m)
+</textarea>
+</details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="mat" data-title="Desafio: jogo da velha">
+  <h2>Desafio: jogo da velha</h2>
+
+  <div class="cols">
+    <div>
+      <p>Leia as três linhas de um tabuleiro de jogo da velha, com as casas separadas por espaço (<code>-</code> é casa vazia).</p>
+      <ol>
+        <li>Mostre o tabuleiro em forma de grade, como <code>X | O | X</code>.</li>
+        <li>Verifique se alguém venceu em uma linha, coluna ou diagonal e mostre <code>X venceu</code>, <code>O venceu</code> ou <code>Ninguém venceu</code>.</li>
+      </ol>
+      <div class="minis"><span class="mini">&quot; | &quot;.join([&quot;X&quot;, &quot;O&quot;, &quot;X&quot;]) <b>→</b> &#x27;X | O | X&#x27;</span><span class="mini">a == b == c == &quot;X&quot; <b>→</b> as três são X?</span></div>
+      <p>São 8 formas de vencer: 3 linhas, 3 colunas e 2 diagonais.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_velha.py" data-stdin="X O X
+O X O
+O X X" data-tests="[{&quot;in&quot;: &quot;X O X\nO X O\nO X X&quot;, &quot;out&quot;: [&quot;X venceu&quot;], &quot;nao&quot;: [&quot;O venceu&quot;, &quot;Ninguém venceu&quot;]}, {&quot;in&quot;: &quot;O O O\nX X -\nX - -&quot;, &quot;out&quot;: [&quot;O venceu&quot;], &quot;nao&quot;: [&quot;X venceu&quot;, &quot;Ninguém venceu&quot;]}, {&quot;in&quot;: &quot;X O X\nX O O\nO X X&quot;, &quot;out&quot;: [&quot;Ninguém venceu&quot;], &quot;nao&quot;: [&quot;X venceu&quot;, &quot;O venceu&quot;]}, {&quot;in&quot;: &quot;X - O\nX O -\nX - O&quot;, &quot;out&quot;: [&quot;X venceu&quot;], &quot;nao&quot;: [&quot;O venceu&quot;, &quot;Ninguém venceu&quot;]}, {&quot;in&quot;: &quot;X X O\nX O -\nO - -&quot;, &quot;out&quot;: [&quot;O venceu&quot;], &quot;nao&quot;: [&quot;X venceu&quot;, &quot;Ninguém venceu&quot;]}]">
+tab = []
+for i in range(3):
+    tab.append(input(f&quot;Linha {i + 1}: &quot;).split())
+
+# 1) Mostre o tabuleiro em grade
+
+# 2) Descubra quem venceu
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="X O X
+O X O
+O X X">
+tab = []
+for i in range(3):
+    tab.append(input(f&quot;Linha {i + 1}: &quot;).split())
+
+for linha in tab:
+    print(&quot; | &quot;.join(linha))
+
+vencedor = &quot;Ninguém&quot;
+for jogador in (&quot;X&quot;, &quot;O&quot;):
+    for i in range(3):
+        if tab[i][0] == tab[i][1] == tab[i][2] == jogador:      # linha i
+            vencedor = jogador
+        if tab[0][i] == tab[1][i] == tab[2][i] == jogador:      # coluna i
+            vencedor = jogador
+    if tab[0][0] == tab[1][1] == tab[2][2] == jogador:          # diagonal principal
+        vencedor = jogador
+    if tab[0][2] == tab[1][1] == tab[2][0] == jogador:          # diagonal secundária
+        vencedor = jogador
+print(vencedor, &quot;venceu&quot;)
+</textarea>
+</details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TUPLAS ===================== -->
+<section class="slide" data-mod="tup" data-title="Tuplas">
+  <h2>Tuplas</h2>
+  <div class="cols">
+    <div>
+      <p>Uma tupla é uma sequência como a lista, escrita entre parênteses <code>( )</code>. A diferença: <strong>é imutável</strong>. Depois de criada, não ganha, não perde e não troca elementos.</p>
+      <p>Use tuplas para dados que andam juntos e não devem mudar: coordenadas, data (dia, mês, ano), dias da semana.</p>
+      <div class="note warn">Tupla com um único elemento precisa de vírgula: <code>(42,)</code>. Sem a vírgula, <code>(42)</code> é apenas o número 42 entre parênteses.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="tuplas.py">
+ponto = (3, 5)
+cores = ("vermelho", "verde", "azul")
+unico = (42,)         # tupla de 1 elemento: vírgula obrigatória
+nao_e_tupla = (42)    # isto é só o número 42
+
+print(ponto[0], ponto[1])
+print(cores[-1])
+print(cores[0:2])
+print(len(cores))
+print(type(unico))
+print(type(nao_e_tupla))
+print("verde" in cores)
+</textarea>
+<textarea class="py" data-label="tupla_imutavel.py">
+cores = ("vermelho", "verde", "azul")
+cores[0] = "preto"    # tentar alterar. Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="tup" data-title="Desempacotamento">
+  <h2>Desempacotamento</h2>
+  <div class="cols">
+    <div>
+      <p>Podemos distribuir os elementos de uma tupla em várias variáveis de uma só vez. A quantidade de variáveis precisa ser igual à quantidade de elementos.</p>
+      <p>Isso permite trocar o valor de duas variáveis sem usar uma variável auxiliar e percorrer listas de pares de forma legível.</p>
+      <p><code>enumerate()</code> entrega pares <code>(posição, elemento)</code> durante o <code>for</code>.</p>
+      <div class="minis"><span class="mini">list(enumerate(["a", "b"])) <b>→</b> [(0, 'a'), (1, 'b')]</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desempacotar.py">
+ponto = (3, 5)
+x, y = ponto            # cada variável recebe um elemento
+print("x =", x, "| y =", y)
+
+a = 10
+b = 20
+a, b = b, a             # troca de valores
+print("a =", a, "| b =", b)
+
+alunos = [("Ana", 8.5), ("Bruno", 7.0), ("Carla", 9.5)]
+for nome, nota in alunos:
+    print(nome, "tirou", nota)
+
+for i, nome in enumerate(["Ana", "Bruno", "Carla"]):
+    print(i, nome)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="tup" data-title="zip e tuplas como registros">
+  <h2>zip e tuplas como registros</h2>
+
+  <div class="cols">
+    <div>
+      <p><code>zip(a, b)</code> percorre duas sequências <strong>lado a lado</strong>, entregando a cada volta uma tupla com um elemento de cada. É o jeito mais limpo de trabalhar com listas paralelas.</p>
+      <div class="minis"><span class="mini">list(zip([&quot;a&quot;, &quot;b&quot;], [1, 2])) <b>→</b> [(&#x27;a&#x27;, 1), (&#x27;b&#x27;, 2)]</span></div>
+      <p>Se as listas tiverem tamanhos diferentes, <code>zip</code> para na menor.</p>
+      <p>Tuplas também funcionam como pequenos <strong>registros</strong> de tamanho fixo, em que cada posição tem um significado: <code>(dia, mês, ano)</code>, <code>(nome, nota)</code>, <code>(x, y)</code>.</p>
+      <div class="minis"><span class="mini">(1, 2, 2, 3).count(2) <b>→</b> 2</span><span class="mini">(&quot;a&quot;, &quot;b&quot;).index(&quot;b&quot;) <b>→</b> 1</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="zip.py">
+nomes = [&quot;Ana&quot;, &quot;Bruno&quot;, &quot;Carla&quot;]
+notas = [8.5, 6.0, 9.5]
+
+for nome, nota in zip(nomes, notas):     # um de cada lista por volta
+    print(f&quot;{nome:&lt;6} {nota:&gt;4}&quot;)
+
+print(list(zip(nomes, notas)))           # lista de tuplas
+
+nascimento = (15, 3, 2006)               # registro: (dia, mês, ano)
+dia, mes, ano = nascimento
+print(f&quot;{dia:02d}/{mes:02d}/{ano}&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="tup" data-title="Lista ou tupla?">
+  <h2>Lista ou tupla?</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th></th><th>Lista</th><th>Tupla</th></tr>
+        <tr><td>Sintaxe</td><td><code>[1, 2, 3]</code></td><td><code>(1, 2, 3)</code></td></tr>
+        <tr><td>Pode mudar?</td><td>sim</td><td>não</td></tr>
+        <tr><td>Índices e fatiamento</td><td>sim</td><td>sim</td></tr>
+        <tr><td><code>append</code>, <code>remove</code>…</td><td>sim</td><td>não existem</td></tr>
+        <tr><td>Uso típico</td><td>coleção que cresce ou é editada: carrinho, fila, notas</td><td>registro fixo: coordenada, data, configurações</td></tr>
+      </table>
+      <p>Se precisar alterar uma tupla, converta para lista com <code>list()</code>, altere e, se quiser, volte com <code>tuple()</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="conversao.py">
+dias = ("seg", "ter", "qua", "qui", "sex")
+print(dias)
+
+lista_dias = list(dias)     # cópia em forma de lista
+lista_dias.append("sab")
+print(lista_dias)
+
+congelada = tuple(lista_dias)
+print(congelada)
+print(dias)                 # a tupla original não mudou
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DICIONÁRIOS ===================== -->
+<section class="slide" data-mod="dict" data-title="Dicionários">
+  <h2>Dicionários</h2>
+  <div class="cols">
+    <div>
+      <p>Em listas e tuplas acessamos os valores pela <strong>posição</strong>. Em um dicionário, cada valor tem um nome: a <strong>chave</strong>. Escrevemos pares <code>chave: valor</code> entre chaves <code>{ }</code>.</p>
+      <div class="kv">
+        <span class="k">"nome"</span><span class="a">→</span><span class="v">"Ana"</span>
+        <span class="k">"matricula"</span><span class="a">→</span><span class="v">2026001</span>
+        <span class="k">"curso"</span><span class="a">→</span><span class="v">"Sistemas de Informação"</span>
+      </div>
+      <p>As chaves não se repetem e normalmente são strings ou números. Os valores podem ser qualquer coisa, inclusive listas.</p>
+      <div class="note warn">Acessar uma chave que não existe com colchetes gera erro. <code>get()</code> devolve <code>None</code> (ou um valor padrão) em vez de erro.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="dicionarios.py">
+aluno = {
+    "nome": "Ana",
+    "matricula": 2026001,
+    "curso": "Sistemas de Informação",
+}
+
+print(aluno)
+print(aluno["nome"])          # acesso pela CHAVE, não por posição
+print(aluno["curso"])
+print(aluno.get("email"))     # chave inexistente: get devolve None
+print(aluno.get("email", "não informado"))
+print(aluno["email"])         # e com colchetes? Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dict" data-title="Alterando um dicionário">
+  <h2>Alterando um dicionário</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Operação</th><th>O que faz</th></tr>
+        <tr><td><code>d[chave] = valor</code></td><td>chave nova: <strong>adiciona</strong>; chave existente: <strong>altera</strong></td></tr>
+        <tr><td><code>del d[chave]</code></td><td>remove o par</td></tr>
+        <tr><td><code>d.pop(chave)</code></td><td>remove e devolve o valor</td></tr>
+        <tr><td><code>chave in d</code></td><td>verifica se a <strong>chave</strong> existe</td></tr>
+        <tr><td><code>len(d)</code></td><td>quantidade de pares</td></tr>
+      </table>
+      <div class="note"><code>in</code> procura apenas nas chaves. Para procurar entre os valores, use <code>valor in d.values()</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="alterando.py">
+estoque = {"caneta": 10, "caderno": 5}
+
+estoque["lapis"] = 20        # chave nova: ADICIONA
+estoque["caneta"] = 8        # chave existente: ALTERA
+print(estoque)
+
+del estoque["caderno"]       # remove a chave e seu valor
+print(estoque)
+
+print("lapis" in estoque)    # in verifica as CHAVES
+print(20 in estoque)         # 20 é valor, não chave
+print(20 in estoque.values())
+print(len(estoque))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dict" data-title="Percorrendo dicionários">
+  <h2>Percorrendo dicionários</h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Forma</th><th>A cada volta, recebe</th></tr>
+        <tr><td><code>for k in d:</code></td><td>uma chave</td></tr>
+        <tr><td><code>for v in d.values():</code></td><td>um valor</td></tr>
+        <tr><td><code>for k, v in d.items():</code></td><td>uma tupla (chave, valor), desempacotada</td></tr>
+      </table>
+      <p>Na f-string, <code>:.2f</code> mostra o número com duas casas decimais.</p>
+      <div class="minis"><span class="mini">f"{4.5:.2f}" <b>→</b> '4.50'</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="percorrendo.py">
+precos = {"café": 4.5, "pão": 0.8, "suco": 6.0}
+
+for produto in precos:                  # chaves
+    print(produto)
+
+for valor in precos.values():           # valores
+    print(valor)
+
+for produto, valor in precos.items():   # pares
+    print(f"{produto}: R$ {valor:.2f}")
+
+print(list(precos.keys()))
+print("Total:", sum(precos.values()))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dict" data-title="Dicionário como contador">
+  <h2>Dicionário como contador</h2>
+  <div class="cols">
+    <div>
+      <p>Problema clássico: quantas vezes cada palavra aparece em um texto? A chave é a palavra; o valor é a contagem.</p>
+      <p>A cada palavra: se ela já está no dicionário, somamos 1; se não está, ela entra com valor 1.</p>
+      <p>A versão curta usa <code>get(chave, 0)</code>: devolve o valor atual, ou 0 se a chave ainda não existir.</p>
+      <div class="minis"><span class="mini">{"a": 2}.get("a", 0) <b>→</b> 2</span><span class="mini">{"a": 2}.get("b", 0) <b>→</b> 0</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="contador.py">
+frase = "o rato roeu a roupa do rei de roma o rato fugiu"
+contagem = {}
+
+for palavra in frase.split():
+    if palavra in contagem:
+        contagem[palavra] = contagem[palavra] + 1
+    else:
+        contagem[palavra] = 1
+
+print(contagem)
+print("rato aparece", contagem["rato"], "vezes")
+</textarea>
+<textarea class="py" data-label="contador_get.py">
+palavra = "abacaxi"
+letras = {}
+for letra in palavra:
+    letras[letra] = letras.get(letra, 0) + 1
+print(letras)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dict" data-title="Agrupando e consultando com dicionários">
+  <h2>Agrupando e consultando com dicionários</h2>
+
+  <div class="cols">
+    <div>
+      <p><strong>Agrupar</strong>: o valor de cada chave pode ser uma lista. A cada item, se a chave ainda não existe, criamos a lista vazia; depois, acrescentamos o item na lista daquela chave.</p>
+      <p><strong>Consultar</strong>: um dicionário também substitui longas cadeias de <code>if/elif</code> que só traduzem um valor em outro.</p>
+      <p><code>sorted(d)</code> devolve as <strong>chaves</strong> em ordem, útil para exibir o resultado organizado.</p>
+      <div class="minis"><span class="mini">sorted({&quot;b&quot;: 1, &quot;a&quot;: 2}) <b>→</b> [&#x27;a&#x27;, &#x27;b&#x27;]</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="agrupando.py">
+alunos = [(&quot;Ana&quot;, &quot;manhã&quot;), (&quot;Bruno&quot;, &quot;noite&quot;), (&quot;Carla&quot;, &quot;manhã&quot;),
+          (&quot;Davi&quot;, &quot;noite&quot;), (&quot;Eva&quot;, &quot;tarde&quot;)]
+
+turnos = {}
+for nome, turno in alunos:
+    if turno not in turnos:
+        turnos[turno] = []          # primeira vez: cria a lista
+    turnos[turno].append(nome)      # acrescenta na lista do turno
+
+print(turnos)
+for turno in sorted(turnos):        # chaves em ordem alfabética
+    print(turno, &quot;-&gt;&quot;, &quot;, &quot;.join(turnos[turno]))
+</textarea>
+<textarea class="py" data-label="consulta.py" data-stdin="4">
+dias = {1: &quot;domingo&quot;, 2: &quot;segunda&quot;, 3: &quot;terça&quot;, 4: &quot;quarta&quot;,
+        5: &quot;quinta&quot;, 6: &quot;sexta&quot;, 7: &quot;sábado&quot;}
+n = int(input(&quot;Dia da semana (1 a 7): &quot;))
+print(dias.get(n, &quot;dia inválido&quot;))    # sem nenhum if!
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dict" data-title="Estruturas combinadas">
+  <h2>Estruturas combinadas</h2>
+  <div class="cols">
+    <div>
+      <p>As estruturas podem ser combinadas. Uma <strong>lista de dicionários</strong> representa bem uma tabela: cada dicionário é uma linha (um aluno) e cada chave é uma coluna.</p>
+      <p>Para chegar a um valor interno, encadeamos os acessos da esquerda para a direita:</p>
+      <p><code>turma[2]["notas"][0]</code><br>terceiro aluno → suas notas → primeira nota.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="combinadas.py">
+turma = [
+    {"nome": "Ana", "notas": [8.0, 9.0, 7.5]},
+    {"nome": "Bruno", "notas": [6.0, 5.5, 7.0]},
+    {"nome": "Carla", "notas": [9.5, 10.0, 9.0]},
+]
+
+for aluno in turma:
+    media = sum(aluno["notas"]) / len(aluno["notas"])
+    if media >= 7:
+        situacao = "aprovado"
+    else:
+        situacao = "reprovado"
+    print(f'{aluno["nome"]}: média {media:.1f} ({situacao})')
+
+print(turma[2]["notas"][0])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dict" data-title="Desafio: vendas da cantina">
+  <h2>Desafio: vendas da cantina</h2>
+  <div class="cols">
+    <div>
+      <p>A lista abaixo registra vendas como tuplas <code>(produto, quantidade)</code>. Um mesmo produto aparece várias vezes.</p>
+      <ol>
+        <li>Monte um dicionário com o total vendido de cada produto.</li>
+        <li>Mostre cada produto com seu total.</li>
+        <li>Descubra qual produto vendeu mais.</li>
+      </ol>
+      <p>Este desafio usa as quatro estruturas da aula.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_dicionarios.py">
+vendas = [("café", 2), ("pão", 10), ("café", 1), ("suco", 3), ("pão", 5)]
+
+# 1) Monte um dicionário com o total vendido de cada produto
+
+# 2) Mostre cada produto e seu total
+
+# 3) Descubra qual produto vendeu mais
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+vendas = [("café", 2), ("pão", 10), ("café", 1), ("suco", 3), ("pão", 5)]
+
+totais = {}
+for produto, qtd in vendas:
+    totais[produto] = totais.get(produto, 0) + qtd
+
+for produto, total in totais.items():
+    print(produto, "->", total)
+
+mais_vendido = ""
+maior = 0
+for produto, total in totais.items():
+    if total > maior:
+        maior = total
+        mais_vendido = produto
+print("Mais vendido:", mais_vendido, "com", maior, "unidades")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FECHAMENTO ===================== -->
+<section class="slide" data-mod="intro" data-title="Comparativo das estruturas">
+  <h2>Comparativo das estruturas</h2>
+  <div class="tblwrap">
+    <table class="tbl">
+      <tr><th>Estrutura</th><th>Sintaxe</th><th>Acesso</th><th>Pode mudar?</th><th>Quando usar</th></tr>
+      <tr><td style="color:var(--c-str);font-weight:700">String</td><td><code>"abc"</code></td><td>posição</td><td>não</td><td>texto</td></tr>
+      <tr><td style="color:var(--c-list);font-weight:700">Lista</td><td><code>[1, 2, 3]</code></td><td>posição</td><td>sim</td><td>coleção ordenada que cresce, diminui ou é editada</td></tr>
+      <tr><td style="color:var(--c-mat);font-weight:700">Matriz</td><td><code>[[1, 2], [3, 4]]</code></td><td>linha e coluna</td><td>sim</td><td>dados em grade: tabuleiros, tabelas, notas por avaliação</td></tr>
+      <tr><td style="color:var(--c-tup);font-weight:700">Tupla</td><td><code>(1, 2, 3)</code></td><td>posição</td><td>não</td><td>grupo fixo de valores relacionados</td></tr>
+      <tr><td style="color:var(--c-dict);font-weight:700">Dicionário</td><td><code>{"k": 1}</code></td><td>chave</td><td>sim</td><td>associar um identificador a um valor</td></tr>
+    </table>
+  </div>
+<textarea class="py" data-label="tipos.py">
+exemplos = ["abc", [1, 2, 3], (1, 2, 3), {"k": 1}]
+for item in exemplos:
+    print(item, "->", type(item).__name__, "| tamanho:", len(item))
+</textarea>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual estrutura usar?">
+  <h2>Qual estrutura usar?</h2>
+  <p class="lead">Leia a situação para a turma, colete as respostas e só então clique.</p>
+  <div class="quiz" data-quiz="estrutura" data-label="Situação"></div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute linha por linha.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 1: strings e listas">
+  <h2>Prática 1: strings e listas</h2>
+<p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Tente antes de abrir a solução!</p><div class="cols even">
+<div><div class="exercise">
+  <h3>1. Analisando uma frase <span class="lvl l1">básico</span></h3>
+  <p>Leia uma frase e mostre quantas palavras ela tem e qual é a maior palavra. Em caso de empate, mostre a primeira.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>python é uma linguagem legal</pre></td><td><pre>Palavras: 5
+Maior palavra: linguagem</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex1_frase.py" data-stdin="python é uma linguagem legal" data-tests="[{&quot;in&quot;: &quot;python é uma linguagem legal&quot;, &quot;out&quot;: [&quot;Palavras: 5&quot;, &quot;Maior palavra: linguagem&quot;]}, {&quot;in&quot;: &quot;eu amo programar&quot;, &quot;out&quot;: [&quot;Palavras: 3&quot;, &quot;Maior palavra: programar&quot;]}, {&quot;in&quot;: &quot;sol mar céu&quot;, &quot;out&quot;: [&quot;Palavras: 3&quot;, &quot;Maior palavra: sol&quot;], &quot;nao&quot;: [&quot;Maior palavra: mar&quot;, &quot;Maior palavra: céu&quot;]}, {&quot;in&quot;: &quot;Quixadá&quot;, &quot;out&quot;: [&quot;Palavras: 1&quot;, &quot;Maior palavra: Quixadá&quot;]}]">
+frase = input(&quot;Frase: &quot;)
+
+# quebre a frase em palavras e analise
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="python é uma linguagem legal">
+frase = input(&quot;Frase: &quot;)
+palavras = frase.split()
+maior = palavras[0]
+for p in palavras:
+    if len(p) &gt; len(maior):      # &gt; (e não &gt;=) mantém a primeira no empate
+        maior = p
+print(&quot;Palavras:&quot;, len(palavras))
+print(&quot;Maior palavra:&quot;, maior)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>2. Sem repetidos <span class="lvl l1">básico</span></h3>
+  <p>Leia números inteiros digitados na mesma linha, separados por espaço. Mostre a lista sem números repetidos, <strong>mantendo a ordem</strong> em que apareceram pela primeira vez.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3 1 3 2 1 5 2 5</pre></td><td><pre>Sem repetidos: [3, 1, 2, 5]</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex2_repetidos.py" data-stdin="3 1 3 2 1 5 2 5" data-tests="[{&quot;in&quot;: &quot;3 1 3 2 1 5 2 5&quot;, &quot;out&quot;: [&quot;Sem repetidos: [3, 1, 2, 5]&quot;]}, {&quot;in&quot;: &quot;7 7 7 7&quot;, &quot;out&quot;: [&quot;Sem repetidos: [7]&quot;]}, {&quot;in&quot;: &quot;4 3 2 1&quot;, &quot;out&quot;: [&quot;Sem repetidos: [4, 3, 2, 1]&quot;]}, {&quot;in&quot;: &quot;10 -1 10 -1 0&quot;, &quot;out&quot;: [&quot;Sem repetidos: [10, -1, 0]&quot;]}]">
+partes = input(&quot;Números: &quot;).split()
+
+# monte uma nova lista só com a primeira ocorrência de cada número
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3 1 3 2 1 5 2 5">
+partes = input(&quot;Números: &quot;).split()
+unicos = []
+for texto in partes:
+    n = int(texto)
+    if n not in unicos:
+        unicos.append(n)
+print(&quot;Sem repetidos:&quot;, unicos)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 2: strings e tuplas">
+  <h2>Prática 2: strings e tuplas</h2>
+<div class="cols even">
+<div><div class="exercise">
+  <h3>3. Iniciais do nome <span class="lvl l2">intermediário</span></h3>
+  <p>Leia um nome completo e mostre as iniciais em maiúsculas, ignorando as palavras <code>da</code>, <code>de</code>, <code>do</code>, <code>das</code>, <code>dos</code> e <code>e</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>Maria da Silva Costa</pre></td><td><pre>Iniciais: M. S. C.</pre></td></tr><tr><td><pre>joão dos santos</pre></td><td><pre>Iniciais: J. S.</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex3_iniciais.py" data-stdin="Maria da Silva Costa" data-tests="[{&quot;in&quot;: &quot;Maria da Silva Costa&quot;, &quot;out&quot;: [&quot;Iniciais: M. S. C.&quot;]}, {&quot;in&quot;: &quot;joão dos santos&quot;, &quot;out&quot;: [&quot;Iniciais: J. S.&quot;], &quot;nao&quot;: [&quot;D.&quot;]}, {&quot;in&quot;: &quot;Ana&quot;, &quot;out&quot;: [&quot;Iniciais: A.&quot;]}, {&quot;in&quot;: &quot;Pedro de Alcântara e Souza&quot;, &quot;out&quot;: [&quot;Iniciais: P. A. S.&quot;], &quot;nao&quot;: [&quot;E.&quot;, &quot;D.&quot;]}]">
+nome = input(&quot;Nome completo: &quot;)
+ignorar = (&quot;da&quot;, &quot;de&quot;, &quot;do&quot;, &quot;das&quot;, &quot;dos&quot;, &quot;e&quot;)
+
+# monte as iniciais
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="Maria da Silva Costa">
+nome = input(&quot;Nome completo: &quot;)
+ignorar = (&quot;da&quot;, &quot;de&quot;, &quot;do&quot;, &quot;das&quot;, &quot;dos&quot;, &quot;e&quot;)
+iniciais = []
+for parte in nome.split():
+    if parte.lower() not in ignorar:
+        iniciais.append(parte[0].upper() + &quot;.&quot;)
+print(&quot;Iniciais:&quot;, &quot; &quot;.join(iniciais))
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>4. Nome do mês <span class="lvl l2">intermediário</span></h3>
+  <p>Guarde os nomes dos meses em uma tupla. Leia um número e mostre o nome do mês. Para números fora de 1 a 12, mostre <code>Mês inválido</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3</pre></td><td><pre>Mês: março</pre></td></tr><tr><td><pre>13</pre></td><td><pre>Mês inválido</pre></td></tr></table></div>
+  <div class="note warn">Teste também com <code>0</code>. Por que <code>meses[0 - 1]</code> mostraria <em>dezembro</em> em vez de dar erro?</div>
+  <textarea class="py" data-label="ex4_mes.py" data-stdin="3" data-tests="[{&quot;in&quot;: &quot;3&quot;, &quot;out&quot;: [&quot;Mês: março&quot;]}, {&quot;in&quot;: &quot;1&quot;, &quot;out&quot;: [&quot;Mês: janeiro&quot;]}, {&quot;in&quot;: &quot;12&quot;, &quot;out&quot;: [&quot;Mês: dezembro&quot;]}, {&quot;in&quot;: &quot;13&quot;, &quot;out&quot;: [&quot;Mês inválido&quot;]}, {&quot;in&quot;: &quot;0&quot;, &quot;out&quot;: [&quot;Mês inválido&quot;], &quot;nao&quot;: [&quot;dezembro&quot;]}, {&quot;in&quot;: &quot;-2&quot;, &quot;out&quot;: [&quot;Mês inválido&quot;], &quot;nao&quot;: [&quot;novembro&quot;]}]">
+meses = (&quot;janeiro&quot;, &quot;fevereiro&quot;, &quot;março&quot;, &quot;abril&quot;, &quot;maio&quot;, &quot;junho&quot;,
+         &quot;julho&quot;, &quot;agosto&quot;, &quot;setembro&quot;, &quot;outubro&quot;, &quot;novembro&quot;, &quot;dezembro&quot;)
+n = int(input(&quot;Número do mês: &quot;))
+
+# mostre o nome do mês (lembre: a tupla começa no índice 0)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3">
+meses = (&quot;janeiro&quot;, &quot;fevereiro&quot;, &quot;março&quot;, &quot;abril&quot;, &quot;maio&quot;, &quot;junho&quot;,
+         &quot;julho&quot;, &quot;agosto&quot;, &quot;setembro&quot;, &quot;outubro&quot;, &quot;novembro&quot;, &quot;dezembro&quot;)
+n = int(input(&quot;Número do mês: &quot;))
+if 1 &lt;= n &lt;= 12:
+    print(&quot;Mês:&quot;, meses[n - 1])     # mês 1 está no índice 0
+else:
+    print(&quot;Mês inválido&quot;)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 3: dicionários e matrizes">
+  <h2>Prática 3: dicionários e matrizes</h2>
+<div class="cols even">
+<div><div class="exercise">
+  <h3>5. Agenda telefônica <span class="lvl l3">desafio</span></h3>
+  <p>Use um dicionário <code>nome → telefone</code> e um menu com <code>while</code>:</p>
+  <div class="tblwrap"><table class="tbl">
+    <tr><th>Opção</th><th>Ação</th><th>Mensagens</th></tr>
+    <tr><td><code>1</code></td><td>adicionar: lê nome e telefone</td><td><code>Contato salvo</code></td></tr>
+    <tr><td><code>2</code></td><td>buscar: lê um nome</td><td><code>Encontrado: 9999-1111</code> ou <code>Contato não encontrado</code></td></tr>
+    <tr><td><code>3</code></td><td>remover: lê um nome</td><td><code>Contato removido</code> ou <code>Contato não encontrado</code></td></tr>
+    <tr><td><code>4</code></td><td>listar em ordem alfabética</td><td><code>Ana - 9999-1111</code>, um por linha, ou <code>Agenda vazia</code></td></tr>
+    <tr><td><code>0</code></td><td>sair</td><td></td></tr>
+  </table></div>
+  <p>Qualquer outra opção mostra <code>Opção inválida</code>.</p>
+  <textarea class="py" data-label="ex5_agenda.py" data-stdin="1
+Ana
+9999-1111
+4
+0" data-tests="[{&quot;in&quot;: &quot;1\nAna\n9999-1111\n1\nBia\n8888-2222\n2\nAna\n3\nAna\n2\nAna\n4\n0&quot;, &quot;out&quot;: [&quot;Contato salvo&quot;, &quot;Encontrado: 9999-1111&quot;, &quot;Contato removido&quot;, &quot;Contato não encontrado&quot;, &quot;Bia - 8888-2222&quot;], &quot;nao&quot;: [&quot;Ana - 9999-1111&quot;]}, {&quot;in&quot;: &quot;4\n3\nZé\n0&quot;, &quot;out&quot;: [&quot;Agenda vazia&quot;, &quot;Contato não encontrado&quot;]}, {&quot;in&quot;: &quot;1\nZé\n1234\n1\nAna\n5678\n4\n0&quot;, &quot;out&quot;: [&quot;Ana - 5678\nZé - 1234&quot;]}, {&quot;in&quot;: &quot;7\n0&quot;, &quot;out&quot;: [&quot;Opção inválida&quot;]}]">
+agenda = {}
+opcao = &quot;&quot;
+while opcao != &quot;0&quot;:
+    print(&quot;1-Adicionar  2-Buscar  3-Remover  4-Listar  0-Sair&quot;)
+    opcao = input(&quot;Opção: &quot;)
+    if opcao == &quot;1&quot;:
+        nome = input(&quot;Nome: &quot;)
+        telefone = input(&quot;Telefone: &quot;)
+        # guarde o contato na agenda
+
+    # complete as outras opções
+print(&quot;Até logo!&quot;)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1
+Ana
+9999-1111
+1
+Bia
+8888-2222
+2
+Ana
+3
+Ana
+2
+Ana
+4
+0">
+agenda = {}
+opcao = &quot;&quot;
+while opcao != &quot;0&quot;:
+    print(&quot;1-Adicionar  2-Buscar  3-Remover  4-Listar  0-Sair&quot;)
+    opcao = input(&quot;Opção: &quot;)
+    if opcao == &quot;1&quot;:
+        nome = input(&quot;Nome: &quot;)
+        telefone = input(&quot;Telefone: &quot;)
+        agenda[nome] = telefone
+        print(&quot;Contato salvo&quot;)
+    elif opcao == &quot;2&quot;:
+        nome = input(&quot;Nome: &quot;)
+        if nome in agenda:
+            print(&quot;Encontrado:&quot;, agenda[nome])
+        else:
+            print(&quot;Contato não encontrado&quot;)
+    elif opcao == &quot;3&quot;:
+        nome = input(&quot;Nome: &quot;)
+        if nome in agenda:
+            del agenda[nome]
+            print(&quot;Contato removido&quot;)
+        else:
+            print(&quot;Contato não encontrado&quot;)
+    elif opcao == &quot;4&quot;:
+        if len(agenda) == 0:
+            print(&quot;Agenda vazia&quot;)
+        for nome in sorted(agenda):
+            print(nome, &quot;-&quot;, agenda[nome])
+    elif opcao != &quot;0&quot;:
+        print(&quot;Opção inválida&quot;)
+print(&quot;Até logo!&quot;)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>6. Diagonal e maior valor <span class="lvl l3">desafio</span></h3>
+  <p>Leia o tamanho <code>n</code> de uma matriz quadrada e depois suas <code>n</code> linhas (valores separados por espaço). Mostre a soma da diagonal principal e o maior valor da matriz.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3
+1 2 3
+4 5 6
+7 8 9</pre></td><td><pre>Diagonal: 15
+Maior: 9</pre></td></tr></table></div>
+  <p>Os testes incluem uma matriz só com negativos: cuidado com o valor inicial do maior.</p>
+  <textarea class="py" data-label="ex6_diagonal.py" data-stdin="3
+1 2 3
+4 5 6
+7 8 9" data-tests="[{&quot;in&quot;: &quot;3\n1 2 3\n4 5 6\n7 8 9&quot;, &quot;out&quot;: [&quot;Diagonal: 15&quot;, &quot;Maior: 9&quot;]}, {&quot;in&quot;: &quot;2\n-1 -5\n-3 -2&quot;, &quot;out&quot;: [&quot;Diagonal: -3&quot;, &quot;Maior: -1&quot;], &quot;nao&quot;: [&quot;Maior: 0&quot;]}, {&quot;in&quot;: &quot;1\n7&quot;, &quot;out&quot;: [&quot;Diagonal: 7&quot;, &quot;Maior: 7&quot;]}, {&quot;in&quot;: &quot;3\n0 9 0\n0 0 0\n0 0 4&quot;, &quot;out&quot;: [&quot;Diagonal: 4&quot;, &quot;Maior: 9&quot;]}]">
+n = int(input(&quot;Tamanho: &quot;))
+m = []
+for i in range(n):
+    partes = input(f&quot;Linha {i + 1}: &quot;).split()
+    linha = []
+    for valor in partes:
+        linha.append(int(valor))
+    m.append(linha)
+
+# calcule a soma da diagonal e o maior valor
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3
+1 2 3
+4 5 6
+7 8 9">
+n = int(input(&quot;Tamanho: &quot;))
+m = []
+for i in range(n):
+    partes = input(f&quot;Linha {i + 1}: &quot;).split()
+    linha = []
+    for valor in partes:
+        linha.append(int(valor))
+    m.append(linha)
+
+diagonal = 0
+maior = m[0][0]                 # começa com um valor que existe na matriz
+for i in range(n):
+    diagonal += m[i][i]
+    for j in range(n):
+        if m[i][j] &gt; maior:
+            maior = m[i][j]
+print(&quot;Diagonal:&quot;, diagonal)
+print(&quot;Maior:&quot;, maior)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: conte quantas vezes cada letra aparece em seu nome; monte uma matriz 5 × 5 com a tabuada; guarde um cardápio em um dicionário e calcule o valor de um pedido.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "colecoes",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "str": {
+   "name": "Strings",
+   "color": "#0b78b0"
+  },
+  "list": {
+   "name": "Listas",
+   "color": "#0f7a62"
+  },
+  "mat": {
+   "name": "Matrizes",
+   "color": "#c2410c"
+  },
+  "tup": {
+   "name": "Tuplas",
+   "color": "#a8670c"
+  },
+  "dict": {
+   "name": "Dicionários",
+   "color": "#8e3a8f"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "quizzes": {
+  "estrutura": [
+   {
+    "q": "Guardar as notas de uma turma, que podem ser corrigidas depois.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 1,
+    "why": "A quantidade varia e os valores podem mudar: lista."
+   },
+   {
+    "q": "Guardar a latitude e a longitude de Quixadá.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 2,
+    "why": "Dois valores que andam juntos e não mudam: tupla."
+   },
+   {
+    "q": "Associar a matrícula de cada aluno ao seu nome.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 3,
+    "why": "Queremos encontrar o nome a partir de um identificador: a matrícula é a chave."
+   },
+   {
+    "q": "Mostrar o nome de uma pessoa todo em maiúsculas.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 0,
+    "why": "É um texto; basta o método upper()."
+   },
+   {
+    "q": "Controlar uma fila de atendimento em que pessoas entram e saem.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 1,
+    "why": "Elementos entram (append) e saem (pop(0)) o tempo todo: lista."
+   },
+   {
+    "q": "Contar quantas vezes cada palavra aparece em um texto.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 3,
+    "why": "Cada palavra (chave) é associada à sua contagem (valor)."
+   },
+   {
+    "q": "Guardar os nomes dos dias da semana.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 2,
+    "why": "Sequência fixa que nunca muda: tupla."
+   },
+   {
+    "q": "Guardar o preço de cada produto do cardápio da cantina.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 3,
+    "why": "Busca pelo nome do produto: produto → preço."
+   },
+   {
+    "q": "Representar o tabuleiro de um jogo da velha.",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 1,
+    "why": "Uma lista de listas (matriz): 3 linhas com 3 casas cada, que mudam a cada jogada."
+   },
+   {
+    "q": "Agrupar os nomes dos alunos por turno (manhã, tarde, noite).",
+    "opts": [
+     "string",
+     "lista",
+     "tupla",
+     "dicionário"
+    ],
+    "ans": 3,
+    "why": "Um dicionário de listas: o turno é a chave e a lista de nomes é o valor."
+   }
+  ],
+  "saida": [
+   {
+    "code": "s = \"Python\"\nprint(s[1:4])",
+    "opts": [
+     "Pyt",
+     "yth",
+     "ytho",
+     "pyt"
+    ],
+    "ans": 1,
+    "why": "Começa no índice 1 (y) e para antes do 4: y, t, h."
+   },
+   {
+    "code": "palavras = \"a b  c\".split()\nprint(len(palavras))",
+    "opts": [
+     "3",
+     "4",
+     "5",
+     "1"
+    ],
+    "ans": 0,
+    "why": "Sem argumento, split separa por qualquer quantidade de espaços: [\"a\", \"b\", \"c\"]."
+   },
+   {
+    "code": "s = \"banana\"\nprint(s.count(\"a\"), s.find(\"z\"))",
+    "opts": [
+     "3 -1",
+     "3 0",
+     "2 -1",
+     "Erro"
+    ],
+    "ans": 0,
+    "why": "\"a\" aparece 3 vezes; find devolve -1 quando não encontra (index daria erro)."
+   },
+   {
+    "code": "print(\"-\".join([\"1\", \"2\", \"3\"]))",
+    "opts": [
+     "1-2-3",
+     "-1-2-3-",
+     "123",
+     "Erro"
+    ],
+    "ans": 0,
+    "why": "join coloca o separador apenas ENTRE os elementos."
+   },
+   {
+    "code": "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(len(a))",
+    "opts": [
+     "3",
+     "4",
+     "Erro",
+     "[1, 2, 3, 4]"
+    ],
+    "ans": 1,
+    "why": "b = a não copia: os dois nomes apontam para a mesma lista, que agora tem 4 elementos."
+   },
+   {
+    "code": "nums = [3, 1, 2]\nr = nums.sort()\nprint(r)",
+    "opts": [
+     "[1, 2, 3]",
+     "None",
+     "[3, 1, 2]",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "sort() ordena a própria lista e não devolve nada (None). Para receber uma lista nova, use sorted(nums)."
+   },
+   {
+    "code": "m = [[1, 2], [3, 4], [5, 6]]\nprint(m[2][0] + m[0][1])",
+    "opts": [
+     "3",
+     "5",
+     "7",
+     "Erro"
+    ],
+    "ans": 2,
+    "why": "m[2][0] é 5 (terceira linha, primeira coluna) e m[0][1] é 2: 5 + 2 = 7."
+   },
+   {
+    "code": "x = (7)\nprint(type(x).__name__)",
+    "opts": [
+     "tuple",
+     "int",
+     "list",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "Sem vírgula, os parênteses são só de agrupamento. Tupla de um elemento: (7,)."
+   },
+   {
+    "code": "d = {\"a\": 1, \"b\": 2}\nd[\"a\"] = 10\nd[\"c\"] = 3\nprint(len(d), d[\"a\"])",
+    "opts": [
+     "2 1",
+     "3 10",
+     "3 1",
+     "2 10"
+    ],
+    "ans": 1,
+    "why": "\"a\" já existia e foi alterada para 10; \"c\" é nova e foi adicionada: 3 pares."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

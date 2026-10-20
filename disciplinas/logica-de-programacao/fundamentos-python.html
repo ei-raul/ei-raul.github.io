@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Variáveis, entrada e saída, decisões e repetições — Lógica de Programação</title>
+  <meta name="description" content="Aula interativa de Lógica de Programação: Variáveis, entrada e saída, decisões e repetições. Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../logica-de-programacao.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Lógica de Programação
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Fundamentos de Python</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck">
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Variáveis, entrada e saída, decisões e repetições</h1>
+  <p class="sub">As peças com que se constrói qualquer programa: guardar valores, conversar com o usuário, escolher um caminho e repetir tarefas.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="var" style="color:var(--c-var)"><span class="sym">x = 10</span><span class="nm">Variáveis e tipos</span><span class="ds">guardar e transformar valores</span></a>
+    <a href="#" data-goto="io" style="color:var(--c-io)"><span class="sym">input()</span><span class="nm">Entrada e saída</span><span class="ds">ler do teclado e mostrar na tela</span></a>
+    <a href="#" data-goto="cond" style="color:var(--c-cond)"><span class="sym">if</span><span class="nm">Decisão</span><span class="ds">if, elif e else</span></a>
+    <a href="#" data-goto="loop" style="color:var(--c-loop)"><span class="sym">while / for</span><span class="nm">Repetição</span><span class="ds">executar várias vezes</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 8</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">Nos desafios e exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas e mostra o que está certo e o que falta.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Como um programa executa">
+  <h2>Como um programa executa</h2>
+  <p class="lead">O Python executa as linhas de cima para baixo, uma de cada vez. Cada linha trabalha com os valores que existem <strong>naquele momento</strong>.</p>
+  <div class="trace" data-code="x = 5
+y = x * 2
+x = 10
+print(x, y)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;x&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;x&quot;: &quot;5&quot;, &quot;y&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;x&quot;: &quot;10&quot;, &quot;y&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;x&quot;: &quot;10&quot;, &quot;y&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;10 10\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;x&quot;, &quot;y&quot;]"></div>
+  <div class="note">Pergunta para a turma antes de avançar até o fim: depois que <code>x</code> passa a valer 10, o valor de <code>y</code> muda? Por quê?</div>
+  <p class="keys">Este quadro é um <strong>teste de mesa</strong>: cada clique executa uma linha e a tabela registra o valor das variáveis depois dela. Usaremos o mesmo recurso nas decisões e nas repetições.</p>
+</section>
+
+<!-- ===================== VARIÁVEIS ===================== -->
+<section class="slide" data-mod="var" data-title="Variáveis">
+  <h2>Variáveis</h2>
+  <div class="cols">
+    <div>
+      <p>Uma variável é um <strong>nome</strong> associado a um <strong>valor</strong> guardado na memória. Usamos o nome para recuperar o valor depois.</p>
+      <div class="kv">
+        <span class="k">nome</span><span class="a">→</span><span class="v">"Ana"</span>
+        <span class="k">idade</span><span class="a">→</span><span class="v">19</span>
+        <span class="k">altura</span><span class="a">→</span><span class="v">1.68</span>
+      </div>
+      <p>O sinal <code>=</code> é a <strong>atribuição</strong>: o Python calcula o lado direito e guarda o resultado no nome à esquerda. Não é a igualdade da matemática.</p>
+      <div class="minis"><span class="mini">x = 3 <b>→</b> x passa a valer 3</span><span class="mini">x = x + 1 <b>→</b> x passa a valer 4</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="variaveis.py">
+nome = "Ana"
+idade = 19
+altura = 1.68
+
+print(nome)
+print(idade)
+print(altura)
+
+idade = 20         # reatribuição: o valor antigo é substituído
+print(idade)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Regras para nomes de variáveis">
+  <h2>Regras para nomes de variáveis</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Nome</th><th>Válido?</th><th>Motivo</th></tr>
+        <tr><td><code>nota_final</code></td><td>sim</td><td>letras, números e <code>_</code>; estilo recomendado em Python</td></tr>
+        <tr><td><code>nota2</code></td><td>sim</td><td>números são permitidos depois da primeira letra</td></tr>
+        <tr><td><code>2nota</code></td><td>não</td><td>não pode começar com número</td></tr>
+        <tr><td><code>nota final</code></td><td>não</td><td>não pode ter espaço</td></tr>
+        <tr><td><code>nota-final</code></td><td>não</td><td>o hífen é lido como subtração</td></tr>
+        <tr><td><code>if</code></td><td>não</td><td>palavra reservada da linguagem</td></tr>
+      </table>
+      <p>Prefira nomes que expliquem o conteúdo: <code>media</code> diz mais que <code>m</code> ou <code>x1</code>.</p>
+    </div>
+    <div>
+      <p>O Python diferencia maiúsculas de minúsculas: <code>nota</code> e <code>Nota</code> são variáveis diferentes.</p>
+<textarea class="py" data-label="nomes.py">
+nota = 8
+Nota = 5
+print(nota)
+print(Nota)
+print(media)        # nunca foi criada. Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Tipos de dados">
+  <h2>Tipos de dados</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Tipo</th><th>Representa</th><th>Exemplos</th></tr>
+        <tr><td><code>int</code></td><td>números inteiros</td><td><code>42</code>, <code>-7</code>, <code>0</code></td></tr>
+        <tr><td><code>float</code></td><td>números com parte decimal</td><td><code>3.14</code>, <code>2.0</code>, <code>-0.5</code></td></tr>
+        <tr><td><code>str</code></td><td>texto, sempre entre aspas</td><td><code>"Quixadá"</code>, <code>'42'</code></td></tr>
+        <tr><td><code>bool</code></td><td>verdadeiro ou falso</td><td><code>True</code>, <code>False</code></td></tr>
+      </table>
+      <div class="note warn">A parte decimal usa <strong>ponto</strong>: <code>19.90</code>. Escrever <code>19,90</code> cria outra coisa (dois valores separados).</div>
+      <p><code>type(valor)</code> mostra o tipo de um valor.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="tipos.py">
+quantidade = 42
+preco = 19.90
+produto = "Caderno"
+disponivel = True
+
+print(type(quantidade))
+print(type(preco))
+print(type(produto))
+print(type(disponivel))
+print(type(10 / 2))   # a divisão com / sempre gera float
+print(type("10"))     # entre aspas é texto, não número
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Operadores aritméticos">
+  <h2>Operadores aritméticos</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Operador</th><th>Operação</th><th>Exemplo</th></tr>
+        <tr><td><code>+</code></td><td>soma</td><td><code>7 + 2</code> → <code>9</code></td></tr>
+        <tr><td><code>-</code></td><td>subtração</td><td><code>7 - 2</code> → <code>5</code></td></tr>
+        <tr><td><code>*</code></td><td>multiplicação</td><td><code>7 * 2</code> → <code>14</code></td></tr>
+        <tr><td><code>/</code></td><td>divisão real</td><td><code>7 / 2</code> → <code>3.5</code></td></tr>
+        <tr><td><code>//</code></td><td>divisão inteira (quociente)</td><td><code>7 // 2</code> → <code>3</code></td></tr>
+        <tr><td><code>%</code></td><td>resto da divisão</td><td><code>7 % 2</code> → <code>1</code></td></tr>
+        <tr><td><code>**</code></td><td>potência</td><td><code>7 ** 2</code> → <code>49</code></td></tr>
+      </table>
+      <p>Ordem: primeiro <code>**</code>, depois <code>* / // %</code>, por último <code>+ -</code>. Parênteses mudam a ordem.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="aritmetica.py">
+a = 17
+b = 5
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)     # divisão real
+print(a // b)    # divisão inteira: 17 = 5 * 3 + 2
+print(a % b)     # resto: o 2 que sobrou
+print(a ** 2)    # potência
+print(2 + 3 * 4)     # multiplicação primeiro
+print((2 + 3) * 4)   # parênteses mudam a ordem
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Funções matemáticas e o módulo math">
+  <h2>Funções matemáticas e o módulo math</h2>
+
+  <div class="cols">
+    <div>
+      <p>Além dos operadores, o Python traz <strong>funções prontas</strong>. Algumas estão sempre disponíveis; outras ficam no <strong>módulo</strong> <code>math</code>, que precisa ser importado uma vez, no início do programa, com <code>import math</code>.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Função</th><th>O que faz</th><th>Exemplo</th></tr>
+        <tr><td><code>abs(x)</code></td><td>valor absoluto</td><td><code>abs(-7)</code> → <code>7</code></td></tr>
+        <tr><td><code>round(x, n)</code></td><td>arredonda para <code>n</code> casas</td><td><code>round(3.14159, 2)</code> → <code>3.14</code></td></tr>
+        <tr><td><code>max</code> / <code>min</code></td><td>maior / menor valor</td><td><code>max(4, 9, 2)</code> → <code>9</code></td></tr>
+        <tr><td><code>math.sqrt(x)</code></td><td>raiz quadrada</td><td><code>math.sqrt(81)</code> → <code>9.0</code></td></tr>
+        <tr><td><code>math.floor(x)</code></td><td>arredonda para baixo</td><td><code>math.floor(3.7)</code> → <code>3</code></td></tr>
+        <tr><td><code>math.ceil(x)</code></td><td>arredonda para cima</td><td><code>math.ceil(3.2)</code> → <code>4</code></td></tr>
+        <tr><td><code>math.pi</code></td><td>a constante π</td><td><code>3.141592653589793</code></td></tr>
+      </table></div>
+      <div class="note"><strong>Problema real:</strong> quantos ônibus de 40 lugares levam 130 alunos? <code>130 / 40</code> dá <code>3.25</code>, mas não existe um quarto de ônibus: <code>math.ceil(130 / 40)</code> → <code>4</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="matematica.py">
+import math                # importa o módulo uma vez, no início
+
+print(abs(-7.5))           # distância até o zero
+print(round(3.14159, 2))   # arredonda para 2 casas
+print(max(4, 9, 2), min(4, 9, 2))
+print(2 ** 10, pow(2, 10)) # duas formas de calcular potência
+
+print(math.sqrt(81))       # raiz quadrada
+print(math.floor(3.7))     # para baixo
+print(math.ceil(3.2))      # para cima
+print(math.ceil(130 / 40), &quot;ônibus&quot;)
+</textarea>
+      <p>Aplicação: o teorema de Pitágoras.</p>
+<textarea class="py" data-label="hipotenusa.py" data-stdin="3
+4">
+import math
+
+a = float(input(&quot;Cateto a: &quot;))
+b = float(input(&quot;Cateto b: &quot;))
+h = math.sqrt(a ** 2 + b ** 2)
+print(f&quot;Hipotenusa: {h:.2f}&quot;)
+</textarea>
+      <div class="note warn"><code>round</code> desempata para o número <strong>par</strong>: <code>round(2.5)</code> → <code>2</code> e <code>round(3.5)</code> → <code>4</code>. Para apenas <em>exibir</em> um valor, prefira a f-string: <code>f"{x:.2f}"</code>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Conversão de tipos">
+  <h2>Conversão de tipos</h2>
+  <div class="cols">
+    <div>
+      <p>O tipo define o que uma operação faz. <code>+</code> entre números soma; entre textos, junta.</p>
+      <p>Para converter um valor de um tipo para outro, usamos o nome do tipo como função:</p>
+      <div class="minis"><span class="mini">int("42") <b>→</b> 42</span><span class="mini">float("3.5") <b>→</b> 3.5</span><span class="mini">str(10) <b>→</b> '10'</span><span class="mini">int(3.9) <b>→</b> 3</span></div>
+      <p><code>int()</code> de um número com casas decimais <strong>corta</strong> a parte decimal; não arredonda.</p>
+      <div class="note warn">A última linha do exemplo tenta converter um texto que não representa um número. Peça para a turma prever o resultado.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="conversao.py">
+print(5 + 3)          # números: soma
+print("5" + "3")      # textos: junta
+print(int("5") + int("3"))
+print("Idade: " + str(20))
+print(int(3.9))       # corta a parte decimal
+print(float("2.5") * 2)
+print(int("dez"))     # texto que não é número. Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Lendo mensagens de erro">
+  <h2>Lendo mensagens de erro</h2>
+
+  <p class="lead">Errar faz parte de programar. A mensagem de erro informa <strong>o tipo</strong> do problema, <strong>uma explicação</strong> e <strong>a linha</strong> em que o Python percebeu o erro.</p>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Erro</th><th>Causa mais comum</th></tr>
+        <tr><td><code>SyntaxError</code></td><td>faltou <code>:</code>, aspas ou parêntese; algo não está escrito em Python</td></tr>
+        <tr><td><code>IndentationError</code></td><td>recuo faltando ou desalinhado</td></tr>
+        <tr><td><code>NameError</code></td><td>variável usada antes de ser criada, ou nome digitado diferente</td></tr>
+        <tr><td><code>TypeError</code></td><td>operação entre tipos incompatíveis, como <code>"5" + 3</code></td></tr>
+        <tr><td><code>ValueError</code></td><td>tipo certo, valor inválido: <code>int("dez")</code></td></tr>
+        <tr><td><code>ZeroDivisionError</code></td><td>divisão por zero</td></tr>
+      </table>
+      <div class="note"><strong>Roteiro:</strong> 1) leia o tipo do erro; 2) vá até a linha indicada (às vezes o problema está na linha de cima, como um parêntese não fechado); 3) corrija <strong>um erro por vez</strong> e execute de novo.</div>
+    </div>
+    <div>
+      <p>Este programa tem <strong>três erros</strong>. Execute, leia a mensagem e a dica, corrija e repita até funcionar.</p>
+<textarea class="py" data-label="conserte.py" data-stdin="150">
+# Calcula o preço com 10% de desconto
+preco = input(&quot;Preço: &quot;)
+desconto = 10
+valor_final = preco - preco * desconto / 100
+print(&quot;Valor final:&quot;, Valor_final)
+if valor_final &gt; 100
+    print(&quot;Compra acima de R$ 100&quot;)
+</textarea>
+      <details class="sol"><summary>Mostrar a versão corrigida</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="150">
+# Calcula o preço com 10% de desconto
+preco = float(input(&quot;Preço: &quot;))                 # 2) TypeError: faltava converter
+desconto = 10
+valor_final = preco - preco * desconto / 100
+print(&quot;Valor final:&quot;, valor_final)              # 3) NameError: V maiúsculo
+if valor_final &gt; 100:                           # 1) SyntaxError: faltavam os dois-pontos
+    print(&quot;Compra acima de R$ 100&quot;)
+</textarea>
+</details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="var" data-title="Atualizando o valor de uma variável">
+  <h2>Atualizando o valor de uma variável</h2>
+  <div class="cols">
+    <div>
+      <p>Em <code>pontos = pontos + 5</code>, o Python lê o valor atual de <code>pontos</code>, soma 5 e guarda o resultado de volta no mesmo nome.</p>
+      <p>Esse padrão é tão comum que existe uma forma abreviada:</p>
+      <table class="tbl">
+        <tr><th>Abreviado</th><th>Equivale a</th></tr>
+        <tr><td><code>x += 1</code></td><td><code>x = x + 1</code></td></tr>
+        <tr><td><code>x -= 3</code></td><td><code>x = x - 3</code></td></tr>
+        <tr><td><code>x *= 2</code></td><td><code>x = x * 2</code></td></tr>
+        <tr><td><code>x /= 4</code></td><td><code>x = x / 4</code></td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="atualizando.py">
+pontos = 10
+pontos = pontos + 5     # lê o valor atual, soma 5 e guarda
+print(pontos)
+pontos += 5             # forma abreviada da mesma operação
+print(pontos)
+pontos -= 3
+print(pontos)
+pontos *= 2
+print(pontos)
+</textarea>
+      <div class="note">Peça para a turma escrever os quatro valores no caderno antes de executar.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ENTRADA E SAÍDA ===================== -->
+<section class="slide" data-mod="io" data-title="Saída com print">
+  <h2>Saída com <code>print</code></h2>
+  <div class="cols">
+    <div>
+      <p><code>print()</code> mostra valores na tela e pula para a próxima linha.</p>
+      <p>Vários valores separados por vírgula são mostrados com um espaço entre eles, e podem ser de tipos diferentes.</p>
+      <table class="tbl">
+        <tr><th>Parâmetro</th><th>Controla</th><th>Padrão</th></tr>
+        <tr><td><code>sep</code></td><td>o que vai entre os valores</td><td>um espaço</td></tr>
+        <tr><td><code>end</code></td><td>o que vai no final</td><td>quebra de linha</td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="print.py">
+print("Olá, turma")
+print("Nota:", 8.5)            # vírgula separa e coloca espaço
+print(1, 2, 3, sep=" - ")      # muda o separador
+print("sem quebra", end="")    # muda o final da linha
+print(" ... continua na mesma linha")
+print()                        # linha em branco
+print("fim")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="io" data-title="Formatando a saída com f-strings">
+  <h2>Formatando a saída com f-strings</h2>
+  <div class="cols">
+    <div>
+      <p>Com um <code>f</code> antes das aspas, tudo que estiver entre <code>{ }</code> é calculado e inserido no texto.</p>
+      <p>Depois de dois-pontos, dentro das chaves, indicamos o formato. <code>:.2f</code> significa “número com 2 casas decimais”.</p>
+      <div class="minis"><span class="mini">f"{2 + 3}" <b>→</b> '5'</span><span class="mini">f"{3.14159:.2f}" <b>→</b> '3.14'</span><span class="mini">f"{7.5:.1f}" <b>→</b> '7.5'</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="fstring.py">
+nome = "Ana"
+nota1 = 7.5
+nota2 = 8.25
+media = (nota1 + nota2) / 2
+
+print("Aluna", nome, "média", media)      # com vírgulas
+print(f"Aluna {nome}, média {media}")     # com f-string
+print(f"Média com 2 casas: {media:.2f}")
+print(f"Dobro da nota 1: {nota1 * 2}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="io" data-title="Alinhando a saída em colunas">
+  <h2>Alinhando a saída em colunas</h2>
+
+  <div class="cols">
+    <div>
+      <p>Dentro das chaves da f-string podemos definir uma <strong>largura</strong> e um <strong>alinhamento</strong>. Isso permite montar relatórios e tabelas bem organizados.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Formato</th><th>Significado</th></tr>
+        <tr><td><code>{x:10}</code></td><td>ocupa no mínimo 10 posições</td></tr>
+        <tr><td><code>{x:&lt;10}</code></td><td>alinha à esquerda</td></tr>
+        <tr><td><code>{x:&gt;10}</code></td><td>alinha à direita</td></tr>
+        <tr><td><code>{x:^10}</code></td><td>centraliza</td></tr>
+        <tr><td><code>{x:&gt;10.2f}</code></td><td>à direita, 10 posições, 2 casas</td></tr>
+        <tr><td><code>{x:03d}</code></td><td>inteiro com zeros à esquerda</td></tr>
+        <tr><td><code>{x:,.2f}</code></td><td>separador de milhar</td></tr>
+      </table></div>
+      <div class="minis"><span class="mini">f&quot;[{&#x27;ab&#x27;:&gt;5}]&quot; <b>→</b> &#x27;[   ab]&#x27;</span><span class="mini">f&quot;{7:03d}&quot; <b>→</b> &#x27;007&#x27;</span><span class="mini">f&quot;{1500.5:,.2f}&quot; <b>→</b> &#x27;1,500.50&#x27;</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="tabela.py">
+print(f&quot;{&#x27;Produto&#x27;:&lt;15}{&#x27;Preço&#x27;:&gt;10}&quot;)
+print(&quot;-&quot; * 25)
+print(f&quot;{&#x27;Café&#x27;:&lt;15}{4.5:&gt;10.2f}&quot;)
+print(f&quot;{&#x27;Pão de queijo&#x27;:&lt;15}{3.75:&gt;10.2f}&quot;)
+print(f&quot;{&#x27;Suco&#x27;:&lt;15}{12:&gt;10.2f}&quot;)
+print(&quot;-&quot; * 25)
+print(f&quot;{&#x27;Total&#x27;:&lt;15}{4.5 + 3.75 + 12:&gt;10.2f}&quot;)
+print(f&quot;{&#x27;Volte sempre!&#x27;:^25}&quot;)
+</textarea>
+      <p>O separador de milhar sai no padrão americano. Para o padrão brasileiro, troque os sinais com <code>replace</code> (que substitui um texto por outro):</p>
+<textarea class="py" data-label="reais.py">
+valor = 1234567.891
+texto = f&quot;{valor:,.2f}&quot;          # 1,234,567.89
+print(texto)
+brasil = texto.replace(&quot;,&quot;, &quot;X&quot;).replace(&quot;.&quot;, &quot;,&quot;).replace(&quot;X&quot;, &quot;.&quot;)
+print(&quot;R$&quot;, brasil)              # R$ 1.234.567,89
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="io" data-title="Entrada com input">
+  <h2>Entrada com <code>input</code></h2>
+  <div class="cols">
+    <div>
+      <p><code>input("mensagem")</code> mostra a mensagem, espera o usuário digitar e devolve o que foi digitado.</p>
+      <div class="note warn"><code>input()</code> devolve <strong>sempre</strong> um texto (<code>str</code>), mesmo que o usuário digite um número. Para fazer contas, converta com <code>int()</code> ou <code>float()</code>.</div>
+      <p>Aqui na aula, os valores digitados ficam no campo <em>Entrada</em>, um por linha. Se o campo estiver vazio, o navegador abre uma caixa para digitar.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="input.py" data-stdin="Ana
+19">
+nome = input("Seu nome: ")
+idade = input("Sua idade: ")
+print(type(idade))            # input sempre devolve str
+idade = int(idade)            # converte para poder calcular
+print(f"{nome}, daqui a 5 anos você terá {idade + 5} anos.")
+</textarea>
+      <p>Forma usual: converter na mesma linha da leitura.</p>
+<textarea class="py" data-label="input_direto.py" data-stdin="4.5
+3">
+preco = float(input("Preço: "))
+quantidade = int(input("Quantidade: "))
+print(f"Total: R$ {preco * quantidade:.2f}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="io" data-title="Entrada, processamento e saída">
+  <h2>Entrada, processamento e saída</h2>
+  <div class="cols">
+    <div>
+      <p>A maioria dos programas simples segue três etapas:</p>
+      <ol>
+        <li><strong>Entrada:</strong> ler os dados necessários.</li>
+        <li><strong>Processamento:</strong> fazer os cálculos.</li>
+        <li><strong>Saída:</strong> mostrar o resultado.</li>
+      </ol>
+      <p>Antes de programar, identifique cada etapa no enunciado. Ex.: “Leia três notas e mostre a média” → entrada: 3 notas; processamento: somar e dividir por 3; saída: a média.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="media.py" data-stdin="7.5
+8
+6.5">
+# Entrada
+n1 = float(input("Nota 1: "))
+n2 = float(input("Nota 2: "))
+n3 = float(input("Nota 3: "))
+
+# Processamento
+media = (n1 + n2 + n3) / 3
+
+# Saída
+print(f"Média: {media:.1f}")
+</textarea>
+      <div class="note warn">Teste sem os parênteses: <code>n1 + n2 + n3 / 3</code>. O resultado muda por causa da ordem das operações.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="io" data-title="Desafio: temperatura e tempo">
+  <h2>Desafio: temperatura e tempo</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Leia uma temperatura em graus Celsius e mostre em Fahrenheit, com uma casa decimal. Fórmula: <code>F = C * 9 / 5 + 32</code>.</li>
+        <li>Leia uma quantidade de segundos e mostre no formato horas, minutos e segundos. Ex.: 3725 → <code>1h 2min 5s</code>.</li>
+      </ol>
+      <p>Dica para o item 2: use <code>//</code> e <code>%</code>. Uma hora tem 3600 segundos.</p>
+      <div class="minis"><span class="mini">3725 // 3600 <b>→</b> 1</span><span class="mini">3725 % 3600 <b>→</b> 125</span><span class="mini">125 // 60 <b>→</b> 2</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_io.py" data-stdin="30
+3725" data-tests="[{&quot;in&quot;: &quot;30\n3725&quot;, &quot;out&quot;: [&quot;86.0&quot;, &quot;1h 2min 5s&quot;]}, {&quot;in&quot;: &quot;-40\n59&quot;, &quot;out&quot;: [&quot;-40.0&quot;, &quot;0h 0min 59s&quot;]}, {&quot;in&quot;: &quot;100\n7200&quot;, &quot;out&quot;: [&quot;212.0&quot;, &quot;2h 0min 0s&quot;]}]">
+# 1) Celsius para Fahrenheit
+
+
+# 2) Segundos para horas, minutos e segundos
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="30
+3725">
+c = float(input("Temperatura em °C: "))
+f = c * 9 / 5 + 32
+print(f"{c} °C = {f:.1f} °F")
+
+total = int(input("Total de segundos: "))
+horas = total // 3600
+resto = total % 3600
+minutos = resto // 60
+segundos = resto % 60
+print(f"{horas}h {minutos}min {segundos}s")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DECISÃO ===================== -->
+<section class="slide" data-mod="cond" data-title="Comparações e o tipo bool">
+  <h2>Comparações e o tipo <code>bool</code></h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Operador</th><th>Pergunta</th><th>Exemplo</th></tr>
+        <tr><td><code>==</code></td><td>é igual?</td><td><code>5 == 5</code> → <code>True</code></td></tr>
+        <tr><td><code>!=</code></td><td>é diferente?</td><td><code>5 != 5</code> → <code>False</code></td></tr>
+        <tr><td><code>&gt;</code></td><td>é maior?</td><td><code>7 &gt; 3</code> → <code>True</code></td></tr>
+        <tr><td><code>&lt;</code></td><td>é menor?</td><td><code>7 &lt; 3</code> → <code>False</code></td></tr>
+        <tr><td><code>&gt;=</code></td><td>é maior ou igual?</td><td><code>7 &gt;= 7</code> → <code>True</code></td></tr>
+        <tr><td><code>&lt;=</code></td><td>é menor ou igual?</td><td><code>6 &lt;= 7</code> → <code>True</code></td></tr>
+      </table>
+      <div class="note warn"><code>=</code> guarda um valor; <code>==</code> compara dois valores. Trocar um pelo outro é o erro mais comum nesta etapa.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="comparacoes.py">
+idade = 17
+print(idade >= 18)
+print(idade == 17)
+print(idade != 17)
+print("ana" == "Ana")      # maiúsculas fazem diferença
+print(10 == 10.0)
+aprovado = 8 >= 7          # o resultado pode ser guardado
+print(aprovado, type(aprovado))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="if: executar só quando a condição é verdadeira">
+  <h2><code>if</code>: executar só quando a condição é verdadeira</h2>
+  <div class="cols">
+    <div>
+      <p>A estrutura tem três partes: a palavra <code>if</code>, uma condição e dois-pontos. As linhas que pertencem ao <code>if</code> ficam <strong>recuadas</strong> com 4 espaços.</p>
+      <p>Se a condição for <code>True</code>, o bloco recuado executa. Se for <code>False</code>, o Python pula o bloco e segue para a próxima linha sem recuo.</p>
+      <div class="note">Execute com 17 e depois troque a entrada para 20. Compare as saídas.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="if.py" data-stdin="17">
+idade = int(input("Idade: "))
+if idade >= 18:
+    print("Pode tirar a carteira de motorista.")
+    print("Procure uma autoescola.")
+print("Esta linha sempre executa.")
+</textarea>
+      <p>Sem o recuo, o Python não sabe quais linhas pertencem ao <code>if</code>:</p>
+<textarea class="py" data-label="sem_recuo.py">
+nota = 8
+if nota >= 7:
+print("Aprovado")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="if e else: dois caminhos">
+  <h2><code>if</code> e <code>else</code>: dois caminhos</h2>
+  <div class="cols">
+    <div>
+      <p><code>else</code> define o que fazer quando a condição é falsa. Exatamente um dos dois blocos executa, nunca os dois.</p>
+      <p><code>else</code> não tem condição: ele cobre todos os casos que o <code>if</code> não cobriu.</p>
+      <p>Um número é par quando o resto da divisão por 2 é zero.</p>
+      <div class="minis"><span class="mini">8 % 2 <b>→</b> 0</span><span class="mini">7 % 2 <b>→</b> 1</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="par_impar.py" data-stdin="7">
+n = int(input("Número: "))
+if n % 2 == 0:
+    print(n, "é par")
+else:
+    print(n, "é ímpar")
+print("Fim da verificação")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="if, elif e else: vários caminhos">
+  <h2><code>if</code>, <code>elif</code> e <code>else</code>: vários caminhos</h2>
+  <p class="lead">As condições são testadas de cima para baixo. A primeira verdadeira executa e as demais são ignoradas. Acompanhe no teste de mesa quais linhas são puladas.</p>
+  <div class="trace" data-code="nota = 8.5
+if nota &gt;= 9:
+    print(&quot;Conceito A&quot;)
+elif nota &gt;= 7:
+    print(&quot;Conceito B&quot;)
+else:
+    print(&quot;Conceito D&quot;)
+print(&quot;Fim&quot;)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;nota&quot;: &quot;8.5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;nota&quot;: &quot;8.5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;nota &gt;= 9 → False&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;nota&quot;: &quot;8.5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;nota &gt;= 7 → True&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;nota&quot;: &quot;8.5&quot;}, &quot;out&quot;: &quot;Conceito B\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;nota&quot;: &quot;8.5&quot;}, &quot;out&quot;: &quot;Conceito B\nFim\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;nota&quot;]"></div>
+  <div class="cols even">
+    <div>
+<textarea class="py" data-label="conceito.py" data-stdin="8.5">
+nota = float(input("Nota: "))
+if nota >= 9:
+    print("Conceito A")
+elif nota >= 7:
+    print("Conceito B")
+elif nota >= 5:
+    print("Conceito C")
+else:
+    print("Conceito D")
+</textarea>
+    </div>
+    <div>
+      <p>A ordem importa. Por que a nota 9.5 recebe conceito C aqui?</p>
+<textarea class="py" data-label="ordem_errada.py">
+nota = 9.5
+if nota >= 5:
+    print("Conceito C")
+elif nota >= 7:
+    print("Conceito B")
+elif nota >= 9:
+    print("Conceito A")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="Decisões aninhadas">
+  <h2>Decisões aninhadas</h2>
+
+  <p class="lead">Um <code>if</code> pode ficar dentro de outro. O bloco interno só é avaliado quando a condição externa é verdadeira. O <strong>recuo</strong> mostra quem está dentro de quem.</p>
+  <div class="trace" data-code="idade = 20
+tem_titulo = False
+if idade &gt;= 16:
+    if tem_titulo:
+        print(&quot;Pode votar&quot;)
+    else:
+        print(&quot;Tire o título de eleitor&quot;)
+else:
+    print(&quot;Ainda não pode votar&quot;)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;idade&quot;: &quot;20&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;idade&quot;: &quot;20&quot;, &quot;tem_titulo&quot;: &quot;False&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;idade&quot;: &quot;20&quot;, &quot;tem_titulo&quot;: &quot;False&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;idade &gt;= 16 → True&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;idade&quot;: &quot;20&quot;, &quot;tem_titulo&quot;: &quot;False&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tem_titulo → False&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;idade&quot;: &quot;20&quot;, &quot;tem_titulo&quot;: &quot;False&quot;}, &quot;out&quot;: &quot;Tire o título de eleitor\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;idade&quot;, &quot;tem_titulo&quot;]"></div>
+  <div class="cols">
+    <div>
+      <p>Use aninhamento quando a segunda pergunta só faz sentido depois da primeira. Na calculadora ao lado, só vale a pena olhar o divisor quando a operação é uma divisão.</p>
+      <div class="note">Cada <code>else</code> pertence ao <code>if</code> que está <strong>no mesmo recuo</strong>. Troque <code>tem_titulo</code> para <code>True</code> no teste de mesa mentalmente: qual linha muda?</div>
+      <p>Muitas vezes um aninhamento pode virar <code>and</code>: <code>if idade &gt;= 16 and tem_titulo:</code>. Escolha a forma mais fácil de ler.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="calculadora.py" data-stdin="10
+/
+0">
+a = float(input(&quot;Primeiro número: &quot;))
+op = input(&quot;Operação (+ - * /): &quot;)
+b = float(input(&quot;Segundo número: &quot;))
+
+if op == &quot;+&quot;:
+    print(&quot;Resultado:&quot;, a + b)
+elif op == &quot;-&quot;:
+    print(&quot;Resultado:&quot;, a - b)
+elif op == &quot;*&quot;:
+    print(&quot;Resultado:&quot;, a * b)
+elif op == &quot;/&quot;:
+    if b == 0:                     # decisão dentro da decisão
+        print(&quot;Não é possível dividir por zero&quot;)
+    else:
+        print(&quot;Resultado:&quot;, a / b)
+else:
+    print(&quot;Operação inválida&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="Operadores lógicos: and, or, not">
+  <h2>Operadores lógicos: <code>and</code>, <code>or</code>, <code>not</code></h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>A</th><th>B</th><th><code>A and B</code></th><th><code>A or B</code></th></tr>
+        <tr><td>True</td><td>True</td><td>True</td><td>True</td></tr>
+        <tr><td>True</td><td>False</td><td>False</td><td>True</td></tr>
+        <tr><td>False</td><td>True</td><td>False</td><td>True</td></tr>
+        <tr><td>False</td><td>False</td><td>False</td><td>False</td></tr>
+      </table>
+      <p><code>and</code>: as duas precisam ser verdadeiras. <code>or</code>: basta uma. <code>not</code> inverte: <code>not True</code> → <code>False</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="logicos.py">
+idade = 20
+tem_carteira = False
+
+print(idade >= 18 and tem_carteira)    # as duas precisam ser True
+print(idade >= 18 or tem_carteira)     # basta uma ser True
+print(not tem_carteira)                # inverte
+
+nota = 6.5
+frequencia = 80
+if nota >= 7 and frequencia >= 75:
+    print("Aprovado")
+elif nota >= 5 and frequencia >= 75:
+    print("Prova final")
+else:
+    print("Reprovado")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="Armadilhas nas condições">
+  <h2>Armadilhas nas condições</h2>
+
+  <div class="cols">
+    <div>
+      <ol>
+        <li><strong>Intervalos.</strong> O Python aceita comparações encadeadas, como na matemática: <code>18 &lt;= idade &lt; 60</code> equivale a <code>idade &gt;= 18 and idade &lt; 60</code>.</li>
+        <li><strong>O <code>or</code> incompleto.</strong> <code>cor == "azul" or "verde"</code> está <em>sempre</em> certo, porque um texto não vazio sozinho já vale <code>True</code>. Escreva a comparação completa dos dois lados: <code>cor == "azul" or cor == "verde"</code>.</li>
+        <li><strong>Igualdade com <code>float</code>.</strong> Números decimais são guardados de forma aproximada: <code>0.1 + 0.2</code> não é exatamente <code>0.3</code>. Arredonde antes de comparar.</li>
+        <li><strong>Texto não é número.</strong> <code>"10" &gt; "9"</code> é <code>False</code>, porque textos são comparados letra a letra. Converta com <code>int()</code> antes.</li>
+      </ol>
+    </div>
+    <div>
+<textarea class="py" data-label="armadilhas.py">
+idade = 25
+print(18 &lt;= idade &lt; 60)              # comparação encadeada
+
+cor = &quot;vermelho&quot;
+if cor == &quot;azul&quot; or &quot;verde&quot;:         # ERRADO: &quot;verde&quot; sozinho vale True
+    print(&quot;Entrou no if (mas não devia!)&quot;)
+if cor == &quot;azul&quot; or cor == &quot;verde&quot;:  # CERTO
+    print(&quot;Cor fria&quot;)
+else:
+    print(&quot;Não é azul nem verde&quot;)
+
+print(0.1 + 0.2)                     # decimais são aproximados
+print(0.1 + 0.2 == 0.3)
+print(round(0.1 + 0.2, 2) == 0.3)    # arredonde antes de comparar
+
+print(&quot;10&quot; &gt; &quot;9&quot;, 10 &gt; 9)            # texto x número
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cond" data-title="Desafio: ano bissexto">
+  <h2>Desafio: ano bissexto</h2>
+  <div class="cols">
+    <div>
+      <p>Leia um ano e informe se ele é bissexto. Um ano é bissexto quando:</p>
+      <ul>
+        <li>é divisível por 4 <strong>e não</strong> é divisível por 100, <strong>ou</strong></li>
+        <li>é divisível por 400.</li>
+      </ul>
+      <p>“Divisível por” significa resto zero.</p>
+      <div class="minis"><span class="mini">2024 % 4 <b>→</b> 0</span><span class="mini">1900 % 100 <b>→</b> 0</span><span class="mini">2000 % 400 <b>→</b> 0</span></div>
+      <p>Mostre no formato <code>2024 é bissexto</code> ou <code>2023 não é bissexto</code>. O botão <strong>✓ Verificar</strong> testa com 2024, 2023, 1900 e 2000.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_bissexto.py" data-stdin="2024" data-tests="[{&quot;in&quot;: &quot;2024&quot;, &quot;out&quot;: [&quot;2024 é bissexto&quot;], &quot;nao&quot;: [&quot;não&quot;]}, {&quot;in&quot;: &quot;2023&quot;, &quot;out&quot;: [&quot;2023 não é bissexto&quot;]}, {&quot;in&quot;: &quot;1900&quot;, &quot;out&quot;: [&quot;1900 não é bissexto&quot;]}, {&quot;in&quot;: &quot;2000&quot;, &quot;out&quot;: [&quot;2000 é bissexto&quot;], &quot;nao&quot;: [&quot;não&quot;]}]">
+ano = int(input("Ano: "))
+
+# escreva a decisão aqui
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1900">
+ano = int(input("Ano: "))
+if (ano % 4 == 0 and ano % 100 != 0) or ano % 400 == 0:
+    print(ano, "é bissexto")
+else:
+    print(ano, "não é bissexto")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REPETIÇÃO ===================== -->
+<section class="slide" data-mod="loop" data-title="while: repetir enquanto a condição for verdadeira">
+  <h2><code>while</code>: repetir enquanto a condição for verdadeira</h2>
+  <p class="lead">O bloco recuado executa, a condição é testada de novo, e assim por diante. Quando a condição fica falsa, o programa segue para depois do laço.</p>
+  <div class="trace" data-code="soma = 0
+i = 1
+while i &lt;= 4:
+    soma = soma + i
+    i = i + 1
+print(&quot;Soma:&quot;, soma)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;soma&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;soma&quot;: &quot;0&quot;, &quot;i&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;soma&quot;: &quot;0&quot;, &quot;i&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i &lt;= 4 → True&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;soma&quot;: &quot;1&quot;, &quot;i&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;soma&quot;: &quot;1&quot;, &quot;i&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;soma&quot;: &quot;1&quot;, &quot;i&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i &lt;= 4 → True&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;soma&quot;: &quot;3&quot;, &quot;i&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;soma&quot;: &quot;3&quot;, &quot;i&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;soma&quot;: &quot;3&quot;, &quot;i&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i &lt;= 4 → True&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;soma&quot;: &quot;6&quot;, &quot;i&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;soma&quot;: &quot;6&quot;, &quot;i&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;soma&quot;: &quot;6&quot;, &quot;i&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i &lt;= 4 → True&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;soma&quot;: &quot;10&quot;, &quot;i&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;soma&quot;: &quot;10&quot;, &quot;i&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;soma&quot;: &quot;10&quot;, &quot;i&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i &lt;= 4 → False&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;soma&quot;: &quot;10&quot;, &quot;i&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;Soma: 10\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;soma&quot;, &quot;i&quot;]"></div>
+  <div class="cols even">
+    <div>
+      <p>Todo <code>while</code> com contador tem três partes:</p>
+      <ol>
+        <li><strong>inicialização</strong> antes do laço: <code>i = 1</code></li>
+        <li><strong>condição</strong> testada a cada volta: <code>i &lt;= 4</code></li>
+        <li><strong>atualização</strong> dentro do laço: <code>i = i + 1</code></li>
+      </ol>
+    </div>
+    <div>
+<textarea class="py" data-label="while.py">
+contador = 1
+while contador <= 5:
+    print("Volta número", contador)
+    contador += 1
+print("Saiu do laço com contador =", contador)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="while com valor de parada">
+  <h2><code>while</code> com valor de parada</h2>
+  <div class="cols">
+    <div>
+      <p>Quando não sabemos quantas vezes vamos repetir, combinamos um <strong>valor de parada</strong> com o usuário. Aqui, digitar <code>-1</code> encerra a leitura.</p>
+      <p>Repare que a primeira leitura acontece <strong>antes</strong> do laço e a próxima leitura é a última linha <strong>dentro</strong> dele.</p>
+      <p>Mude as entradas e execute de novo. Teste também começando com <code>-1</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="sentinela.py" data-stdin="8
+6.5
+9
+-1">
+soma = 0
+quantidade = 0
+nota = float(input("Nota (-1 para parar): "))
+while nota != -1:
+    soma += nota
+    quantidade += 1
+    nota = float(input("Nota (-1 para parar): "))
+
+if quantidade > 0:
+    print(f"{quantidade} notas, média {soma / quantidade:.2f}")
+else:
+    print("Nenhuma nota informada.")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="Cuidado: laço infinito">
+  <h2>Cuidado: laço infinito</h2>
+  <div class="cols even">
+    <div>
+      <p>Se a condição nunca ficar falsa, o laço nunca termina. No código abaixo falta a atualização: <code>i</code> vale 1 para sempre.</p>
+      <div class="runner"><div class="rbar"><span class="rlabel">nao_execute.py</span><span class="rhint">exemplo sem botão de executar</span></div><div class="editor"><pre class="stat">i = 1
+while i &lt;= 5:
+    print(i)
+# falta i = i + 1: a condição é sempre True</pre></div></div>
+      <div class="note warn">Não execute laços infinitos nesta página: o navegador trava. No terminal ou no IDLE, <kbd>Ctrl</kbd>+<kbd>C</kbd> interrompe o programa.</div>
+    </div>
+    <div>
+      <p>Pergunta para a turma: o que imprime o laço infinito acima? Depois, a versão corrigida:</p>
+<textarea class="py" data-label="corrigido.py">
+i = 1
+while i <= 5:
+    print(i)
+    i = i + 1      # atualização: aproxima a condição de False
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="Validando entradas e menus">
+  <h2>Validando entradas e menus</h2>
+
+  <div class="cols">
+    <div>
+      <p>O usuário nem sempre digita o que esperamos. O <code>while</code> permite <strong>repetir a pergunta enquanto a resposta for inválida</strong>:</p>
+      <ol>
+        <li>leia o valor;</li>
+        <li><strong>enquanto</strong> for inválido: avise e leia de novo;</li>
+        <li>depois do laço, o valor com certeza é válido.</li>
+      </ol>
+      <p>O mesmo raciocínio cria <strong>menus</strong>: o programa repete as opções até o usuário escolher sair. Você vai usar esse padrão na agenda telefônica da próxima aula.</p>
+      <div class="note">Altere as entradas: o que acontece com <code>-1</code>, <code>10</code> e <code>11</code> na validação? Os limites 0 e 10 são aceitos?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="validacao.py" data-stdin="15
+-2
+8">
+nota = float(input(&quot;Nota (0 a 10): &quot;))
+while nota &lt; 0 or nota &gt; 10:
+    print(&quot;Valor inválido! Digite de novo.&quot;)
+    nota = float(input(&quot;Nota (0 a 10): &quot;))
+print(&quot;Nota registrada:&quot;, nota)
+</textarea>
+<textarea class="py" data-label="menu.py" data-stdin="1
+5
+2
+0">
+opcao = &quot;&quot;
+while opcao != &quot;0&quot;:
+    print(&quot;1 - Dizer olá   2 - Contar até 3   0 - Sair&quot;)
+    opcao = input(&quot;Escolha: &quot;)
+    if opcao == &quot;1&quot;:
+        print(&quot;Olá!&quot;)
+    elif opcao == &quot;2&quot;:
+        for i in range(1, 4):
+            print(i)
+    elif opcao != &quot;0&quot;:
+        print(&quot;Opção inválida&quot;)
+print(&quot;Programa encerrado&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="for e range">
+  <h2><code>for</code> e <code>range</code></h2>
+  <p class="lead"><code>for</code> repete o bloco uma vez para cada valor de uma sequência. <code>range</code> gera sequências de números.</p>
+  <div class="trace" data-code="for i in range(1, 4):
+    quadrado = i * i
+    print(i, &quot;ao quadrado =&quot;, quadrado)
+print(&quot;Fim&quot;)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i recebe 1&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;quadrado&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;quadrado&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;quadrado&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n&quot;, &quot;note&quot;: &quot;i recebe 2&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;quadrado&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;quadrado&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n2 ao quadrado = 4\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;3&quot;, &quot;quadrado&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n2 ao quadrado = 4\n&quot;, &quot;note&quot;: &quot;i recebe 3&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;3&quot;, &quot;quadrado&quot;: &quot;9&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n2 ao quadrado = 4\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;3&quot;, &quot;quadrado&quot;: &quot;9&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n2 ao quadrado = 4\n3 ao quadrado = 9\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;3&quot;, &quot;quadrado&quot;: &quot;9&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n2 ao quadrado = 4\n3 ao quadrado = 9\n&quot;, &quot;note&quot;: &quot;a sequência do range acabou: sai do for&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;i&quot;: &quot;3&quot;, &quot;quadrado&quot;: &quot;9&quot;}, &quot;out&quot;: &quot;1 ao quadrado = 1\n2 ao quadrado = 4\n3 ao quadrado = 9\nFim\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;i&quot;, &quot;quadrado&quot;]"></div>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Chamada</th><th>Gera</th></tr>
+        <tr><td><code>range(5)</code></td><td>0, 1, 2, 3, 4</td></tr>
+        <tr><td><code>range(2, 6)</code></td><td>2, 3, 4, 5 (o 6 fica de fora)</td></tr>
+        <tr><td><code>range(0, 10, 3)</code></td><td>0, 3, 6, 9 (de 3 em 3)</td></tr>
+        <tr><td><code>range(5, 0, -1)</code></td><td>5, 4, 3, 2, 1 (decrescente)</td></tr>
+      </table>
+      <div class="minis"><span class="mini">list(range(3)) <b>→</b> [0, 1, 2]</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="for.py">
+for i in range(5):
+    print("Volta", i)
+
+for n in range(10, 0, -2):
+    print(n, end=" ")
+print()
+
+for letra in "Python":     # o for também percorre textos
+    print(letra)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="for ou while?">
+  <h2><code>for</code> ou <code>while</code>?</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th></th><th><code>for</code></th><th><code>while</code></th></tr>
+        <tr><td>Use quando</td><td>a quantidade de repetições é conhecida ou há uma sequência para percorrer</td><td>a repetição depende de uma condição que muda durante a execução</td></tr>
+        <tr><td>Exemplos</td><td>tabuada, ler 10 notas, percorrer um texto</td><td>ler até digitar 0, pedir senha até acertar</td></tr>
+        <tr><td>Contador</td><td>automático</td><td>você cria e atualiza</td></tr>
+      </table>
+      <p>Toda tarefa feita com <code>for</code> pode ser feita com <code>while</code>. O <code>for</code> deixa o código menor e evita esquecer a atualização.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="comparando.py">
+# Contar de 1 a 5 com while
+i = 1
+while i <= 5:
+    print(i, end=" ")
+    i += 1
+print()
+
+# A mesma contagem com for
+for i in range(1, 6):
+    print(i, end=" ")
+print()
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="break e continue">
+  <h2><code>break</code> e <code>continue</code></h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Comando</th><th>Efeito</th></tr>
+        <tr><td><code>break</code></td><td>encerra o laço imediatamente</td></tr>
+        <tr><td><code>continue</code></td><td>pula o restante desta volta e vai para a próxima</td></tr>
+      </table>
+      <p>Um uso comum de <code>break</code> é o laço <code>while True</code>, que repete até alguma condição interna mandar parar.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="break_continue.py">
+for n in range(1, 11):
+    if n % 3 == 0:
+        continue          # pula os múltiplos de 3
+    if n > 8:
+        break             # encerra o laço
+    print(n, end=" ")
+print()
+</textarea>
+<textarea class="py" data-label="senha.py" data-stdin="abc
+4321
+1234">
+while True:
+    senha = input("Senha: ")
+    if senha == "1234":
+        print("Acesso liberado")
+        break
+    print("Senha incorreta")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="Padrões: contador, acumulador e maior valor">
+  <h2>Padrões: contador, acumulador e maior valor</h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Padrão</th><th>Começa com</th><th>A cada volta</th></tr>
+        <tr><td>contador</td><td><code>0</code></td><td><code>pares += 1</code> quando a condição vale</td></tr>
+        <tr><td>acumulador</td><td><code>0</code></td><td><code>soma += n</code></td></tr>
+        <tr><td>maior valor</td><td>o primeiro lido</td><td>troca quando aparece um maior</td></tr>
+      </table>
+      <p>Esses três padrões resolvem boa parte dos exercícios de laço. Identifique qual deles cada enunciado pede.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="padroes.py" data-stdin="7
+3
+12
+5
+9">
+soma = 0          # acumulador
+pares = 0         # contador
+maior = 0
+
+for i in range(5):
+    n = int(input(f"Número {i + 1}: "))
+    soma += n
+    if n % 2 == 0:
+        pares += 1
+    if i == 0 or n > maior:   # o primeiro número sempre é o maior até então
+        maior = n
+
+print("Soma:", soma)
+print("Pares:", pares)
+print("Maior:", maior)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="Laços aninhados">
+  <h2>Laços aninhados</h2>
+
+  <p class="lead">Um laço pode ficar dentro de outro. Para <strong>cada volta</strong> do laço de fora, o laço de dentro executa <strong>todas</strong> as suas voltas. Aqui são 2 × 3 = 6 impressões.</p>
+  <div class="trace" data-code="for i in range(1, 3):
+    for j in range(1, 4):
+        print(i, &quot;x&quot;, j, &quot;=&quot;, i * j)
+print(&quot;Fim&quot;)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;i recebe 1&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;j recebe 1&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n&quot;, &quot;note&quot;: &quot;j recebe 2&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n&quot;, &quot;note&quot;: &quot;j recebe 3&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;1&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n&quot;, &quot;note&quot;: &quot;a sequência acabou: sai do for&quot;}, {&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n&quot;, &quot;note&quot;: &quot;i recebe 2&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n&quot;, &quot;note&quot;: &quot;j recebe 1&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n&quot;, &quot;note&quot;: &quot;j recebe 2&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n2 x 2 = 4\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n2 x 2 = 4\n&quot;, &quot;note&quot;: &quot;j recebe 3&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n&quot;, &quot;note&quot;: &quot;a sequência acabou: sai do for&quot;}, {&quot;line&quot;: 1, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n&quot;, &quot;note&quot;: &quot;a sequência acabou: sai do for&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;i&quot;: &quot;2&quot;, &quot;j&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;1 x 1 = 1\n1 x 2 = 2\n1 x 3 = 3\n2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\nFim\n&quot;, &quot;note&quot;: null}]" data-vars="[&quot;i&quot;, &quot;j&quot;]"></div>
+  <div class="cols">
+    <div>
+      <p>Laços aninhados aparecem sempre que há <strong>linhas e colunas</strong>: tabelas, desenhos, tabuleiros e, na próxima aula, matrizes.</p>
+      <p>No desenho ao lado, a linha 1 tem 1 asterisco, a linha 2 tem 2… O laço de dentro usa a variável do laço de fora.</p>
+      <div class="minis"><span class="mini">&quot;*&quot; * 3 <b>→</b> &#x27;***&#x27;</span></div>
+      <div class="note"><strong>Experimente:</strong> mude o programa para desenhar um quadrado 4 × 4; depois, o triângulo de cabeça para baixo.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="triangulo.py">
+altura = 4
+for linha in range(1, altura + 1):
+    for coluna in range(linha):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()          # termina a linha
+</textarea>
+<textarea class="py" data-label="tabuadas.py">
+for n in range(1, 4):
+    print(f&quot;Tabuada do {n}:&quot;)
+    for i in range(1, 6):
+        print(f&quot;  {n} x {i} = {n * i}&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="loop" data-title="Desafio: tabuada e contagem">
+  <h2>Desafio: tabuada e contagem</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Leia um número <code>n</code> e mostre a tabuada de <code>n</code> de 1 a 10, no formato <code>7 x 3 = 21</code>.</li>
+        <li>Leia números até o usuário digitar 0. No final, mostre <code>Positivos: 2</code> e <code>Negativos: 2</code> (com as quantidades certas).</li>
+      </ol>
+      <p>Qual dos dois pede <code>for</code> e qual pede <code>while</code>?</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_lacos.py" data-stdin="7
+5
+-3
+8
+-1
+0" data-tests="[{&quot;in&quot;: &quot;7\n5\n-3\n8\n-1\n0&quot;, &quot;out&quot;: [&quot;7 x 1 = 7&quot;, &quot;7 x 3 = 21&quot;, &quot;7 x 10 = 70&quot;, &quot;Positivos: 2&quot;, &quot;Negativos: 2&quot;]}, {&quot;in&quot;: &quot;3\n0&quot;, &quot;out&quot;: [&quot;3 x 10 = 30&quot;, &quot;Positivos: 0&quot;, &quot;Negativos: 0&quot;]}]">
+# 1) Tabuada
+
+
+# 2) Positivos e negativos até digitar 0
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="7
+5
+-3
+8
+-1
+0">
+n = int(input("Tabuada do: "))
+for i in range(1, 11):
+    print(f"{n} x {i} = {n * i}")
+
+positivos = 0
+negativos = 0
+x = int(input("Número (0 para parar): "))
+while x != 0:
+    if x > 0:
+        positivos += 1
+    else:
+        negativos += 1
+    x = int(input("Número (0 para parar): "))
+print("Positivos:", positivos, "| Negativos:", negativos)
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FECHAMENTO ===================== -->
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Peça para a turma escrever a resposta antes de revelar.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 1: programas sequenciais">
+  <h2>Prática 1: programas sequenciais</h2>
+<p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Tente antes de abrir a solução!</p><div class="cols even">
+<div><div class="exercise">
+  <h3>1. Calculadora de inteiros <span class="lvl l1">básico</span></h3>
+  <p>Leia dois inteiros e mostre, um por linha, a soma, a diferença, o produto, a divisão real (2 casas), a divisão inteira e o resto.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>17
+5</pre></td><td><pre>Soma: 22
+Diferença: 12
+Produto: 85
+Divisão: 3.40
+Divisão inteira: 3
+Resto: 2</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex1_operacoes.py" data-stdin="17
+5" data-tests="[{&quot;in&quot;: &quot;17\n5&quot;, &quot;out&quot;: [&quot;Soma: 22&quot;, &quot;Diferença: 12&quot;, &quot;Produto: 85&quot;, &quot;Divisão: 3.40&quot;, &quot;Divisão inteira: 3&quot;, &quot;Resto: 2&quot;]}, {&quot;in&quot;: &quot;9\n3&quot;, &quot;out&quot;: [&quot;Soma: 12&quot;, &quot;Diferença: 6&quot;, &quot;Produto: 27&quot;, &quot;Divisão: 3.00&quot;, &quot;Divisão inteira: 3&quot;, &quot;Resto: 0&quot;]}, {&quot;in&quot;: &quot;4\n8&quot;, &quot;out&quot;: [&quot;Soma: 12&quot;, &quot;Diferença: -4&quot;, &quot;Produto: 32&quot;, &quot;Divisão: 0.50&quot;, &quot;Divisão inteira: 0&quot;, &quot;Resto: 4&quot;]}]">
+a = int(input(&quot;Primeiro número: &quot;))
+b = int(input(&quot;Segundo número: &quot;))
+
+# mostre os seis resultados
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="17
+5">
+a = int(input(&quot;Primeiro número: &quot;))
+b = int(input(&quot;Segundo número: &quot;))
+print(&quot;Soma:&quot;, a + b)
+print(&quot;Diferença:&quot;, a - b)
+print(&quot;Produto:&quot;, a * b)
+print(f&quot;Divisão: {a / b:.2f}&quot;)
+print(&quot;Divisão inteira:&quot;, a // b)
+print(&quot;Resto:&quot;, a % b)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>2. Reajuste salarial <span class="lvl l1">básico</span></h3>
+  <p>Leia um salário e um percentual de aumento. Mostre o valor do aumento e o novo salário, com duas casas decimais.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>2100
+10</pre></td><td><pre>Aumento: R$ 210.00
+Novo salário: R$ 2310.00</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex2_salario.py" data-stdin="2100
+10" data-tests="[{&quot;in&quot;: &quot;2100\n10&quot;, &quot;out&quot;: [&quot;Aumento: R$ 210.00&quot;, &quot;Novo salário: R$ 2310.00&quot;]}, {&quot;in&quot;: &quot;1518\n7.5&quot;, &quot;out&quot;: [&quot;Aumento: R$ 113.85&quot;, &quot;Novo salário: R$ 1631.85&quot;]}, {&quot;in&quot;: &quot;3000\n0&quot;, &quot;out&quot;: [&quot;Aumento: R$ 0.00&quot;, &quot;Novo salário: R$ 3000.00&quot;]}]">
+salario = float(input(&quot;Salário: &quot;))
+percentual = float(input(&quot;Aumento (%): &quot;))
+
+# calcule e mostre o aumento e o novo salário
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="2100
+10">
+salario = float(input(&quot;Salário: &quot;))
+percentual = float(input(&quot;Aumento (%): &quot;))
+aumento = salario * percentual / 100
+print(f&quot;Aumento: R$ {aumento:.2f}&quot;)
+print(f&quot;Novo salário: R$ {salario + aumento:.2f}&quot;)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 2: decisões">
+  <h2>Prática 2: decisões</h2>
+<div class="cols even">
+<div><div class="exercise">
+  <h3>3. O maior de três <span class="lvl l1">básico</span></h3>
+  <p>Leia três números inteiros e mostre o maior, <strong>sem usar</strong> <code>max()</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3
+9
+4</pre></td><td><pre>Maior: 9</pre></td></tr></table></div>
+  <div class="minis"><span class="mini">dica <b>→</b> comece supondo que o primeiro é o maior</span></div>
+  <textarea class="py" data-label="ex3_maior.py" data-stdin="3
+9
+4" data-tests="[{&quot;in&quot;: &quot;3\n9\n4&quot;, &quot;out&quot;: [&quot;Maior: 9&quot;], &quot;nao&quot;: [&quot;Maior: 3&quot;, &quot;Maior: 4&quot;]}, {&quot;in&quot;: &quot;7\n7\n2&quot;, &quot;out&quot;: [&quot;Maior: 7&quot;]}, {&quot;in&quot;: &quot;1\n2\n30&quot;, &quot;out&quot;: [&quot;Maior: 30&quot;]}, {&quot;in&quot;: &quot;-1\n-5\n-3&quot;, &quot;out&quot;: [&quot;Maior: -1&quot;], &quot;nao&quot;: [&quot;Maior: -3&quot;, &quot;Maior: -5&quot;]}]">
+a = int(input(&quot;Primeiro: &quot;))
+b = int(input(&quot;Segundo: &quot;))
+c = int(input(&quot;Terceiro: &quot;))
+
+# descubra o maior com if
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3
+9
+4">
+a = int(input(&quot;Primeiro: &quot;))
+b = int(input(&quot;Segundo: &quot;))
+c = int(input(&quot;Terceiro: &quot;))
+maior = a
+if b &gt; maior:
+    maior = b
+if c &gt; maior:
+    maior = c
+print(&quot;Maior:&quot;, maior)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>4. Faixa etária <span class="lvl l2">intermediário</span></h3>
+  <p>Leia uma idade e classifique: criança (0 a 11), adolescente (12 a 17), adulto (18 a 59) ou idoso (60 ou mais). Para idade negativa, mostre <code>Idade inválida</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>15</pre></td><td><pre>Classificação: adolescente</pre></td></tr><tr><td><pre>-3</pre></td><td><pre>Idade inválida</pre></td></tr></table></div>
+  <p>Os testes conferem os <strong>limites</strong> de cada faixa (11, 12, 17, 18, 59, 60).</p>
+  <textarea class="py" data-label="ex4_faixa.py" data-stdin="15" data-tests="[{&quot;in&quot;: &quot;0&quot;, &quot;out&quot;: [&quot;Classificação: criança&quot;], &quot;nao&quot;: [&quot;Classificação: adolescente&quot;, &quot;Classificação: adulto&quot;, &quot;Classificação: idoso&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;11&quot;, &quot;out&quot;: [&quot;Classificação: criança&quot;], &quot;nao&quot;: [&quot;Classificação: adolescente&quot;, &quot;Classificação: adulto&quot;, &quot;Classificação: idoso&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;12&quot;, &quot;out&quot;: [&quot;Classificação: adolescente&quot;], &quot;nao&quot;: [&quot;Classificação: criança&quot;, &quot;Classificação: adulto&quot;, &quot;Classificação: idoso&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;17&quot;, &quot;out&quot;: [&quot;Classificação: adolescente&quot;], &quot;nao&quot;: [&quot;Classificação: criança&quot;, &quot;Classificação: adulto&quot;, &quot;Classificação: idoso&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;18&quot;, &quot;out&quot;: [&quot;Classificação: adulto&quot;], &quot;nao&quot;: [&quot;Classificação: criança&quot;, &quot;Classificação: adolescente&quot;, &quot;Classificação: idoso&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;59&quot;, &quot;out&quot;: [&quot;Classificação: adulto&quot;], &quot;nao&quot;: [&quot;Classificação: criança&quot;, &quot;Classificação: adolescente&quot;, &quot;Classificação: idoso&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;60&quot;, &quot;out&quot;: [&quot;Classificação: idoso&quot;], &quot;nao&quot;: [&quot;Classificação: criança&quot;, &quot;Classificação: adolescente&quot;, &quot;Classificação: adulto&quot;, &quot;Idade inválida&quot;]}, {&quot;in&quot;: &quot;-3&quot;, &quot;out&quot;: [&quot;Idade inválida&quot;], &quot;nao&quot;: [&quot;Classificação: criança&quot;, &quot;Classificação: adolescente&quot;, &quot;Classificação: adulto&quot;, &quot;Classificação: idoso&quot;]}]">
+idade = int(input(&quot;Idade: &quot;))
+
+# classifique com if, elif e else
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="0">
+idade = int(input(&quot;Idade: &quot;))
+if idade &lt; 0:
+    print(&quot;Idade inválida&quot;)
+elif idade &lt;= 11:
+    print(&quot;Classificação: criança&quot;)
+elif idade &lt;= 17:
+    print(&quot;Classificação: adolescente&quot;)
+elif idade &lt;= 59:
+    print(&quot;Classificação: adulto&quot;)
+else:
+    print(&quot;Classificação: idoso&quot;)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 3: repetições">
+  <h2>Prática 3: repetições</h2>
+<div class="cols even">
+<div><div class="exercise">
+  <h3>5. Soma e fatorial <span class="lvl l2">intermediário</span></h3>
+  <p>Leia um inteiro <code>n</code> (zero ou positivo). Mostre a soma de 1 até <code>n</code> e o fatorial de <code>n</code>: <code>5! = 5 × 4 × 3 × 2 × 1 = 120</code>. Por definição, <code>0! = 1</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>5</pre></td><td><pre>Soma de 1 a 5: 15
+5! = 120</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex5_fatorial.py" data-stdin="5" data-tests="[{&quot;in&quot;: &quot;5&quot;, &quot;out&quot;: [&quot;Soma de 1 a 5: 15&quot;, &quot;5! = 120&quot;]}, {&quot;in&quot;: &quot;1&quot;, &quot;out&quot;: [&quot;Soma de 1 a 1: 1&quot;, &quot;1! = 1&quot;]}, {&quot;in&quot;: &quot;0&quot;, &quot;out&quot;: [&quot;Soma de 1 a 0: 0&quot;, &quot;0! = 1&quot;]}, {&quot;in&quot;: &quot;10&quot;, &quot;out&quot;: [&quot;Soma de 1 a 10: 55&quot;, &quot;10! = 3628800&quot;]}]">
+n = int(input(&quot;n: &quot;))
+
+# use um acumulador para a soma e outro para o produto
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="5">
+n = int(input(&quot;n: &quot;))
+soma = 0
+fatorial = 1           # o produto começa em 1, não em 0
+for i in range(1, n + 1):
+    soma += i
+    fatorial *= i
+print(f&quot;Soma de 1 a {n}: {soma}&quot;)
+print(f&quot;{n}! = {fatorial}&quot;)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>6. Jogo de adivinhação <span class="lvl l2">intermediário</span></h3>
+  <p>O número secreto está na variável <code>secreto</code>. Peça palpites até o usuário acertar. A cada erro, diga <code>O número secreto é maior</code> ou <code>O número secreto é menor</code>. No final, mostre <code>Acertou em N tentativas</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>50
+30
+42</pre></td><td><pre>O número secreto é menor
+O número secreto é maior
+Acertou em 3 tentativas</pre></td></tr></table></div>
+  <div class="note">Depois de passar nos testes, jogue de verdade: coloque <code>import random</code> no início e troque <code>42</code> por <code>random.randint(1, 100)</code>.</div>
+  <textarea class="py" data-label="ex6_adivinhacao.py" data-stdin="50
+30
+42" data-tests="[{&quot;in&quot;: &quot;50\n30\n42&quot;, &quot;out&quot;: [&quot;é menor&quot;, &quot;é maior&quot;, &quot;Acertou em 3 tentativa&quot;]}, {&quot;in&quot;: &quot;42&quot;, &quot;out&quot;: [&quot;Acertou em 1 tentativa&quot;], &quot;nao&quot;: [&quot;é maior&quot;, &quot;é menor&quot;]}, {&quot;in&quot;: &quot;1\n100\n41\n43\n42&quot;, &quot;out&quot;: [&quot;Acertou em 5 tentativa&quot;]}]">
+secreto = 42
+tentativas = 0
+
+# peça palpites até acertar
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="50
+30
+42">
+secreto = 42
+tentativas = 0
+palpite = -1
+while palpite != secreto:
+    palpite = int(input(&quot;Palpite: &quot;))
+    tentativas += 1
+    if palpite &lt; secreto:
+        print(&quot;O número secreto é maior&quot;)
+    elif palpite &gt; secreto:
+        print(&quot;O número secreto é menor&quot;)
+print(f&quot;Acertou em {tentativas} tentativas&quot;)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 4: desafios">
+  <h2>Prática 4: desafios</h2>
+<p class="lead">Dois problemas clássicos que juntam tudo o que vimos: operadores, decisões e repetições.</p><div class="cols even">
+<div><div class="exercise">
+  <h3>7. Caixa eletrônico <span class="lvl l3">desafio</span></h3>
+  <p>Leia o valor inteiro de um saque e mostre a <strong>menor quantidade</strong> de cédulas de 100, 50, 20, 10, 5 e 2 e de moedas de 1. Mostre só os valores usados, do maior para o menor.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>388</pre></td><td><pre>3 x R$ 100
+1 x R$ 50
+1 x R$ 20
+1 x R$ 10
+1 x R$ 5
+1 x R$ 2
+1 x R$ 1</pre></td></tr><tr><td><pre>70</pre></td><td><pre>1 x R$ 50
+1 x R$ 20</pre></td></tr></table></div>
+  <div class="minis"><span class="mini">388 // 100 <b>→</b> 3</span><span class="mini">388 % 100 <b>→</b> 88</span></div>
+  <p>Dica: <code>for cedula in (100, 50, 20, 10, 5, 2, 1):</code> percorre os valores entre parênteses, um por volta (é uma <em>tupla</em>, assunto da próxima aula).</p>
+  <textarea class="py" data-label="ex7_caixa.py" data-stdin="388" data-tests="[{&quot;in&quot;: &quot;388&quot;, &quot;out&quot;: [&quot;3 x R$ 100&quot;, &quot;1 x R$ 50&quot;, &quot;1 x R$ 20&quot;, &quot;1 x R$ 10&quot;, &quot;1 x R$ 5&quot;, &quot;1 x R$ 2&quot;, &quot;1 x R$ 1&quot;]}, {&quot;in&quot;: &quot;70&quot;, &quot;out&quot;: [&quot;1 x R$ 50&quot;, &quot;1 x R$ 20&quot;], &quot;nao&quot;: [&quot;x R$ 100\n&quot;, &quot;x R$ 10\n&quot;, &quot;x R$ 5\n&quot;, &quot;x R$ 2\n&quot;, &quot;x R$ 1\n&quot;]}, {&quot;in&quot;: &quot;7&quot;, &quot;out&quot;: [&quot;1 x R$ 5&quot;, &quot;1 x R$ 2&quot;], &quot;nao&quot;: [&quot;x R$ 100\n&quot;, &quot;x R$ 50\n&quot;, &quot;x R$ 20\n&quot;, &quot;x R$ 10\n&quot;, &quot;x R$ 1\n&quot;]}, {&quot;in&quot;: &quot;600&quot;, &quot;out&quot;: [&quot;6 x R$ 100&quot;], &quot;nao&quot;: [&quot;x R$ 50\n&quot;, &quot;x R$ 20\n&quot;, &quot;x R$ 10\n&quot;, &quot;x R$ 5\n&quot;, &quot;x R$ 2\n&quot;, &quot;x R$ 1\n&quot;]}]">
+valor = int(input(&quot;Valor do saque: &quot;))
+
+# para cada cédula: quantas cabem (//) e quanto sobra (%)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="388">
+valor = int(input(&quot;Valor do saque: &quot;))
+for cedula in (100, 50, 20, 10, 5, 2, 1):
+    quantidade = valor // cedula      # quantas cabem
+    if quantidade &gt; 0:
+        print(f&quot;{quantidade} x R$ {cedula}&quot;)
+    valor = valor % cedula            # o que ainda falta pagar
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>8. Número primo <span class="lvl l3">desafio</span></h3>
+  <p>Leia um inteiro positivo e diga se ele é primo, isto é, se tem exatamente dois divisores: 1 e ele mesmo. Lembre: 1 não é primo.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>17</pre></td><td><pre>17 é primo</pre></td></tr><tr><td><pre>18</pre></td><td><pre>18 não é primo</pre></td></tr></table></div>
+  <p>Dica: procure um divisor entre 2 e <code>n - 1</code>. Achou um? Já pode parar com <code>break</code>.</p>
+  <textarea class="py" data-label="ex8_primo.py" data-stdin="17" data-tests="[{&quot;in&quot;: &quot;17&quot;, &quot;out&quot;: [&quot;17 é primo&quot;], &quot;nao&quot;: [&quot;não é primo&quot;]}, {&quot;in&quot;: &quot;18&quot;, &quot;out&quot;: [&quot;18 não é primo&quot;]}, {&quot;in&quot;: &quot;2&quot;, &quot;out&quot;: [&quot;2 é primo&quot;], &quot;nao&quot;: [&quot;não é primo&quot;]}, {&quot;in&quot;: &quot;1&quot;, &quot;out&quot;: [&quot;1 não é primo&quot;]}, {&quot;in&quot;: &quot;91&quot;, &quot;out&quot;: [&quot;91 não é primo&quot;]}, {&quot;in&quot;: &quot;97&quot;, &quot;out&quot;: [&quot;97 é primo&quot;], &quot;nao&quot;: [&quot;não é primo&quot;]}]">
+n = int(input(&quot;Número: &quot;))
+
+# procure divisores de n
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="17">
+n = int(input(&quot;Número: &quot;))
+primo = n &gt;= 2               # 0 e 1 não são primos
+for d in range(2, n):
+    if n % d == 0:           # achou um divisor
+        primo = False
+        break
+if primo:
+    print(n, &quot;é primo&quot;)
+else:
+    print(n, &quot;não é primo&quot;)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: converta o jogo de adivinhação para números aleatórios; desenhe um losango de asteriscos; faça uma calculadora de IMC com classificação.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "fundamentos",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "var": {
+   "name": "Variáveis e tipos",
+   "color": "#0b78b0"
+  },
+  "io": {
+   "name": "Entrada e saída",
+   "color": "#0f7a62"
+  },
+  "cond": {
+   "name": "Decisão",
+   "color": "#a8670c"
+  },
+  "loop": {
+   "name": "Repetição",
+   "color": "#8e3a8f"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "quizzes": {
+  "saida": [
+   {
+    "code": "x = 7\nx = x + 3\nprint(x)",
+    "opts": [
+     "7",
+     "10",
+     "3",
+     "x + 3"
+    ],
+    "ans": 1,
+    "why": "O lado direito é calculado com o valor atual (7 + 3) e o resultado é guardado de novo em x."
+   },
+   {
+    "code": "print(7 / 2, 7 // 2, 7 % 2)",
+    "opts": [
+     "3.5 3 1",
+     "3 3 1",
+     "3.5 3.5 1",
+     "3 3.5 0"
+    ],
+    "ans": 0,
+    "why": "/ é a divisão real (3.5), // o quociente inteiro (3) e % o resto (1)."
+   },
+   {
+    "code": "idade = input(\"Idade: \")   # usuário digita 20\nprint(idade + 1)",
+    "opts": [
+     "21",
+     "201",
+     "Erro (TypeError)",
+     "20"
+    ],
+    "ans": 2,
+    "why": "input devolve texto. Somar texto com número gera TypeError; seria preciso int(idade) + 1."
+   },
+   {
+    "code": "a = 5\nb = \"5\"\nprint(a == b)",
+    "opts": [
+     "True",
+     "False",
+     "Erro",
+     "5"
+    ],
+    "ans": 1,
+    "why": "O número 5 e o texto \"5\" são de tipos diferentes, então não são iguais."
+   },
+   {
+    "code": "n = 15\nif n > 10:\n    print(\"A\")\nelif n > 5:\n    print(\"B\")\nelse:\n    print(\"C\")",
+    "opts": [
+     "A",
+     "A e B",
+     "B",
+     "C"
+    ],
+    "ans": 0,
+    "why": "n > 10 é verdadeira; o bloco do if executa e o elif nem é testado."
+   },
+   {
+    "code": "x = 3\nif x > 1 and x < 3:\n    print(\"dentro\")\nelse:\n    print(\"fora\")",
+    "opts": [
+     "dentro",
+     "fora",
+     "dentro e fora",
+     "nada"
+    ],
+    "ans": 1,
+    "why": "x < 3 é falsa quando x vale 3; com and, basta uma falsa para o resultado ser False."
+   },
+   {
+    "code": "i = 0\nwhile i < 3:\n    print(i, end=\" \")\n    i += 1",
+    "opts": [
+     "0 1 2",
+     "1 2 3",
+     "0 1 2 3",
+     "laço infinito"
+    ],
+    "ans": 0,
+    "why": "Imprime 0, 1 e 2. Quando i chega a 3, a condição i < 3 fica falsa."
+   },
+   {
+    "code": "for i in range(2, 10, 3):\n    print(i, end=\" \")",
+    "opts": [
+     "2 5 8",
+     "2 5 8 11",
+     "3 6 9",
+     "2 3 4 5 6 7 8 9"
+    ],
+    "ans": 0,
+    "why": "Começa em 2 e soma 3 a cada volta; 11 não entra porque o fim (10) fica de fora."
+   },
+   {
+    "code": "total = 0\nfor n in range(1, 5):\n    total += n\nprint(total)",
+    "opts": [
+     "10",
+     "15",
+     "4",
+     "1 3 6 10"
+    ],
+    "ans": 0,
+    "why": "range(1, 5) gera 1, 2, 3, 4; o acumulador soma 10. O print está fora do laço, então mostra só o total."
+   },
+   {
+    "code": "import math\nprint(math.ceil(7 / 2))",
+    "opts": [
+     "3",
+     "3.5",
+     "4",
+     "Erro"
+    ],
+    "ans": 2,
+    "why": "7 / 2 = 3.5 e ceil arredonda para cima: 4."
+   },
+   {
+    "code": "print(10 // 3 * 3 + 10 % 3)",
+    "opts": [
+     "10",
+     "9",
+     "1",
+     "3.33"
+    ],
+    "ans": 0,
+    "why": "Quociente × divisor + resto sempre devolve o número original: 3 * 3 + 1 = 10."
+   },
+   {
+    "code": "x = 15\nif x > 10:\n    if x > 20:\n        print(\"A\")\n    else:\n        print(\"B\")\nelse:\n    print(\"C\")",
+    "opts": [
+     "A",
+     "B",
+     "C",
+     "B e C"
+    ],
+    "ans": 1,
+    "why": "x > 10 é verdadeira, então entra no if de fora; x > 20 é falsa, então executa o else de dentro."
+   },
+   {
+    "code": "cor = \"verde\"\nif cor == \"azul\" or \"vermelho\":\n    print(\"A\")\nelse:\n    print(\"B\")",
+    "opts": [
+     "A",
+     "B",
+     "Erro",
+     "nada"
+    ],
+    "ans": 0,
+    "why": "\"vermelho\" sozinho é um texto não vazio e vale True. O certo seria cor == \"azul\" or cor == \"vermelho\"."
+   },
+   {
+    "code": "for i in range(3):\n    for j in range(2):\n        print(\"*\", end=\"\")",
+    "opts": [
+     "**",
+     "***",
+     "*****",
+     "******"
+    ],
+    "ans": 3,
+    "why": "O laço de dentro dá 2 voltas para cada uma das 3 voltas do de fora: 3 × 2 = 6 asteriscos."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>
