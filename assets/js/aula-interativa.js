@@ -3,13 +3,17 @@
   Cada página define <script type="application/json" id="aula-config"> com:
     { "id": "...", "mods": { chave: { "name": "...", "color": "#..." } }, "quizzes": { chave: [ ... ] } }
   Cada <div class="quiz" data-quiz="chave"> usa a lista correspondente.
-  Itens do quiz: { "q" ou "code", "opts": [...], "ans": índice, "why": "..." }
+  Itens do quiz: { "q" e/ou "code", "opts": [...], "ans": índice, "why": "..." }
   Exercícios: <textarea class="py" data-tests='[{"in": "...", "out": [...], "nao": [...]}]'>
     passa quando a saída contém cada texto de "out" e nenhum de "nao"
     (sem diferenciar maiúsculas e ignorando espaços repetidos).
+  Componentes extras (ex.: terminal-linux.js) entram no progresso registrando-se, antes deste
+  script, em window.aulaPlugins: { name, collect(), apply(estado|null), summary() → [textos] },
+  e avisam mudanças com window.aulaAutosave(). window.aulaHl, se definido, realça o código do quiz.
 */
 window.pyReady = function(){
   const st = document.getElementById('pystatus');
+  if (!st) return;
   st.classList.add('ok'); st.classList.remove('fail');
   st.querySelector('span').textContent = 'Python pronto';
 };
@@ -396,13 +400,13 @@ function makeQuiz(el, items){
   const label = el.dataset.label || 'Questão';
   function draw(){
     const item = items[q];
-    el.innerHTML = '<div class="q-count"></div>' + (item.code ? '<pre class="q-code"></pre>' : '<div class="q-text"></div>') + '<div class="q-opts"></div><div class="q-fb" aria-live="polite"></div>';
+    el.innerHTML = '<div class="q-count"></div>' + (item.q ? '<div class="q-text"></div>' : '') + (item.code ? '<pre class="q-code"></pre>' : '') + '<div class="q-opts"></div><div class="q-fb" aria-live="polite"></div>';
     const feitas = Object.keys(resp).length;
     const acertos = Object.keys(resp).filter(i => items[i] && resp[i] === items[i].ans).length;
     $('.q-count', el).textContent = label + ' ' + (q + 1) + ' de ' + items.length +
       (feitas ? ' · ' + acertos + ' acerto' + (acertos === 1 ? '' : 's') + ' em ' + feitas + ' respondida' + (feitas === 1 ? '' : 's') : '');
-    if (item.code) $('.q-code', el).innerHTML = hl(item.code);
-    else $('.q-text', el).textContent = item.q;
+    if (item.q) $('.q-text', el).textContent = item.q;
+    if (item.code) $('.q-code', el).innerHTML = (window.aulaHl || hl)(item.code);
     const box = $('.q-opts', el), fb = $('.q-fb', el);
     const buttons = item.opts.map((o, k) => {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = o;
@@ -449,6 +453,7 @@ function makeQuiz(el, items){
    Fica salvo automaticamente neste navegador e pode ser baixado/carregado como arquivo JSON. */
 const FORMATO = 'aula-interativa-progresso';
 const quizzes = {};
+const plugins = window.aulaPlugins || [];
 let ready = false, saveTimer = 0;
 
 function collect(){
@@ -466,7 +471,8 @@ function collect(){
   return {
     formato: FORMATO, versao: 2, aula: CFG.id, salvoEm: new Date().toISOString(),
     etapa: cur, modo: isAll() ? 'pagina-unica' : 'etapas',
-    codigos, resolvidos, quiz
+    codigos, resolvidos, quiz,
+    extras: plugins.reduce((o, p) => { o[p.name] = p.collect(); return o; }, {})
   };
 }
 function apply(st, nav){
@@ -483,6 +489,7 @@ function apply(st, nav){
     if (r.tests) setSolved(r, (st.resolvidos || {})[i] === r.label);
   });
   Object.keys(quizzes).forEach(k => { const q = (st.quiz || {})[k]; if (q) quizzes[k].set(q); else quizzes[k].reset(); });
+  plugins.forEach(p => p.apply((st.extras || {})[p.name] || null));
   if (nav){
     if (Number.isInteger(st.etapa)) cur = Math.max(0, Math.min(slides.length - 1, st.etapa));
     setView(st.modo === 'pagina-unica');
@@ -504,7 +511,8 @@ function progSummary(){
   const parts = [];
   if (ex) parts.push(ok + ' de ' + ex + ' exercícios resolvidos');
   if (qt) parts.push(qr + ' de ' + qt + ' questões respondidas');
-  parts.push(n + ' código' + (n === 1 ? '' : 's') + ' alterado' + (n === 1 ? '' : 's'));
+  plugins.forEach(p => parts.push(...p.summary()));
+  if (runners.length) parts.push(n + ' código' + (n === 1 ? '' : 's') + ' alterado' + (n === 1 ? '' : 's'));
   $('#progInfo').textContent = parts.join(' · ') + '.';
 }
 function progMsg(text, bad){
@@ -531,17 +539,17 @@ function upload(file){
     store.set(KEY + 'estado', JSON.stringify(collect()));
     progSummary();
     const quando = st.salvoEm ? new Date(st.salvoEm).toLocaleString('pt-BR') : '';
-    progMsg('Progresso carregado' + (quando ? ' (salvo em ' + quando + ')' : '') + ': ' + n + ' código' + (n === 1 ? '' : 's') + ' restaurado' + (n === 1 ? '' : 's') + '.');
+    progMsg('Progresso carregado' + (quando ? ' (salvo em ' + quando + ')' : '') + (runners.length ? ': ' + n + ' código' + (n === 1 ? '' : 's') + ' restaurado' + (n === 1 ? '' : 's') : '') + '.');
   };
   rd.onerror = () => progMsg('Não foi possível ler o arquivo.', true);
   rd.readAsText(file);
 }
 function clearProgress(){
-  if (!confirm('Apagar todas as suas alterações nesta aula e voltar os códigos ao original?')) return;
+  if (!confirm('Apagar todas as suas alterações nesta aula e voltar ao estado original?')) return;
   apply({ codigos: {}, resolvidos: {}, quiz: {} }, false);
   store.set(KEY + 'estado', '');
   progSummary();
-  progMsg('Progresso apagado. Os códigos voltaram ao original.');
+  progMsg('Progresso apagado. Tudo voltou ao original.');
 }
 
 /* ---------- Navegação ---------- */
@@ -697,13 +705,15 @@ try {
   if (saved && saved.formato === FORMATO && saved.aula === CFG.id) apply(saved, false);
 } catch(e){}
 ready = true;
+window.aulaAutosave = autosave;
 progSummary();
 
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(autosizeVisible);
 
 setTimeout(() => {
-  if (typeof window.runPython !== 'function'){
-    const st = $('#pystatus'); st.classList.add('fail');
+  const st = $('#pystatus');
+  if (st && typeof window.runPython !== 'function'){
+    st.classList.add('fail');
     $('span', st).textContent = 'Python indisponível (verifique a internet)';
   }
 }, 25000);

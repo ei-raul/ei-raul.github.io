@@ -265,15 +265,25 @@ h1, h2, h3, h4, h5, h6 {
   background-size: cover;
 }
 
-@media only screen and (max-width: 550px) {
+/* Small screens: keep the face (~63% across the photo) in frame and move the
+   title down onto the shirt, so the text does not cover it. */
+@media only screen and (max-width: 768px) {
   #hero {
-    background-position: -300px top;
+    height: 100vh;
+    height: 100svh;
+    background-position: 66% 30%;
+    justify-content: flex-end !important;
+    padding-bottom: 12vh;
   }
-}
 
-@media only screen and (max-width: 400px) {
-  #hero {
-    background-position: -500px top;
+  section#hero:before {
+    background: linear-gradient(to bottom, rgba(24, 28, 34, 0.15) 0%, rgba(24, 28, 34, 0.15) 45%, rgba(24, 28, 34, 0.65) 100%);
+  }
+
+  #hero .hero-container {
+    align-self: flex-start;
+    padding: 0 24px;
+    min-width: 0;
   }
 }
 
@@ -982,4 +992,106 @@ section {
     font-size: 12px;
   }
 }
-                                                                                                                     
+
+/*--------------------------------------------------------------
+# Teaching - mobile agenda (replaces the weekly grid on small screens)
+--------------------------------------------------------------*/
+.teaching .teaching-agenda {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .teaching .table-content {
+    display: none;
+  }
+
+  .teaching .teaching-agenda {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .teaching .agenda-day {
+    display: flex;
+    align-items: stretch;
+    background: #fff;
+    border: 1px solid #d0e8f5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(20, 157, 221, 0.08);
+  }
+
+  .teaching .agenda-day-name {
+    flex: 0 0 92px;
+    margin: 0;
+    padding: 12px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #173b6c;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .teaching .agenda-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 12px 14px;
+  }
+
+  .teaching .agenda-class {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .teaching .agenda-class .class-code {
+    display: inline-block;
+    background-color: #149ddd;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    letter-spacing: 0.05em;
+  }
+
+  .teaching .agenda-name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #272829;
+  }
+
+  .teaching .agenda-class:hover .agenda-name {
+    color: #149ddd;
+  }
+
+  .teaching .agenda-time {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #5a6b7d;
+  }
+
+  .teaching .agenda-day-empty {
+    box-shadow: none;
+    background: #f7fafd;
+  }
+
+  .teaching .agenda-day-empty .agenda-day-name {
+    background-color: #8a9bb0;
+  }
+
+  .teaching .agenda-day-empty .empty-cell {
+    color: #bcd4e6;
+    font-size: 18px;
+  }
+}

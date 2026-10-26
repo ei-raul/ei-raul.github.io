@@ -118,6 +118,7 @@ window.I18N.en = {
   'teaching.time1': '6:30 PM to 7:20 PM',
   'teaching.time2': '7:20 PM to 8:10 PM',
   'teaching.time3': '8:30 PM to 9:20 PM',
+  'teaching.timespan': '6:30 PM to 9:20 PM',
   'teaching.sem4': '4th semester',
   'teaching.sem2': '2nd semester',
   'teaching.previous': 'Previous courses',
@@ -139,7 +140,7 @@ window.I18N.en = {
   'pub.visstorymaker.desc': 'System for visually exploring datasets and communicating insights through visual annotations and data stories — winner of the SBC Innovation Seal 2022.',
   'pub.vismaker.desc': 'Question-oriented visualization recommender system, designed to support data exploration by analysts with different levels of expertise.',
   'pub.hcii.desc': 'Review and extension of visualization task taxonomies, with an emphasis on data transformation functions.',
-  'pub.bracis.desc': 'Classification of Brazilian music genres based on song lyrics, using BLSTM neural networks.',
+  'pub.icaisc.desc': 'Classification of Brazilian music genres based on song lyrics, using BLSTM neural networks.',
   'pub.eniac.desc': 'Comparative analysis of sentiment classification methods for short Portuguese-language texts, using Word2Vec embeddings.',
 
   /* ---- misc ---- */

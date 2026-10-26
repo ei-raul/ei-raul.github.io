@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de arquivos no Linux — Sistemas Operacionais</title>
+  <meta name="description" content="Aula interativa de Sistemas Operacionais: hierarquia de diretórios, navegação, manipulação de arquivos, busca e permissões no Linux, com um terminal simulado no navegador e missões corrigidas automaticamente.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/terminal-linux.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../sistemas-operacionais.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Sistemas Operacionais
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Gestão de Arquivos no Linux</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck">
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Gestão de arquivos no Linux</h1>
+  <p class="sub">Como o Linux organiza discos, pastas e arquivos em uma única árvore, e como navegar, criar, mover, procurar e proteger arquivos usando o terminal.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="fhs" style="color:var(--c-fhs)"><span class="sym">/</span><span class="nm">Hierarquia</span><span class="ds">o que fica em cada diretório</span></a>
+    <a href="#" data-goto="nav" style="color:var(--c-nav)"><span class="sym">cd · ls</span><span class="nm">Navegação</span><span class="ds">caminhos, pwd, cd e ls</span></a>
+    <a href="#" data-goto="arq" style="color:var(--c-arq)"><span class="sym">cp · mv · rm</span><span class="nm">Arquivos e diretórios</span><span class="ds">criar, copiar, mover e remover</span></a>
+    <a href="#" data-goto="txt" style="color:var(--c-txt)"><span class="sym">grep · find</span><span class="nm">Conteúdo e busca</span><span class="ds">redirecionamento, filtros e pipes</span></a>
+    <a href="#" data-goto="perm" style="color:var(--c-perm)"><span class="sym">rwx</span><span class="nm">Permissões</span><span class="ds">quem pode ler, gravar e executar</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 4</span><span class="nm">Missões</span><span class="ds">desafios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto.</p>
+  <p class="keys">Os terminais desta aula são <strong>simulados no navegador</strong>: cada um tem o seu próprio sistema de arquivos, então experimente sem medo, nada afeta o seu computador. Dentro do terminal, <kbd>Tab</kbd> completa nomes, <kbd>↑</kbd> <kbd>↓</kbd> recuperam comandos e o botão <strong>↺ Reiniciar</strong> volta tudo ao estado inicial. Os botões abaixo de cada terminal executam comandos de exemplo.</p>
+  <p class="keys">O que você digita fica salvo neste navegador; em <strong>Progresso</strong> você pode baixar um arquivo e continuar em outro computador.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Arquivos, diretórios e a árvore única">
+  <h2>Arquivos, diretórios e a árvore única</h2>
+  <div class="cols">
+    <div>
+      <p>Um <strong>arquivo</strong> é uma sequência de bytes com um nome. Um <strong>diretório</strong> (pasta) é um arquivo especial que guarda uma lista de outros arquivos e diretórios.</p>
+      <p>No Linux existe <strong>uma única árvore</strong>, que começa na <strong>raiz</strong>, escrita <code>/</code>. Não há <code>C:</code> ou <code>D:</code>: um segundo disco ou um pendrive é <strong>montado</strong> em alguma pasta da árvore, como <code>/media/aluno/PENDRIVE</code>.</p>
+      <div class="note">No Linux, <strong>quase tudo é arquivo</strong>: o disco aparece como <code>/dev/sda</code>, e as informações do processador podem ser lidas em <code>/proc/cpuinfo</code> como se fossem um texto.</div>
+    </div>
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th></th><th>Windows</th><th>Linux</th></tr>
+        <tr><td>Raiz</td><td>uma por disco: <code>C:\</code>, <code>D:\</code></td><td>uma só: <code>/</code></td></tr>
+        <tr><td>Separador</td><td><code>\</code></td><td><code>/</code></td></tr>
+        <tr><td>Maiúsculas</td><td><code>Notas.txt</code> = <code>notas.txt</code></td><td><code>Notas.txt</code> ≠ <code>notas.txt</code></td></tr>
+        <tr><td>Extensão</td><td>define o tipo do arquivo</td><td>é só parte do nome (convenção)</td></tr>
+        <tr><td>Ocultos</td><td>atributo do arquivo</td><td>nome começa com ponto: <code>.bashrc</code></td></tr>
+        <tr><td>Pasta pessoal</td><td><code>C:\Users\ana</code></td><td><code>/home/ana</code></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="O interpretador de comandos">
+  <h2>O interpretador de comandos (shell)</h2>
+  <div class="cols">
+    <div>
+      <p>O <strong>shell</strong> é o programa que lê os comandos digitados pelo usuário (ou escritos em scripts), interpreta e pede ao sistema operacional que os execute. O <strong>bash</strong> é o shell mais popular e vem instalado por padrão em muitas distribuições.</p>
+      <p>O <strong>terminal</strong> é apenas a janela; o shell é quem roda dentro dela. Antes de cada comando, o shell mostra o <strong>prompt</strong>:</p>
+      <div class="explain" data-hint="Passe o mouse ou toque em cada parte do prompt.">
+        <div class="ex-line"><button type="button" data-info="Usuário que está usando o shell. É o mesmo nome que o comando whoami mostra.">aluno</button><button type="button" data-info="Nome da máquina (hostname). Útil quando você acessa vários computadores pela rede.">@unicatolica</button><span class="sep">:</span><button type="button" data-info="Diretório atual. O til (~) é um atalho para a pasta pessoal: aqui, ~/Documentos é /home/aluno/Documentos.">~/Documentos</button><button type="button" data-info="$ indica usuário comum. Quando o prompt termina em #, você é o root (administrador) e pode alterar qualquer coisa: atenção redobrada!">$</button></div>
+        <div class="ex-info"></div>
+      </div>
+    </div>
+    <div>
+      <p>Seu primeiro terminal. Clique nos botões ou digite e tecle <kbd>Enter</kbd>:</p>
+      <div class="term" data-label="primeiro contato" data-cmds="whoami|hostname|date|pwd|echo Olá, mundo|help"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Anatomia de um comando">
+  <h2>Anatomia de um comando</h2>
+  <div class="cols">
+    <div>
+      <div class="explain" data-hint="Passe o mouse ou toque em cada parte do comando.">
+        <div class="ex-line"><button type="button" data-info="O comando: o programa que será executado. Sempre a primeira palavra.">ls</button><button type="button" data-info="Opção curta: começa com um hífen e muda o comportamento do comando. -l pede o formato longo (detalhado).">-l</button><button type="button" data-info="Outra opção curta. Opções curtas podem ser juntadas: -l -h é o mesmo que -lh. Muitas também têm versão longa, com dois hifens: --human-readable.">-h</button><button type="button" data-info="Argumento: o alvo do comando. Aqui, o diretório que será listado. Sem argumento, o ls lista o diretório atual.">/etc</button></div>
+        <div class="ex-info"></div>
+      </div>
+      <ul>
+        <li>Comando, opções e argumentos são separados por <strong>espaços</strong>. Um nome com espaço precisa de aspas: <code>cd "Minhas Fotos"</code>.</li>
+        <li>O Linux diferencia maiúsculas de minúsculas: <code>LS</code> não é <code>ls</code>.</li>
+        <li>Quase todo comando aceita <code>--help</code>, um resumo das opções.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="term" data-label="opções e argumentos" data-cmds="ls|ls -l|ls -lh|ls -l -h /etc|ls --human-readable -l /etc|LS|ls --help"></div>
+      <p class="keys">Repare na mensagem de <code>LS</code>: o shell não encontrou nenhum programa com esse nome.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HIERARQUIA ===================== -->
+<section class="slide" data-mod="fhs" data-title="Hierarquia de diretórios">
+  <h2>Hierarquia de diretórios</h2>
+  <p class="lead">As distribuições seguem um padrão (FHS) que diz o que fica em cada diretório. Clique em cada um.</p>
+  <div class="fhs" data-term="t-fhs">
+    <button type="button" class="fhs-root" data-dir="/" data-info="Raiz: o topo da árvore. Todo caminho absoluto começa aqui. Outros discos e pendrives aparecem como pastas dentro dela." data-ex="cd /   ·   ls /"><i class="bx bx-hdd"></i> /</button>
+    <div class="fhs-trunk"></div>
+    <div class="fhs-kids">
+      <button type="button" data-dir="/bin" data-info="Executáveis dos comandos básicos, usados por todos os usuários. Nas distribuições atuais, /bin é um atalho para /usr/bin." data-ex="ls, cp, cat, rm, pwd, su, tar"><b><i class="bx bx-folder"></i>bin</b><small>comandos básicos</small></button>
+      <button type="button" data-dir="/boot" data-info="Arquivos para inicializar o sistema: o kernel (vmlinuz), a imagem inicial (initrd) e a configuração do carregador GRUB." data-ex="vmlinuz-6.8.0-45-generic, grub/grub.cfg"><b><i class="bx bx-folder"></i>boot</b><small>inicialização</small></button>
+      <button type="button" data-dir="/dev" data-info="Arquivos que representam dispositivos: discos, partições, terminais. O hardware também é acessado como arquivo." data-ex="sda (1º disco), sda1 (1ª partição), null, tty"><b><i class="bx bx-folder"></i>dev</b><small>dispositivos</small></button>
+      <button type="button" data-dir="/etc" data-info="Arquivos de configuração do sistema e dos programas, em texto puro." data-ex="passwd (usuários), hostname, hosts, fstab (montagem dos discos)"><b><i class="bx bx-folder"></i>etc</b><small>configurações</small></button>
+      <button type="button" data-dir="/home" data-info="Pastas pessoais dos usuários. Cada usuário tem a sua, em /home/nome, onde guarda seus documentos e configurações pessoais." data-ex="/home/aluno, /home/maria"><b><i class="bx bx-folder"></i>home</b><small>pastas pessoais</small></button>
+      <button type="button" data-dir="/lib" data-info="Bibliotecas usadas pelos programas. Estáticas (.a) são incorporadas a um único programa na compilação; compartilhadas (.so) são carregadas por vários programas ao executar." data-ex="libc.so.6, libm.so.6, libc.a"><b><i class="bx bx-folder"></i>lib</b><small>bibliotecas</small></button>
+      <button type="button" data-dir="/media" data-info="Onde o sistema monta automaticamente mídias removíveis, como pendrives e DVDs." data-ex="/media/aluno/PENDRIVE"><b><i class="bx bx-folder"></i>media</b><small>mídias removíveis</small></button>
+      <button type="button" data-dir="/mnt" data-info="Ponto de montagem temporário, usado manualmente pelo administrador para conectar discos e partições." data-ex="mount /dev/sdb1 /mnt"><b><i class="bx bx-folder"></i>mnt</b><small>montagem manual</small></button>
+      <button type="button" data-dir="/opt" data-info="Programas adicionais, instalados fora do gerenciador de pacotes da distribuição, cada um em sua pasta." data-ex="/opt/vscode, /opt/google/chrome"><b><i class="bx bx-folder"></i>opt</b><small>programas extras</small></button>
+      <button type="button" data-dir="/proc" data-info="Sistema de arquivos virtual: não ocupa espaço no disco. O kernel gera seu conteúdo na hora, com informações sobre processos e hardware." data-ex="cpuinfo, meminfo, uptime, /proc/1 (processo 1)"><b><i class="bx bx-folder"></i>proc</b><small>processos e kernel</small></button>
+      <button type="button" data-dir="/root" data-info="Pasta pessoal do administrador (usuário root). Não confunda com a raiz /. Usuários comuns não podem entrar." data-ex="ls /root → Permissão negada"><b><i class="bx bx-folder"></i>root</b><small>casa do administrador</small></button>
+      <button type="button" data-dir="/sbin" data-info="Ferramentas de administração do sistema, em geral usadas pelo root." data-ex="fdisk, mkfs, reboot, shutdown"><b><i class="bx bx-folder"></i>sbin</b><small>administração</small></button>
+      <button type="button" data-dir="/tmp" data-info="Arquivos temporários. Qualquer usuário pode gravar aqui, e o conteúdo costuma ser apagado quando o sistema reinicia." data-ex="arquivos de sessão, downloads parciais"><b><i class="bx bx-folder"></i>tmp</b><small>temporários</small></button>
+      <button type="button" data-dir="/usr" data-info="Programas e arquivos instalados pela distribuição para os usuários: executáveis (/usr/bin), bibliotecas (/usr/lib) e documentação (/usr/share)." data-ex="/usr/bin/python3, /usr/share/doc"><b><i class="bx bx-folder"></i>usr</b><small>programas dos usuários</small></button>
+      <button type="button" data-dir="/var" data-info="Dados variáveis, que mudam e crescem com o uso do sistema: logs, cache, filas de impressão, páginas de sites." data-ex="/var/log/syslog, /var/log/dpkg.log, /var/www/html"><b><i class="bx bx-folder"></i>var</b><small>dados variáveis</small></button>
+    </div>
+    <div class="fhs-info" aria-live="polite"></div>
+  </div>
+  <div class="term" id="t-fhs" data-label="explorando a raiz" data-cmds="ls /|cat /etc/hostname|cat /etc/os-release|cat /proc/cpuinfo|ls /dev|ls /home|ls /root"></div>
+</section>
+
+<section class="slide" data-mod="fhs" data-title="Onde posso gravar?">
+  <h2>Onde um usuário comum pode gravar?</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Diretório</th><th>Conteúdo</th><th>Usuário comum grava?</th></tr>
+        <tr><td><code>/home/aluno</code></td><td>seus arquivos</td><td>sim, é a sua casa</td></tr>
+        <tr><td><code>/tmp</code></td><td>temporários</td><td>sim, todos podem</td></tr>
+        <tr><td><code>/home/maria</code></td><td>arquivos de outro usuário</td><td>não (nem consegue ver)</td></tr>
+        <tr><td><code>/etc</code></td><td>configurações</td><td>não, só o root</td></tr>
+        <tr><td><code>/bin</code>, <code>/usr</code>, <code>/lib</code></td><td>programas e bibliotecas</td><td>não, só o root</td></tr>
+        <tr><td><code>/var/log</code></td><td>registros do sistema</td><td>não; alguns nem pode ler</td></tr>
+        <tr><td><code>/root</code></td><td>casa do administrador</td><td>não (nem consegue entrar)</td></tr>
+      </table>
+    </div>
+    <div>
+      <p>Essa separação é o que protege o sistema: um usuário comum não consegue, por engano ou por maldade, apagar os programas ou mudar as configurações de todos. Quem decide isso são as <strong>permissões</strong>, que veremos no fim da aula.</p>
+      <div class="term" data-label="testando os limites" data-cmds="touch /tmp/teste.txt|ls /tmp|touch /etc/teste.txt|touch ~/teste.txt|ls ~|ls /home/maria"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="fhs" data-title="Caminhos absolutos e relativos">
+  <h2>Caminhos absolutos e relativos</h2>
+  <div class="cols">
+    <div>
+      <p>Um <strong>caminho</strong> indica onde está um arquivo na árvore.</p>
+      <ul>
+        <li><strong>Absoluto</strong>: começa na raiz, com <code>/</code>. Funciona de qualquer lugar: <code>/home/aluno/notas.txt</code>.</li>
+        <li><strong>Relativo</strong>: parte do diretório atual. Se você está em <code>/home/aluno</code>, basta <code>notas.txt</code>.</li>
+      </ul>
+      <p>Todo diretório tem dois nomes especiais, e o shell oferece mais dois atalhos:</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Símbolo</th><th>Significado</th></tr>
+          <tr><td><code>.</code></td><td>o próprio diretório atual</td></tr>
+          <tr><td><code>..</code></td><td>o diretório pai (um nível acima)</td></tr>
+          <tr><td><code>~</code></td><td>a sua pasta pessoal (<code>/home/aluno</code>)</td></tr>
+          <tr><td><code>-</code></td><td>no <code>cd</code>: o diretório em que você estava antes</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <p>Mude o caminho e veja como o shell o resolve, passo a passo:</p>
+      <div class="pathviz" data-cwd="/home/aluno/Documentos" data-path="../Downloads/aula7.pdf" data-presets="relatorio.txt|./relatorio.txt|..|../..|../../..|../Downloads/aula7.pdf|~/notas.txt|/etc/passwd|../../maria|./../Documentos/./frutas.txt"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== NAVEGAÇÃO ===================== -->
+<section class="slide" data-mod="nav" data-title="whoami, echo e man">
+  <h2><code>whoami</code>, <code>echo</code> e <code>man</code></h2>
+  <div class="cols">
+    <div>
+      <h3><code>whoami</code>: “quem sou eu?”</h3>
+      <p>Mostra o nome do usuário que está usando o shell.</p>
+      <h3><code>echo</code>: o “print” do shell</h3>
+      <p>Escreve um texto na saída. Também mostra o valor de <strong>variáveis</strong> do shell, como <code>$USER</code> e <code>$HOME</code>. Entre aspas simples, nada é substituído.</p>
+      <h3><code>man</code>: o manual</h3>
+      <p><code>man comando</code> abre o manual de qualquer comando, com todas as opções. No terminal real, use as setas para rolar e <kbd>q</kbd> para sair.</p>
+<pre class="sh">$ man ls</pre>
+    </div>
+    <div>
+      <div class="term" data-label="whoami, echo, man" data-cmds="whoami|echo Bom dia, turma!|echo &quot;Minha pasta é $HOME&quot;|echo 'Sem troca: $HOME'|man echo|man cd"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="nav" data-title="pwd e cd">
+  <h2><code>pwd</code> e <code>cd</code>: onde estou e para onde vou</h2>
+  <div class="cols">
+    <div>
+      <p><code>pwd</code> (<em>print working directory</em>) mostra o caminho absoluto do diretório atual.</p>
+      <p><code>cd</code> (<em>change directory</em>) muda o diretório atual:</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Comando</th><th>Vai para</th></tr>
+          <tr><td><code>cd Documentos</code></td><td>a subpasta Documentos (relativo)</td></tr>
+          <tr><td><code>cd /etc</code></td><td>/etc (absoluto)</td></tr>
+          <tr><td><code>cd ..</code></td><td>o diretório pai</td></tr>
+          <tr><td><code>cd ../Downloads</code></td><td>a pasta “irmã” Downloads</td></tr>
+          <tr><td><code>cd</code> ou <code>cd ~</code></td><td>a pasta pessoal</td></tr>
+          <tr><td><code>cd -</code></td><td>o diretório anterior</td></tr>
+        </table>
+      </div>
+      <p>Acompanhe o diretório atual no prompt, depois dos dois-pontos.</p>
+    </div>
+    <div>
+      <div class="term" data-label="pwd e cd" data-cmds="pwd|cd Documentos|pwd|cd ../Downloads|cd ..|cd /var/log|cd -|cd|cd /root|cd notas.txt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="nav" data-title="ls e suas opções">
+  <h2><code>ls</code>: listando o conteúdo de um diretório</h2>
+  <div class="cols">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Opção</th><th>Efeito</th></tr>
+        <tr><td><code>-a</code></td><td>lista todos, inclusive os ocultos (nome começa com <code>.</code>)</td></tr>
+        <tr><td><code>-l</code></td><td>formato longo: permissões, dono, tamanho, data de modificação</td></tr>
+        <tr><td><code>-h</code></td><td>tamanhos legíveis (K, M, G); use junto com <code>-l</code></td></tr>
+        <tr><td><code>-S</code></td><td>ordena pelo tamanho, do maior para o menor</td></tr>
+        <tr><td><code>-t</code></td><td>ordena pela data de modificação, do mais recente</td></tr>
+        <tr><td><code>-r</code></td><td>inverte a ordem</td></tr>
+        <tr><td><code>-R</code></td><td>entra nos subdiretórios (recursivo)</td></tr>
+        <tr><td><code>-d</code></td><td>mostra o diretório em si, não o seu conteúdo</td></tr>
+      </table>
+      <p>As opções se combinam: <code>ls -lhS</code>, <code>ls -ltr</code>. As cores indicam o tipo: <span class="mini"><b>azul</b> diretório</span> <span class="mini"><b>verde</b> executável</span>.</p>
+    </div>
+    <div>
+      <div class="term" data-label="ls" data-cmds="ls|ls -a|ls -l|ls -lh Downloads|ls -lS Downloads|ls -lt Downloads|ls -ltr Downloads|ls -R|ls /etc /home"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="nav" data-title="Lendo a saída de ls -l">
+  <h2>Lendo a saída de <code>ls -l</code></h2>
+  <div class="explain" data-hint="Passe o mouse ou toque em cada coluna.">
+    <div class="ex-line"><button type="button" data-info="Tipo: - arquivo comum, d diretório, l atalho (link simbólico), c e b dispositivos (em /dev).">-</button><button type="button" data-info="Permissões, em três trios: do dono, do grupo e dos outros usuários. r = leitura, w = gravação, x = execução, - = sem permissão. Veremos em detalhes no módulo de permissões.">rw-r--r--</button><button type="button" data-info="Número de links (nomes) que apontam para este arquivo. Para diretórios, conta também as subpastas.">1</button><button type="button" data-info="Dono (usuário) do arquivo. Normalmente, quem o criou.">aluno</button><button type="button" data-info="Grupo do arquivo. Usuários desse grupo recebem as permissões do segundo trio.">turma</button><button type="button" data-info="Tamanho em bytes. Com -h, aparece em K, M ou G.">1536</button><button type="button" data-info="Data e hora da última modificação. Arquivos com mais de seis meses mostram o ano no lugar da hora.">out 20 10:30</button><button type="button" data-info="Nome do arquivo. Diretórios aparecem em azul e executáveis em verde.">notas.txt</button></div>
+    <div class="ex-info"></div>
+  </div>
+  <div class="cols even">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>1º caractere</th><th>Tipo</th><th>Exemplo</th></tr>
+        <tr><td><code>-</code></td><td>arquivo comum</td><td><code>notas.txt</code></td></tr>
+        <tr><td><code>d</code></td><td>diretório</td><td><code>Documentos</code></td></tr>
+        <tr><td><code>l</code></td><td>link simbólico (atalho)</td><td><code>/bin → usr/bin</code></td></tr>
+        <tr><td><code>b</code></td><td>dispositivo de bloco (discos)</td><td><code>/dev/sda</code></td></tr>
+        <tr><td><code>c</code></td><td>dispositivo de caractere</td><td><code>/dev/tty</code></td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="term" data-label="ls -l" data-cmds="ls -l|ls -la|ls -l /dev|ls -ld /tmp|ls -lh /var/log"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="nav" data-title="Sua vez: navegando">
+  <h2>Sua vez: navegando</h2>
+  <p class="lead">Cumpra os objetivos abaixo do terminal. Cada um fica verde quando for atingido.</p>
+  <div class="term" data-label="missão: navegação" data-check='[
+    {"t":"out","cmd":"whoami","has":"aluno","d":"Descobrir com qual usuário você está conectado"},
+    {"t":"out","cmd":"cat","has":"unicatolica","d":"Mostrar o conteúdo do arquivo de configuração com o nome da máquina (fica em /etc)"},
+    {"t":"out","cmd":"ls","has":["dpkg.log","rw-r--r--"],"d":"Listar em formato longo o conteúdo de /var/log"},
+    {"t":"out","cmd":"ls","has":[".bashrc",".profile"],"d":"Listar os arquivos ocultos da sua pasta pessoal"},
+    {"t":"cwd","p":"~/Documentos","d":"Terminar dentro de ~/Documentos"}]'></div>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<pre class="sh">$ whoami
+$ cat /etc/hostname
+$ ls -l /var/log
+$ ls -a ~
+$ cd ~/Documentos</pre>
+  </details>
+</section>
+
+<section class="slide" data-mod="nav" data-title="Revisão: hierarquia e navegação">
+  <h2>Revisão: hierarquia e navegação</h2>
+  <div class="quiz" data-quiz="nav" data-label="Questão"></div>
+</section>
+
+<!-- ===================== ARQUIVOS E DIRETÓRIOS ===================== -->
+<section class="slide" data-mod="arq" data-title="mkdir e rmdir">
+  <h2><code>mkdir</code> e <code>rmdir</code>: criando e removendo diretórios</h2>
+  <div class="cols">
+    <div>
+      <p><code>mkdir</code> (<em>make directory</em>) cria um ou vários diretórios de uma vez. Com <code>-p</code>, cria também os diretórios intermediários que ainda não existem.</p>
+<pre class="sh">$ mkdir aula7
+$ mkdir fotos videos musicas
+$ mkdir -p projeto/src/testes</pre>
+      <p><code>rmdir</code> (<em>remove directory</em>) remove diretórios, <strong>mas só se estiverem vazios</strong>. Caso contrário, dispara um erro: uma proteção contra apagar conteúdo por engano.</p>
+<pre class="sh">$ rmdir projeto
+rmdir: falhou em remover 'projeto': Diretório não vazio</pre>
+    </div>
+    <div>
+      <div class="term" data-label="mkdir e rmdir" data-cmds="mkdir aula7|mkdir fotos videos musicas|ls|mkdir projeto/src|mkdir -p projeto/src/testes|tree projeto|rmdir fotos|rmdir projeto|rmdir projeto/src/testes|tree projeto"></div>
+      <p class="keys"><code>tree</code> desenha a árvore de diretórios. Ele não vem instalado em todas as distribuições, mas ajuda muito a visualizar o resultado.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="touch: criando arquivos vazios">
+  <h2><code>touch</code>: criando arquivos vazios</h2>
+  <div class="cols">
+    <div>
+      <p><code>touch</code> cria um ou vários arquivos vazios de uma vez.</p>
+<pre class="sh">$ touch lista.txt
+$ touch a.txt b.txt c.txt</pre>
+      <p>Se o arquivo <strong>já existe</strong>, o <code>touch</code> não apaga nada: apenas atualiza a data de modificação para agora. Compare a data de <code>notas.txt</code> antes e depois.</p>
+      <div class="note">A extensão é só parte do nome. <code>touch relatorio</code> e <code>touch relatorio.txt</code> criam arquivos igualmente válidos; a extensão serve para pessoas e programas reconhecerem o tipo de conteúdo.</div>
+    </div>
+    <div>
+      <div class="term" data-label="touch" data-cmds="touch lista.txt|touch a.txt b.txt c.txt|ls -l|ls -l notas.txt|touch notas.txt|ls -l notas.txt|cat notas.txt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="cp: copiando">
+  <h2><code>cp</code>: copiando arquivos e diretórios</h2>
+  <div class="cols">
+    <div>
+      <p>Funciona como o “copiar e colar” do gerenciador de arquivos. O último argumento é o destino:</p>
+      <ul>
+        <li>se o destino é um <strong>diretório existente</strong>, a cópia vai para dentro dele, com o mesmo nome;</li>
+        <li>senão, a cópia é criada com o <strong>novo nome</strong>.</li>
+      </ul>
+<pre class="sh">$ cp notas.txt Documentos/
+$ cp notas.txt notas_backup.txt
+$ cp -r Documentos Documentos_backup</pre>
+      <p>Para copiar <strong>diretórios</strong>, use <code>-r</code> (recursivo): sem ele, o <code>cp</code> pula o diretório.</p>
+      <div class="note warn">Se o destino já existir, o <code>cp</code> o <strong>sobrescreve sem perguntar</strong>. Com <code>-i</code>, ele pede confirmação antes.</div>
+    </div>
+    <div>
+      <div class="term" data-label="cp" data-cmds="cp notas.txt Documentos/|ls Documentos|cp notas.txt notas_backup.txt|ls|cp Documentos Documentos_backup|cp -r Documentos Documentos_backup|ls Documentos_backup"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="mv: movendo e renomeando">
+  <h2><code>mv</code>: movendo e renomeando</h2>
+  <div class="cols">
+    <div>
+      <p>Funciona como o “recortar e colar”: o arquivo sai do lugar de origem. A regra do destino é a mesma do <code>cp</code>:</p>
+<pre class="sh">$ mv notas.txt Documentos/
+$ mv Documentos/notas.txt Documentos/lembretes.txt
+$ mv Imagens Fotos</pre>
+      <ul>
+        <li>Mover para um diretório existente: o arquivo vai para dentro dele.</li>
+        <li>Mover para um nome que não existe: o arquivo é <strong>renomeado</strong>. No Linux não há comando separado para renomear.</li>
+        <li>Diretórios são movidos inteiros, <strong>sem precisar de <code>-r</code></strong>.</li>
+      </ul>
+      <div class="note warn">Assim como o <code>cp</code>, o <code>mv</code> sobrescreve o destino sem perguntar (a não ser com <code>-i</code>).</div>
+    </div>
+    <div>
+      <div class="term" data-label="mv" data-cmds="mv notas.txt Documentos/|ls|ls Documentos|mv Documentos/notas.txt Documentos/lembretes.txt|ls Documentos|mv Imagens Fotos|ls|mv Documentos Documentos/sub"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="rm: removendo">
+  <h2><code>rm</code>: removendo arquivos e diretórios</h2>
+  <div class="cols">
+    <div>
+<pre class="sh">$ rm instalador.deb
+$ rm -r Imagens</pre>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Opção</th><th>Efeito</th></tr>
+          <tr><td><code>-r</code></td><td>remove diretórios e todo o seu conteúdo</td></tr>
+          <tr><td><code>-f</code></td><td>força: não reclama de arquivo inexistente e não pergunta nada</td></tr>
+          <tr><td><code>-i</code></td><td>pergunta antes de cada remoção</td></tr>
+          <tr><td><code>-v</code></td><td>mostra cada item removido</td></tr>
+        </table>
+      </div>
+      <div class="note warn"><strong>Não existe lixeira no terminal.</strong> O que o <code>rm</code> apaga não volta. Confira o comando antes de teclar <kbd>Enter</kbd>, principalmente com <code>-r</code>, <code>-f</code> e curingas como <code>*</code>. O famoso <code>rm -rf /</code> tentaria apagar o sistema inteiro: as versões atuais recusam por segurança.</div>
+    </div>
+    <div>
+      <div class="term" data-label="rm" data-cmds="ls Downloads|rm Downloads/instalador.deb|rm nada.txt|rm -f nada.txt|rm Documentos|rm -rv Documentos|ls|rm -rf /"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="Curingas: * ? [ ]">
+  <h2>Curingas: <code>*</code>, <code>?</code> e <code>[ ]</code></h2>
+  <div class="cols">
+    <div>
+      <p>Curingas descrevem vários nomes de uma vez. Quem os expande é o <strong>shell</strong>, antes de executar o comando: o <code>rm *.pdf</code> recebe a lista de nomes já pronta.</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Curinga</th><th>Casa com</th><th>Exemplo</th></tr>
+          <tr><td><code>*</code></td><td>qualquer sequência, inclusive vazia</td><td><code>*.jpg</code>: todos os .jpg</td></tr>
+          <tr><td><code>?</code></td><td>exatamente um caractere</td><td><code>aula?.pdf</code>: aula1.pdf, aula7.pdf</td></tr>
+          <tr><td><code>[ ]</code></td><td>um caractere da lista</td><td><code>[fw]*</code>: começa com f ou w</td></tr>
+        </table>
+      </div>
+      <p>Use <code>echo</code> para ver a expansão antes de usar o curinga em um comando perigoso: <code>echo *.pdf</code> mostra exatamente o que <code>rm *.pdf</code> apagaria.</p>
+    </div>
+    <div>
+      <div class="term" data-label="curingas" data-cwd="~/Downloads" data-cmds="ls|ls *.jpg|ls *.p*|ls aula?.pdf|ls [fw]*|echo *.pdf|mkdir pdfs|mv *.pdf pdfs/|ls"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="Sua vez: arquivos e diretórios">
+  <h2>Sua vez: arquivos e diretórios</h2>
+  <p class="lead">Organize o material da aula na sua pasta pessoal.</p>
+  <div class="term" data-label="missão: aula 7" data-check='[
+    {"t":"dir","p":["~/aula7/exercicios","~/aula7/anotacoes"],"d":"Criar ~/aula7 com as subpastas exercicios e anotacoes"},
+    {"t":"file","p":"~/aula7/anotacoes/resumo.txt","d":"Criar o arquivo vazio resumo.txt em anotacoes"},
+    {"t":"file","p":["~/aula7/lembretes.txt","~/notas.txt"],"has":"chmod","d":"Copiar ~/notas.txt para ~/aula7 com o nome lembretes.txt (o original continua em ~)"},
+    {"t":"file","p":"~/aula7/aula7.pdf","d":"Mover ~/Downloads/aula7.pdf para ~/aula7"},
+    {"t":"none","p":"~/Downloads/aula7.pdf","d":"(o PDF não deve continuar em Downloads)"},
+    {"t":"none","p":"~/Downloads/instalador.deb","d":"Apagar ~/Downloads/instalador.deb"}]'></div>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<pre class="sh">$ mkdir -p aula7/exercicios aula7/anotacoes
+$ touch aula7/anotacoes/resumo.txt
+$ cp notas.txt aula7/lembretes.txt
+$ mv Downloads/aula7.pdf aula7/
+$ rm Downloads/instalador.deb
+$ tree aula7</pre>
+  </details>
+</section>
+
+<section class="slide" data-mod="arq" data-title="Revisão: arquivos e diretórios">
+  <h2>Revisão: arquivos e diretórios</h2>
+  <div class="quiz" data-quiz="arq" data-label="Questão"></div>
+</section>
+
+<!-- ===================== CONTEÚDO E BUSCA ===================== -->
+<section class="slide" data-mod="txt" data-title="Redirecionamento: > e >>">
+  <h2>Redirecionamento da saída: <code>&gt;</code> e <code>&gt;&gt;</code></h2>
+  <div class="cols">
+    <div>
+      <p>Normalmente, a saída de um comando aparece na tela. Com os operadores de redirecionamento, ela vai para um <strong>arquivo</strong>:</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Operador</th><th>Efeito</th></tr>
+          <tr><td><code>&gt;</code></td><td>cria o arquivo ou <strong>substitui</strong> todo o seu conteúdo</td></tr>
+          <tr><td><code>&gt;&gt;</code></td><td><strong>acrescenta</strong> no final, sem apagar o que havia</td></tr>
+          <tr><td><code>2&gt;</code></td><td>redireciona as mensagens de <strong>erro</strong></td></tr>
+          <tr><td><code>&lt;</code></td><td>usa um arquivo como <strong>entrada</strong> do comando</td></tr>
+        </table>
+      </div>
+<pre class="sh">$ echo "Texto qualquer" > arquivo.txt
+$ echo "Mais uma linha" >> arquivo.txt
+$ ls -l > listagem.txt</pre>
+      <div class="note warn">O <code>&gt;</code> apaga o conteúdo anterior sem perguntar. Na dúvida, use <code>&gt;&gt;</code>.</div>
+    </div>
+    <div>
+      <div class="term" data-label="redirecionamento" data-cmds="echo &quot;Primeira linha&quot; > diario.txt|cat diario.txt|echo &quot;Segunda linha&quot; >> diario.txt|cat diario.txt|echo &quot;Sobrescrevi!&quot; > diario.txt|cat diario.txt|ls -l > listagem.txt|cat listagem.txt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="txt" data-title="cat, head, tail e wc">
+  <h2><code>cat</code>, <code>head</code>, <code>tail</code> e <code>wc</code></h2>
+  <div class="cols">
+    <div>
+      <p><code>cat</code> (de con<strong>cat</strong>enar) junta o conteúdo de um ou mais arquivos e mostra o resultado. Com um arquivo só, serve para exibi-lo; com redirecionamento, para juntar arquivos.</p>
+<pre class="sh">$ cat notas.txt
+$ cat parte1.txt parte2.txt > completo.txt</pre>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Comando</th><th>Mostra</th></tr>
+          <tr><td><code>cat -n arq</code></td><td>o arquivo com as linhas numeradas</td></tr>
+          <tr><td><code>head -n 3 arq</code></td><td>as 3 primeiras linhas (padrão: 10)</td></tr>
+          <tr><td><code>tail -n 3 arq</code></td><td>as 3 últimas linhas (ótimo para logs)</td></tr>
+          <tr><td><code>wc -l arq</code></td><td>quantas linhas o arquivo tem (<code>-w</code> palavras, <code>-c</code> bytes)</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="term" data-label="cat, head, tail, wc" data-cwd="~/Documentos" data-cmds="cat relatorio.txt|cat -n alunos.csv|head -n 3 alunos.csv|tail -n 2 alunos.csv|wc -l alunos.csv|wc relatorio.txt|cat frutas.txt numeros.txt > tudo.txt|cat tudo.txt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="txt" data-title="sort e uniq">
+  <h2><code>sort</code> e <code>uniq</code>: ordenando linhas</h2>
+  <div class="cols">
+    <div>
+      <p><code>sort</code> junta o conteúdo de um ou mais arquivos e mostra as linhas <strong>ordenadas</strong>. Ele não altera o arquivo original: para guardar o resultado, redirecione.</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Opção</th><th>Efeito</th></tr>
+          <tr><td><code>-r</code></td><td>ordem inversa</td></tr>
+          <tr><td><code>-n</code></td><td>compara como número: 2 antes de 10</td></tr>
+          <tr><td><code>-u</code></td><td>remove as linhas repetidas</td></tr>
+          <tr><td><code>-f</code></td><td>ignora maiúsculas e minúsculas</td></tr>
+        </table>
+      </div>
+      <p><code>uniq</code> remove repetições <strong>consecutivas</strong>; com <code>-c</code>, conta quantas vezes cada linha aparece. Por isso costuma vir logo depois do <code>sort</code>.</p>
+      <div class="note">Sem <code>-n</code>, os números são comparados como texto, caractere a caractere: <code>100</code> vem antes de <code>2</code>, porque <code>1</code> vem antes de <code>2</code>.</div>
+    </div>
+    <div>
+      <div class="term" data-label="sort e uniq" data-cwd="~/Documentos" data-cmds="cat frutas.txt|sort frutas.txt|sort -r frutas.txt|sort -u frutas.txt|sort numeros.txt|sort -n numeros.txt|sort frutas.txt | uniq -c|sort -u frutas.txt > frutas_ordenadas.txt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="txt" data-title="grep: procurando texto">
+  <h2><code>grep</code>: procurando texto dentro de arquivos</h2>
+  <div class="cols">
+    <div>
+      <p>Mostra as <strong>linhas</strong> que contêm um texto (padrão). Funciona com arquivos e, com <code>-r</code>, com diretórios inteiros.</p>
+<pre class="sh">$ grep texto arquivo
+$ grep -r texto diretório</pre>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Opção</th><th>Efeito</th></tr>
+          <tr><td><code>-i</code></td><td>ignora maiúsculas e minúsculas</td></tr>
+          <tr><td><code>-n</code></td><td>mostra o número de cada linha</td></tr>
+          <tr><td><code>-v</code></td><td>inverte: linhas que <strong>não</strong> contêm o texto</td></tr>
+          <tr><td><code>-c</code></td><td>só conta as linhas encontradas</td></tr>
+          <tr><td><code>-r</code></td><td>procura em todos os arquivos dos diretórios</td></tr>
+          <tr><td><code>-l</code></td><td>mostra só o nome dos arquivos que contêm o texto</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="term" data-label="grep" data-cwd="~/Documentos" data-cmds="grep linux relatorio.txt|grep -i linux relatorio.txt|grep -in linux relatorio.txt|grep SI alunos.csv|grep -c SI alunos.csv|grep -v SI alunos.csv|grep -r banana ~|grep -rl Linux ~|grep install /var/log/dpkg.log"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="txt" data-title="find: procurando arquivos">
+  <h2><code>find</code>: procurando arquivos e diretórios</h2>
+  <div class="cols">
+    <div>
+      <p>Enquanto o <code>grep</code> procura <strong>dentro</strong> dos arquivos, o <code>find</code> procura <strong>os próprios arquivos</strong>, percorrendo a árvore a partir de um diretório.</p>
+<pre class="sh">$ find onde critérios
+$ find ~ -name "*.pdf"
+$ find / -name passwd 2>/dev/null</pre>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Critério</th><th>Encontra</th></tr>
+          <tr><td><code>-name "padrão"</code></td><td>pelo nome (aceita curingas)</td></tr>
+          <tr><td><code>-iname "padrão"</code></td><td>pelo nome, sem diferenciar maiúsculas</td></tr>
+          <tr><td><code>-type f</code> / <code>-type d</code></td><td>só arquivos / só diretórios</td></tr>
+          <tr><td><code>-maxdepth N</code></td><td>desce no máximo N níveis</td></tr>
+          <tr><td><code>-empty</code></td><td>arquivos ou diretórios vazios</td></tr>
+        </table>
+      </div>
+      <div class="note">Coloque o padrão <strong>entre aspas</strong>. Sem elas, o shell expande o <code>*</code> antes de o <code>find</code> receber o padrão. E <code>2&gt;/dev/null</code> descarta as mensagens de “Permissão negada”: <code>/dev/null</code> é um “buraco negro” que engole tudo o que recebe.</div>
+    </div>
+    <div>
+      <div class="term" data-label="find" data-cmds="find . -name &quot;*.txt&quot;|find ~ -name &quot;*.pdf&quot;|find . -type d|find . -maxdepth 1 -type f|find . -iname &quot;*.JPG&quot;|find / -name passwd|find / -name passwd 2>/dev/null|find . -name *.txt"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="txt" data-title="Pipes: combinando comandos">
+  <h2>Pipes: combinando comandos com <code>|</code></h2>
+  <div class="cols">
+    <div>
+      <p>O <strong>pipe</strong> <code>|</code> liga a saída de um comando à entrada do próximo, como um cano. Cada comando faz uma coisa simples; combinados, resolvem problemas maiores.</p>
+<pre class="sh">$ ls | wc -l
+$ cat frutas.txt | sort | uniq -c
+$ grep SI alunos.csv | wc -l
+$ ls -l /etc | grep passwd</pre>
+      <p>Lendo o segundo exemplo da esquerda para a direita: mostra as frutas → ordena → conta as repetições.</p>
+      <div class="note">Diferença importante: <code>&gt;</code> manda a saída para um <strong>arquivo</strong>; <code>|</code> manda para outro <strong>comando</strong>.</div>
+    </div>
+    <div>
+      <div class="term" data-label="pipes" data-cwd="~/Documentos" data-cmds="ls | wc -l|cat frutas.txt | sort | uniq -c|sort frutas.txt | uniq -c | sort -rn|grep SI alunos.csv | wc -l|grep SI alunos.csv | sort -r|ls -l /etc | grep passwd|cat /proc/cpuinfo | grep &quot;model name&quot; | head -n 1"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="txt" data-title="Revisão: conteúdo e busca">
+  <h2>Revisão: conteúdo e busca</h2>
+  <div class="quiz" data-quiz="txt" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PERMISSÕES ===================== -->
+<section class="slide" data-mod="perm" data-title="Permissões: quem e o quê">
+  <h2>Permissões: quem pode fazer o quê</h2>
+  <div class="cols">
+    <div>
+      <p>No Linux, cada arquivo e diretório tem um <strong>dono</strong> e um <strong>grupo</strong>, e define permissões para três tipos de usuário:</p>
+      <div class="kv">
+        <span class="k">u</span><span class="a">→</span><span class="v">dono (user)</span>
+        <span class="k">g</span><span class="a">→</span><span class="v">grupo (group)</span>
+        <span class="k">o</span><span class="a">→</span><span class="v">outros (others)</span>
+      </div>
+      <p>Para cada um, há três permissões, e o <code>-</code> indica a ausência dela:</p>
+      <div class="kv">
+        <span class="k">r</span><span class="a">→</span><span class="v">leitura (read)</span>
+        <span class="k">w</span><span class="a">→</span><span class="v">gravação (write)</span>
+        <span class="k">x</span><span class="a">→</span><span class="v">execução (execute)</span>
+      </div>
+    </div>
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th></th><th>Em um arquivo</th><th>Em um diretório</th></tr>
+        <tr><td><code>r</code></td><td>ler o conteúdo (<code>cat</code>)</td><td>listar os nomes (<code>ls</code>)</td></tr>
+        <tr><td><code>w</code></td><td>alterar o conteúdo</td><td>criar, renomear e apagar itens dentro dele</td></tr>
+        <tr><td><code>x</code></td><td>executar como programa ou script</td><td>entrar (<code>cd</code>) e acessar os itens</td></tr>
+      </table>
+      <p>Quem é você? O comando <code>id</code> mostra o seu usuário e os grupos de que você faz parte.</p>
+      <div class="term" data-label="id" data-cmds="id|groups|ls -l ~|ls -l /etc/passwd /etc/shadow"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perm" data-title="Lendo as permissões">
+  <h2>Lendo as permissões</h2>
+  <div class="explain" data-hint="Passe o mouse ou toque em cada parte.">
+    <div class="ex-line"><button type="button" data-info="Tipo: - arquivo comum, d diretório.">-</button><button type="button" data-info="Trio do DONO (u): rwx. O dono, aluno, pode ler, gravar e executar.">rwx</button><button type="button" data-info="Trio do GRUPO (g): r-x. Quem pertence ao grupo turma pode ler e executar, mas não alterar.">r-x</button><button type="button" data-info="Trio dos OUTROS (o): r--. Qualquer outro usuário só pode ler.">r--</button><span class="sep">1</span><button type="button" data-info="Dono do arquivo: recebe as permissões do primeiro trio.">aluno</button><button type="button" data-info="Grupo do arquivo: seus membros recebem as permissões do segundo trio.">turma</button><span class="sep">102 out 20 10:30</span><button type="button" data-info="Nome do arquivo.">script.sh</button></div>
+    <div class="ex-info"></div>
+  </div>
+  <div class="cols">
+    <div>
+      <p>O sistema verifica <strong>um único trio</strong>, nesta ordem:</p>
+      <ol>
+        <li>Se você é o dono, valem as permissões do dono.</li>
+        <li>Senão, se você está no grupo do arquivo, valem as do grupo.</li>
+        <li>Senão, valem as dos outros.</li>
+      </ol>
+      <p>O <strong>root</strong> (administrador) ignora essas regras: pode ler e alterar qualquer arquivo.</p>
+    </div>
+    <div>
+      <div class="term" data-label="lendo permissões" data-cmds="ls -l|ls -ld /tmp /root /home/maria|ls -l /etc/shadow|cat /etc/shadow|stat script.sh"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perm" data-title="Notação octal">
+  <h2>Notação octal: permissões em números</h2>
+  <div class="cols">
+    <div>
+      <p>Cada permissão vale um número; a soma de cada trio vira um dígito de 0 a 7:</p>
+      <div class="kv">
+        <span class="k">r</span><span class="a">=</span><span class="v">4</span>
+        <span class="k">w</span><span class="a">=</span><span class="v">2</span>
+        <span class="k">x</span><span class="a">=</span><span class="v">1</span>
+      </div>
+      <p>Exemplo: <code>rwx r-x r--</code> = (4+2+1) (4+0+1) (4+0+0) = <strong>754</strong>.</p>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Octal</th><th>Símbolos</th><th>Uso típico</th></tr>
+          <tr><td><code>644</code></td><td><code>rw-r--r--</code></td><td>arquivos comuns</td></tr>
+          <tr><td><code>755</code></td><td><code>rwxr-xr-x</code></td><td>programas, scripts e diretórios</td></tr>
+          <tr><td><code>600</code></td><td><code>rw-------</code></td><td>arquivos privados (chaves, senhas)</td></tr>
+          <tr><td><code>700</code></td><td><code>rwx------</code></td><td>diretórios privados</td></tr>
+          <tr><td><code>777</code></td><td><code>rwxrwxrwx</code></td><td>todos fazem tudo: evite!</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <p>Marque as caixas ou digite o número:</p>
+      <div class="permcalc" data-mode="754" data-file="script.sh"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perm" data-title="chmod: alterando permissões">
+  <h2><code>chmod</code>: alterando permissões</h2>
+  <div class="cols">
+    <div>
+<pre class="sh">$ chmod permissões arquivo</pre>
+      <p>Há duas formas de escrever as permissões:</p>
+      <h3>Octal: define tudo de uma vez</h3>
+<pre class="sh">$ chmod 755 script.sh
+$ chmod 600 senhas.txt</pre>
+      <h3>Simbólica: <em>quem</em> + <em>operação</em> + <em>permissões</em></h3>
+      <div class="tblwrap">
+        <table class="tbl">
+          <tr><th>Comando</th><th>Efeito</th></tr>
+          <tr><td><code>chmod u+x script.sh</code></td><td>dá execução ao dono</td></tr>
+          <tr><td><code>chmod go-w notas.txt</code></td><td>tira a gravação do grupo e dos outros</td></tr>
+          <tr><td><code>chmod a+r aviso.txt</code></td><td>dá leitura a todos (a = u, g e o)</td></tr>
+          <tr><td><code>chmod u=rw,g=r,o= rel.txt</code></td><td>define exatamente: o mesmo que 640</td></tr>
+          <tr><td><code>chmod -R 750 projeto</code></td><td>aplica em tudo o que está dentro</td></tr>
+        </table>
+      </div>
+      <p>Só o <strong>dono</strong> do arquivo (ou o root) pode mudar suas permissões.</p>
+    </div>
+    <div>
+      <p>Um script só roda como programa se tiver permissão <code>x</code>:</p>
+      <div class="term" data-label="chmod" data-cmds="cat script.sh|./script.sh|ls -l script.sh|chmod u+x script.sh|ls -l script.sh|./script.sh|chmod 600 notas.txt|ls -l notas.txt|chmod -v go+r notas.txt|chmod 755 /etc/passwd"></div>
+      <p class="keys"><code>bash script.sh</code> funcionaria mesmo sem <code>x</code>: nesse caso quem executa é o bash, que só precisa <strong>ler</strong> o arquivo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perm" data-title="Permissão negada na prática">
+  <h2>“Permissão negada” na prática</h2>
+  <div class="cols">
+    <div>
+      <p>Experimente quebrar e consertar as permissões dos seus próprios arquivos, e veja o que acontece com os do sistema:</p>
+      <ul>
+        <li><code>chmod 000</code> tira todas as permissões, até do dono. Como você continua sendo o dono, pode devolvê-las.</li>
+        <li>Um diretório sem <code>x</code> não deixa entrar; sem <code>r</code>, não deixa listar.</li>
+        <li><code>chown</code> muda o dono de um arquivo, mas só o root pode usá-lo.</li>
+        <li><code>sudo comando</code> executa um comando como root (pedindo a sua senha). Use apenas quando necessário: como root, nada é negado.</li>
+      </ul>
+      <div class="note warn">Resolver “Permissão negada” com <code>chmod 777</code> ou <code>sudo</code> em tudo é como deixar a porta de casa aberta porque perdeu a chave. Dê apenas a permissão necessária.</div>
+    </div>
+    <div>
+      <div class="term" data-label="permissão negada" data-cmds="chmod 000 notas.txt|cat notas.txt|chmod u+r notas.txt|cat notas.txt|chmod a-x Documentos|cd Documentos|ls Documentos|chmod 755 Documentos|chown maria notas.txt|sudo chown maria notas.txt|ls -l notas.txt|sudo cat /etc/shadow"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perm" data-title="Revisão: permissões">
+  <h2>Revisão: permissões</h2>
+  <div class="quiz" data-quiz="perm" data-label="Questão"></div>
+</section>
+
+<!-- ===================== MISSÕES ===================== -->
+<section class="slide" data-mod="pratica" data-title="Missão 1: organizando os downloads">
+  <h2>Missão 1: organizando os downloads <span class="lvl-tag">básico</span></h2>
+  <p class="lead">A pasta Downloads virou bagunça. Separe os arquivos por tipo, usando curingas para trabalhar com vários arquivos de uma vez.</p>
+  <div class="term tall" data-label="missão 1: downloads" data-check='[
+    {"t":"dir","p":["~/Downloads/imagens","~/Downloads/documentos"],"d":"Criar as pastas imagens e documentos dentro de ~/Downloads"},
+    {"t":"file","p":["~/Downloads/imagens/foto_praia.jpg","~/Downloads/imagens/wallpaper.jpg","~/Downloads/imagens/selfie.png"],"d":"Mover as imagens (.jpg e .png) para imagens"},
+    {"t":"file","p":["~/Downloads/documentos/aula7.pdf","~/Downloads/documentos/trabalho_final.pdf"],"d":"Mover os PDFs para documentos"},
+    {"t":"file","p":"~/Música/musica.mp3","d":"Mover a música para a pasta ~/Música"},
+    {"t":"none","p":"~/Downloads/instalador.deb","d":"Apagar o instalador.deb"},
+    {"t":"count","p":"~/Downloads","g":"*.*","n":0,"d":"Não deixar nenhum arquivo solto em ~/Downloads, só as duas pastas"}]'></div>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<pre class="sh">$ cd ~/Downloads
+$ mkdir imagens documentos
+$ mv *.jpg *.png imagens/
+$ mv *.pdf documentos/
+$ mv musica.mp3 ~/Música/
+$ rm instalador.deb
+$ ls -R</pre>
+  </details>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Missão 2: estrutura de projeto">
+  <h2>Missão 2: estrutura de projeto <span class="lvl-tag">básico</span></h2>
+  <p class="lead">Monte a estrutura de pastas de um projeto em C, com um README e um histórico de alterações.</p>
+  <div class="term tall" data-label="missão 2: projeto" data-check='[
+    {"t":"dir","p":["~/projeto/src","~/projeto/docs","~/projeto/testes"],"d":"Criar ~/projeto com as subpastas src, docs e testes"},
+    {"t":"file","p":["~/projeto/src/main.c","~/projeto/src/util.c"],"d":"Criar os arquivos vazios main.c e util.c dentro de src"},
+    {"t":"file","p":"~/projeto/README.md","has":"Projeto de SO","d":"Criar ~/projeto/README.md contendo o texto Projeto de SO"},
+    {"t":"file","p":"~/projeto/docs/historico.txt","has":["projeto criado","pastas organizadas"],"d":"Criar docs/historico.txt com duas linhas, projeto criado e pastas organizadas (use > e depois >>)"},
+    {"t":"file","p":"~/projeto/testes/README.md","has":"Projeto de SO","d":"Copiar o README.md para dentro de testes"},
+    {"t":"cwd","p":"~/projeto/src","d":"Terminar dentro de ~/projeto/src"}]'></div>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<pre class="sh">$ mkdir -p projeto/src projeto/docs projeto/testes
+$ cd projeto
+$ touch src/main.c src/util.c
+$ echo "Projeto de SO" > README.md
+$ echo "projeto criado" > docs/historico.txt
+$ echo "pastas organizadas" >> docs/historico.txt
+$ cp README.md testes/
+$ cd src</pre>
+  </details>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Missão 3: investigação">
+  <h2>Missão 3: investigação <span class="lvl-tag">intermediário</span></h2>
+  <p class="lead">Use <code>grep</code>, <code>find</code>, <code>sort</code> e redirecionamento para extrair informações.</p>
+  <div class="term tall" data-label="missão 3: investigação" data-setup="mkdir -p ~/.config/cache/antigo
+echo 'A senha do wi-fi da sala é: chmod755' > ~/.config/cache/antigo/segredo_do_prof.txt" data-check='[
+    {"t":"out","cmd":"grep","has":["Ana","Beatriz","Carlos","Felipe"],"nao":["Diego","Eduarda","Gabriela","Heitor"],"d":"Mostrar com grep só as linhas dos alunos do curso SI, em ~/Documentos/alunos.csv"},
+    {"t":"file","p":"~/Documentos/alunos_si.txt","has":["Ana;SI","Felipe;SI"],"nao":["Diego"],"d":"Salvar essas linhas em ~/Documentos/alunos_si.txt"},
+    {"t":"out","cmd":"find","has":".config/cache/antigo/segredo_do_prof.txt","d":"Descobrir com find onde está o arquivo segredo_do_prof.txt, escondido em algum lugar da sua pasta pessoal"},
+    {"t":"file","p":"~/segredo_do_prof.txt","has":"chmod755","d":"Copiar o arquivo encontrado para a sua pasta pessoal"},
+    {"t":"file","p":"~/Documentos/frutas_ordenadas.txt","eq":"abacaxi\nacerola\nbanana\ncaju\nlaranja\nmaçã\nmanga\nuva","d":"Criar ~/Documentos/frutas_ordenadas.txt com as frutas de frutas.txt em ordem alfabética e sem repetição"},
+    {"t":"file","p":"~/remocoes.txt","has":["firefox","vim"],"nao":["install"],"d":"Salvar em ~/remocoes.txt as linhas de /var/log/dpkg.log que registram remoções de pacotes (remove)"}]'></div>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<pre class="sh">$ grep SI ~/Documentos/alunos.csv
+$ grep SI ~/Documentos/alunos.csv > ~/Documentos/alunos_si.txt
+$ find ~ -name "segredo*"
+$ cp ~/.config/cache/antigo/segredo_do_prof.txt ~
+$ sort -u ~/Documentos/frutas.txt > ~/Documentos/frutas_ordenadas.txt
+$ grep remove /var/log/dpkg.log > ~/remocoes.txt</pre>
+  </details>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Missão 4: permissões">
+  <h2>Missão 4: permissões <span class="lvl-tag">intermediário</span></h2>
+  <p class="lead">Ajuste as permissões de cada item. Use <code>ls -l</code> para conferir antes e depois.</p>
+  <div class="term tall" data-label="missão 4: permissões" data-setup="echo 'Hoje aprendi a usar o chmod.' > diario.txt
+mkdir compartilhado" data-check='[
+    {"t":"mode","p":"~/script.sh","m":"755","d":"script.sh: o dono lê, grava e executa; grupo e outros leem e executam"},
+    {"t":"out","cmd":"script.sh","has":"Este script está rodando","d":"Executar o script com ./script.sh"},
+    {"t":"mode","p":"~/diario.txt","m":"600","d":"diario.txt: só o dono lê e grava; ninguém mais tem acesso"},
+    {"t":"mode","p":"~/compartilhado","m":"750","d":"compartilhado: o dono tem acesso total; o grupo lista e entra; os outros não têm acesso"},
+    {"t":"mode","p":"~/compartilhado/regras.txt","m":"640","d":"Criar compartilhado/regras.txt: o dono lê e grava, o grupo só lê e os outros nada"},
+    {"t":"out","cmd":"ls -l","has":["rwxr-x---","compartilhado"],"d":"Conferir o resultado com ls -l na pasta pessoal"}]'></div>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<pre class="sh">$ chmod 755 script.sh
+$ ./script.sh
+$ chmod 600 diario.txt
+$ chmod 750 compartilhado
+$ touch compartilhado/regras.txt
+$ chmod 640 compartilhado/regras.txt
+$ ls -l</pre>
+  </details>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Resumo dos comandos">
+  <h2>Resumo dos comandos</h2>
+  <div class="cols even">
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Comando</th><th>Para quê</th><th>Exemplo</th></tr>
+        <tr><td><code>whoami</code></td><td>usuário atual</td><td><code>whoami</code></td></tr>
+        <tr><td><code>echo</code></td><td>escrever texto</td><td><code>echo "oi" &gt; a.txt</code></td></tr>
+        <tr><td><code>man</code></td><td>manual</td><td><code>man ls</code></td></tr>
+        <tr><td><code>pwd</code></td><td>diretório atual</td><td><code>pwd</code></td></tr>
+        <tr><td><code>cd</code></td><td>mudar de diretório</td><td><code>cd ../Downloads</code></td></tr>
+        <tr><td><code>ls</code></td><td>listar</td><td><code>ls -lah</code></td></tr>
+        <tr><td><code>mkdir</code></td><td>criar diretório</td><td><code>mkdir -p a/b/c</code></td></tr>
+        <tr><td><code>rmdir</code></td><td>remover diretório vazio</td><td><code>rmdir vazio</code></td></tr>
+        <tr><td><code>touch</code></td><td>criar arquivo vazio</td><td><code>touch a.txt</code></td></tr>
+      </table>
+    </div>
+    <div class="tblwrap">
+      <table class="tbl">
+        <tr><th>Comando</th><th>Para quê</th><th>Exemplo</th></tr>
+        <tr><td><code>cp</code></td><td>copiar</td><td><code>cp -r fotos backup/</code></td></tr>
+        <tr><td><code>mv</code></td><td>mover ou renomear</td><td><code>mv a.txt b.txt</code></td></tr>
+        <tr><td><code>rm</code></td><td>remover (sem lixeira!)</td><td><code>rm -r pasta</code></td></tr>
+        <tr><td><code>cat</code></td><td>mostrar ou juntar</td><td><code>cat a b &gt; c</code></td></tr>
+        <tr><td><code>sort</code></td><td>ordenar linhas</td><td><code>sort -n numeros.txt</code></td></tr>
+        <tr><td><code>grep</code></td><td>procurar texto</td><td><code>grep -rin erro /var/log</code></td></tr>
+        <tr><td><code>find</code></td><td>procurar arquivos</td><td><code>find ~ -name "*.pdf"</code></td></tr>
+        <tr><td><code>chmod</code></td><td>mudar permissões</td><td><code>chmod 755 script.sh</code></td></tr>
+        <tr><td><code>&gt;</code> <code>&gt;&gt;</code> <code>|</code></td><td>redirecionar e encadear</td><td><code>ls | wc -l</code></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Terminal livre">
+  <h2>Terminal livre</h2>
+  <p class="lead">Espaço para experimentar durante a aula. Sugestões: monte a sua árvore de pastas do semestre; descubra quantos usuários existem em <code>/etc/passwd</code> com <code>wc -l</code>; procure com <code>find /</code> todos os arquivos <code>.conf</code>; crie um script com <code>echo</code> e <code>&gt;&gt;</code>, dê permissão de execução e rode-o.</p>
+  <div class="term tall" data-label="terminal livre"></div>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Os comandos que você digitou nos terminais, as missões cumpridas e as respostas dos quizzes ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "so-gestao-arquivos",
+ "mods": {
+  "intro":   { "name": "Introdução", "color": "#1f5297" },
+  "fhs":     { "name": "Hierarquia de diretórios", "color": "#0b78b0" },
+  "nav":     { "name": "Navegação", "color": "#0f7a62" },
+  "arq":     { "name": "Arquivos e diretórios", "color": "#a8670c" },
+  "txt":     { "name": "Conteúdo e busca", "color": "#8e3a8f" },
+  "perm":    { "name": "Permissões", "color": "#5b3fb0" },
+  "pratica": { "name": "Missões", "color": "#be3455" }
+ },
+ "quizzes": {
+  "nav": [
+   {
+    "q": "Qual será a saída do último pwd?",
+    "code": "$ pwd\n/home/aluno/Documentos\n$ cd ../Downloads\n$ pwd",
+    "opts": ["/home/aluno/Downloads", "/home/Downloads", "/Downloads", "/home/aluno/Documentos/Downloads"],
+    "ans": 0,
+    "why": "O .. sobe de /home/aluno/Documentos para /home/aluno; dali, o caminho entra em Downloads."
+   },
+   {
+    "q": "Qual destes caminhos é absoluto?",
+    "opts": ["Documentos/notas.txt", "./notas.txt", "/home/aluno/notas.txt", "../aluno/notas.txt"],
+    "ans": 2,
+    "why": "Só caminhos que começam com / partem da raiz e funcionam de qualquer lugar. Os outros dependem do diretório atual."
+   },
+   {
+    "q": "O que o cd faz quando digitado sem nenhum argumento?",
+    "opts": ["Mostra o diretório atual", "Vai para a raiz /", "Vai para a pasta pessoal (~)", "Dá erro"],
+    "ans": 2,
+    "why": "cd sem argumento é o mesmo que cd ~: volta para a pasta pessoal. Para ver o diretório atual, use pwd."
+   },
+   {
+    "q": "Qual opção do ls mostra também os arquivos ocultos?",
+    "opts": ["-l", "-a", "-h", "-S"],
+    "ans": 1,
+    "why": "-a (all) inclui os nomes que começam com ponto, como .bashrc. -l é o formato longo, -h deixa os tamanhos legíveis e -S ordena por tamanho."
+   },
+   {
+    "q": "Nesta linha do ls -l, quem é o dono e qual é o tamanho do arquivo?",
+    "code": "-rw-r--r-- 1 maria turma 2048 out 20 10:30 notas.txt",
+    "opts": ["maria; 2048 bytes", "turma; 2048 bytes", "maria; 1 byte", "root; 2048 bytes"],
+    "ans": 0,
+    "why": "Depois das permissões e do número de links vêm o dono (maria), o grupo (turma) e o tamanho em bytes (2048)."
+   },
+   {
+    "q": "Em qual diretório ficam os arquivos de configuração do sistema, como passwd e hostname?",
+    "opts": ["/bin", "/etc", "/var", "/usr"],
+    "ans": 1,
+    "why": "/etc concentra as configurações. /bin tem comandos, /var dados variáveis (como logs) e /usr os programas dos usuários."
+   },
+   {
+    "q": "Qual diretório contém arquivos que representam dispositivos, como o disco sda?",
+    "opts": ["/dev", "/media", "/proc", "/boot"],
+    "ans": 0,
+    "why": "/dev (devices) tem os arquivos de dispositivo. /media é onde pendrives são montados; /proc mostra processos e kernel; /boot tem o kernel e o carregador."
+   },
+   {
+    "q": "Qual a diferença entre / e /root?",
+    "opts": ["São o mesmo diretório", "/ é a raiz de toda a árvore; /root é a pasta pessoal do administrador", "/root é a raiz; / é a pasta do administrador", "/root guarda os comandos básicos"],
+    "ans": 1,
+    "why": "A raiz / contém todos os diretórios. /root é só a 'casa' do usuário root, equivalente ao /home/aluno do usuário comum."
+   }
+  ],
+  "arq": [
+   {
+    "q": "Qual comando cria projeto/src/testes de uma vez, mesmo que projeto ainda não exista?",
+    "opts": ["mkdir projeto/src/testes", "mkdir -p projeto/src/testes", "touch projeto/src/testes", "mkdir -r projeto/src/testes"],
+    "ans": 1,
+    "why": "Com -p, o mkdir cria os diretórios intermediários que faltam. Sem ele, dá erro porque projeto/src não existe."
+   },
+   {
+    "q": "Como remover a pasta fotos e tudo o que há dentro dela?",
+    "code": "$ rmdir fotos\nrmdir: falhou em remover 'fotos': Diretório não vazio",
+    "opts": ["rmdir -f fotos", "rm fotos", "rm -r fotos", "del fotos"],
+    "ans": 2,
+    "why": "rmdir só remove diretórios vazios, e rm sem -r recusa diretórios. rm -r apaga a pasta com todo o conteúdo, sem lixeira."
+   },
+   {
+    "q": "O que acontece com mv relatorio.txt final.txt, se final.txt não existir?",
+    "opts": ["Cria uma cópia", "O arquivo é renomeado", "Dá erro", "Vai para a lixeira"],
+    "ans": 1,
+    "why": "Quando o destino não existe, o mv dá esse nome ao arquivo: é assim que se renomeia no Linux."
+   },
+   {
+    "q": "Como copiar a pasta fotos, com tudo o que está dentro, para backup/?",
+    "opts": ["cp fotos backup/", "cp -r fotos backup/", "mv fotos backup/", "rmdir fotos backup/"],
+    "ans": 1,
+    "why": "Sem -r, o cp pula diretórios. O mv também levaria a pasta para backup/, mas ela deixaria de existir no lugar original."
+   },
+   {
+    "q": "Depois de rm notas.txt, como recuperar o arquivo?",
+    "opts": ["Na lixeira", "Com o comando undo", "Com rm -u", "Não dá: o rm não usa lixeira"],
+    "ans": 3,
+    "why": "O rm remove de verdade. Por isso vale conferir antes de teclar Enter e manter backups."
+   },
+   {
+    "q": "O que o último ls mostra?",
+    "code": "$ ls\naula1.pdf  aula2.pdf  foto.jpg  notas.txt\n$ rm *.pdf\n$ ls",
+    "opts": ["foto.jpg  notas.txt", "aula1.pdf  aula2.pdf", "nada (diretório vazio)", "notas.txt"],
+    "ans": 0,
+    "why": "O shell expande *.pdf para aula1.pdf aula2.pdf antes de executar o rm. Os demais arquivos ficam."
+   },
+   {
+    "q": "O que touch faz com um arquivo que já existe?",
+    "opts": ["Apaga o conteúdo", "Dá erro", "Atualiza a data de modificação, sem mudar o conteúdo", "Cria uma cópia"],
+    "ans": 2,
+    "why": "O touch só cria o arquivo se ele não existir. Se existir, apenas muda a data de modificação para agora."
+   }
+  ],
+  "txt": [
+   {
+    "q": "O que o cat mostra?",
+    "code": "$ echo um > a.txt\n$ echo dois > a.txt\n$ echo tres >> a.txt\n$ cat a.txt",
+    "opts": ["um, dois e tres", "dois e tres", "só tres", "um e tres"],
+    "ans": 1,
+    "why": "O segundo > substitui o conteúdo (some o um) e o >> acrescenta tres no final."
+   },
+   {
+    "q": "Qual comando mostra as linhas de log.txt que contêm erro, sem diferenciar maiúsculas de minúsculas?",
+    "opts": ["grep -i erro log.txt", "grep -c erro log.txt", "find -i erro log.txt", "cat erro log.txt"],
+    "ans": 0,
+    "why": "-i ignora maiúsculas e minúsculas: encontra erro, Erro e ERRO. -c só contaria as linhas."
+   },
+   {
+    "q": "Para encontrar todos os arquivos .pdf a partir da pasta pessoal, use:",
+    "opts": ["find ~ -name \"*.pdf\"", "grep pdf ~", "ls ~ -name \"*.pdf\"", "find \"*.pdf\" ~"],
+    "ans": 0,
+    "why": "No find, primeiro vem onde procurar e depois o critério. O grep procura texto dentro dos arquivos, não nomes."
+   },
+   {
+    "q": "Qual a ordem mostrada pelo sort?",
+    "code": "$ cat numeros.txt\n10\n2\n33\n$ sort numeros.txt",
+    "opts": ["10, 2, 33", "2, 10, 33", "33, 10, 2", "10, 33, 2"],
+    "ans": 0,
+    "why": "Sem -n, o sort compara texto caractere a caractere: 1 vem antes de 2 e de 3. Para ordem numérica, use sort -n."
+   },
+   {
+    "q": "O que faz ls | wc -l?",
+    "opts": ["Lista os arquivos em formato longo", "Conta quantos itens há no diretório", "Mostra o tamanho dos arquivos", "Dá erro: não se pode juntar comandos"],
+    "ans": 1,
+    "why": "O pipe manda a lista do ls (um nome por linha) para o wc -l, que conta as linhas."
+   },
+   {
+    "q": "Qual a diferença entre grep e find?",
+    "opts": ["Nenhuma", "grep procura texto dentro dos arquivos; find procura arquivos pelo nome, tipo etc.", "grep procura arquivos; find procura texto", "find só funciona a partir de /"],
+    "ans": 1,
+    "why": "grep olha o conteúdo; find percorre a árvore olhando nome, tipo, dono e outros atributos dos arquivos."
+   },
+   {
+    "q": "Qual comando junta cap1.txt e cap2.txt em livro.txt?",
+    "opts": ["cat cap1.txt cap2.txt > livro.txt", "cp cap1.txt cap2.txt livro.txt", "cat cap1.txt > cap2.txt > livro.txt", "mv cap*.txt livro.txt"],
+    "ans": 0,
+    "why": "O cat concatena os arquivos na ordem dada e o > grava o resultado em livro.txt."
+   }
+  ],
+  "perm": [
+   {
+    "q": "O que um usuário do grupo turma (que não é o dono) pode fazer com prova.sh?",
+    "code": "-rwxr-x--- 1 aluno turma 512 out 20 10:30 prova.sh",
+    "opts": ["Ler, gravar e executar", "Ler e executar", "Só ler", "Nada"],
+    "ans": 1,
+    "why": "O segundo trio (r-x) vale para o grupo: leitura e execução, sem gravação."
+   },
+   {
+    "q": "Qual o valor octal de rw-r--r--?",
+    "opts": ["644", "755", "622", "466"],
+    "ans": 0,
+    "why": "rw- = 4+2 = 6; r-- = 4; r-- = 4."
+   },
+   {
+    "q": "Qual comando dá permissão de execução só ao dono, sem mexer no resto?",
+    "opts": ["chmod u+x script.sh", "chmod 777 script.sh", "chmod +r script.sh", "chmod o+x script.sh"],
+    "ans": 0,
+    "why": "u+x acrescenta x apenas ao dono. 777 daria tudo a todos; o+x daria execução aos outros."
+   },
+   {
+    "q": "chmod 750 pasta deixa a pasta como:",
+    "opts": ["drwxr-x---", "drwxrwx---", "drwxr-xr-x", "drw-r-----"],
+    "ans": 0,
+    "why": "7 = rwx, 5 = r-x, 0 = ---."
+   },
+   {
+    "q": "Por que chmod 777 costuma ser má ideia?",
+    "opts": ["Porque apaga o arquivo", "Porque qualquer usuário do sistema poderá alterar e executar o arquivo", "Porque só o root consegue usá-lo", "Porque deixa o arquivo oculto"],
+    "ans": 1,
+    "why": "777 dá leitura, gravação e execução a todos. Qualquer usuário poderia alterar o arquivo, inclusive para executar algo malicioso."
+   },
+   {
+    "q": "Uma pasta tem permissão r-- para você (sem x). O que acontece?",
+    "opts": ["Você vê os nomes com ls, mas não consegue entrar nem abrir os arquivos dela", "Você consegue entrar, mas não listar", "Você consegue tudo", "Você não vê nem os nomes"],
+    "ans": 0,
+    "why": "Em diretórios, r permite listar os nomes e x permite entrar e acessar os itens. Sem x, o cd dá Permissão negada."
+   },
+   {
+    "q": "Você é o dono de backup.sh. O que resolve?",
+    "code": "$ ./backup.sh\nbash: ./backup.sh: Permissão negada",
+    "opts": ["chmod u+x backup.sh", "chmod u+r backup.sh", "rm backup.sh", "cd backup.sh"],
+    "ans": 0,
+    "why": "Para rodar como programa, o arquivo precisa da permissão de execução (x)."
+   },
+   {
+    "q": "Em -rw-------, quem pode ler o arquivo?",
+    "opts": ["Todos", "Só o dono (e o root)", "O dono e o grupo", "Ninguém"],
+    "ans": 1,
+    "why": "Só o trio do dono tem permissões (rw-). O root ignora as permissões."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/terminal-linux.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+</body>
+</html>
