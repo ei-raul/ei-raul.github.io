@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Árvores balanceadas: AVL e rubro-negra — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: árvores AVL (fator de balanceamento, rotações simples e duplas, inserção e remoção) e árvores rubro-negras (propriedades, altura preta, inserção). Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+  <link href="../../assets/css/ed-viz/arvores-balanceadas.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Árvores balanceadas: AVL e rubro-negra</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Árvores balanceadas: AVL e rubro-negra</h1>
+  <p class="sub">Uma árvore binária de busca é rápida enquanto é “baixa”. Mas, se as chaves chegam em ordem, ela vira uma lista e a busca volta a ser O(n). Hoje vamos ver duas árvores que se reorganizam sozinhas para manter a altura em O(log n).</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="avl" style="color:var(--c-avl)"><span class="sym">fb ∈ {−1, 0, +1}</span><span class="nm">AVL</span><span class="ds">altura e fator de balanceamento</span></a>
+    <a href="#" data-goto="rot" style="color:var(--c-rot)"><span class="sym">↻ ↺</span><span class="nm">Rotações</span><span class="ds">simples, duplas, inserção e remoção</span></a>
+    <a href="#" data-goto="rb" style="color:var(--c-rb)"><span class="sym">● ●</span><span class="nm">Rubro-negra</span><span class="ds">cores, altura preta e recolorações</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram os algoritmos passo a passo: digite valores, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Relembrando: árvore binária de busca">
+  <h2>Relembrando: árvore binária de busca</h2>
+  <div class="cols">
+    <div>
+      <p>Em uma <strong>ABB</strong>, para cada nó: tudo à esquerda é <strong>menor</strong> e tudo à direita é <strong>maior</strong>. Buscar e inserir é descer da raiz, escolhendo um lado a cada nó.</p>
+      <p>O custo é o número de níveis percorridos: a <strong>altura</strong> da árvore. Nesta aula, a altura de uma árvore vazia é <code>0</code> e a de uma folha é <code>1</code> (altura = quantidade de nós no caminho mais longo da raiz até uma folha).</p>
+      <div class="minis"><span class="mini">buscar <b>→</b> O(altura)</span><span class="mini">inserir <b>→</b> O(altura)</span><span class="mini">remover <b>→</b> O(altura)</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="abb.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def altura(no):
+    if no is None:
+        return 0
+    return 1 + max(altura(no.esq), altura(no.dir))
+
+def em_ordem(no):
+    if no:
+        em_ordem(no.esq)
+        print(no.chave, end=" ")
+        em_ordem(no.dir)
+
+raiz = None
+for x in [50, 30, 70, 20, 40, 60, 80]:
+    raiz = inserir(raiz, x)
+em_ordem(raiz)
+print("\naltura:", altura(raiz))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="O problema da degeneração">
+  <h2>O problema da degeneração</h2>
+  <div class="cols">
+    <div>
+      <p>A forma da ABB depende da <strong>ordem de inserção</strong>. Inserindo chaves aleatórias, a altura fica em O(log n), em geral entre 2 e 3 vezes log₂ n. Inserindo chaves <strong>já ordenadas</strong>, cada nova chave vai sempre para a direita: a árvore vira uma lista e a altura é <strong>n</strong>.</p>
+      <p>E dados ordenados são comuns: matrículas, datas, códigos sequenciais…</p>
+      <h3>A ideia do balanceamento</h3>
+      <p>Manter a árvore perfeitamente balanceada custaria caro demais a cada inserção. As árvores balanceadas <strong>relaxam</strong> a exigência, só o suficiente para garantir altura O(log n):</p>
+      <table class="tbl">
+        <tr><th>Árvore</th><th>Regra</th></tr>
+        <tr><td>AVL</td><td>as alturas das subárvores de cada nó diferem em no máximo 1</td></tr>
+        <tr><td>Rubro-negra</td><td>regras de cores que impedem um caminho de ter mais que o dobro do tamanho de outro</td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="degeneracao.py">
+import random
+
+def altura_abb(chaves):
+    # insere sem recursão (a lista degenerada seria funda demais)
+    raiz = None
+    filhos = {}                     # chave -> [esq, dir]
+    maior = 0
+    for k in chaves:
+        if raiz is None:
+            raiz = k
+            filhos[k] = [None, None]
+            maior = 1
+            continue
+        atual, nivel = raiz, 1
+        while True:
+            nivel += 1
+            lado = 0 if k < atual else 1
+            if filhos[atual][lado] is None:
+                filhos[atual][lado] = k
+                filhos[k] = [None, None]
+                break
+            atual = filhos[atual][lado]
+        maior = max(maior, nivel)
+    return maior
+
+n = 1000
+ordenadas = list(range(n))
+embaralhadas = ordenadas[:]
+random.shuffle(embaralhadas)
+print("chaves em ordem:     altura", altura_abb(ordenadas))
+print("chaves embaralhadas: altura", altura_abb(embaralhadas))
+</textarea>
+      <div class="note">Com 1.000 chaves em ordem, buscar a última custa 1.000 comparações. Uma árvore balanceada precisaria de no máximo uns 10 a 20.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AVL: CONCEITOS ===================== -->
+<section class="slide" data-mod="avl" data-title="Altura e fator de balanceamento">
+  <h2>Altura e fator de balanceamento</h2>
+  <div class="cols">
+    <div>
+      <p>Na árvore AVL (Adelson-Velsky e Landis, 1962), cada nó guarda sua <strong>altura</strong> e calculamos o <strong>fator de balanceamento</strong>:</p>
+      <p><code>fb(nó) = altura(nó.esq) − altura(nó.dir)</code></p>
+      <table class="tbl">
+        <tr><th>fb</th><th>Significado</th></tr>
+        <tr><td><code>0</code></td><td>subárvores com a mesma altura</td></tr>
+        <tr><td><code>+1</code></td><td>esquerda um nível mais alta</td></tr>
+        <tr><td><code>−1</code></td><td>direita um nível mais alta</td></tr>
+        <tr><td><code>±2</code></td><td><strong>desbalanceado</strong>: precisa de rotação</td></tr>
+      </table>
+      <p>Guardar a altura no nó evita recalcular a árvore inteira: ela é atualizada só no caminho que mudou, de baixo para cima: <code>altura = 1 + max(altura(esq), altura(dir))</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="fator.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):          # ABB comum, sem balancear
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def altura(no):
+    if no is None:
+        return 0
+    return 1 + max(altura(no.esq), altura(no.dir))
+
+def fb(no):
+    return altura(no.esq) - altura(no.dir)
+
+def mostrar(no, nivel=0):        # árvore "deitada": a raiz fica à esquerda
+    if no:
+        mostrar(no.dir, nivel + 1)
+        print("      " * nivel + f"{no.chave} (fb={fb(no)})")
+        mostrar(no.esq, nivel + 1)
+
+raiz = None
+for x in [30, 20, 40, 10, 25, 5]:
+    raiz = inserir(raiz, x)
+mostrar(raiz)
+</textarea>
+      <div class="note">Na saída, a raiz fica à esquerda e a direita da árvore fica para cima. Qual nó ficou com fb = +2?</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="avl" data-title="A invariante AVL">
+  <h2>A invariante AVL</h2>
+  <div class="cols">
+    <div>
+      <p>Uma ABB é <strong>AVL</strong> quando <strong>todos</strong> os nós têm <code>fb</code> igual a −1, 0 ou +1. Não basta olhar a raiz: um nó lá embaixo pode estar desbalanceado.</p>
+      <p>Só duas operações podem quebrar a invariante: <strong>inserir</strong> e <strong>remover</strong>. Elas mudam alturas apenas no caminho entre a raiz e o nó alterado; é ali que procuramos o desbalanceamento e o consertamos com <strong>rotações</strong>.</p>
+      <div class="note">Execute e compare: a terceira árvore tem a raiz equilibrada (fb = +1), mas não é AVL.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="eh_avl.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def altura(no):
+    if no is None:
+        return 0
+    return 1 + max(altura(no.esq), altura(no.dir))
+
+def eh_avl(no):
+    if no is None:
+        return True
+    if abs(altura(no.esq) - altura(no.dir)) > 1:
+        return False
+    return eh_avl(no.esq) and eh_avl(no.dir)
+
+for chaves in [[50, 30, 70, 20, 40], [10, 20, 30], [10, 5, 20, 3, 15, 25, 1]]:
+    raiz = None
+    for x in chaves:
+        raiz = inserir(raiz, x)
+    print(chaves, "-> AVL?", eh_avl(raiz))
+</textarea>
+      <div class="note warn">Esta versão recalcula alturas em cada nó: O(n²) no pior caso. Os exercícios mostram como fazer em O(n), devolvendo a altura e a resposta juntas.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="avl" data-title="Por que a altura é O(log n)?">
+  <h2>Por que a altura é O(log n)?</h2>
+  <p class="lead">Pergunta ao contrário: qual é o <strong>menor</strong> número de nós <code>N(h)</code> de uma AVL de altura h? A árvore mais “magra” possível tem uma raiz, uma subárvore de altura h−1 e outra de altura h−2.</p>
+  <div class="trace" data-code="N = [0, 1]           # N[h]: menor número de nós de uma AVL de altura h
+for h in range(2, 7):
+    N.append(N[h - 1] + N[h - 2] + 1)
+print(N)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;N&quot;: &quot;[0, 1]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;altura 0: árvore vazia (0 nós); altura 1: só a raiz (1 nó)&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;h&quot;: &quot;2&quot;, &quot;N&quot;: &quot;[0, 1]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;h = 2&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;h&quot;: &quot;2&quot;, &quot;N&quot;: &quot;[0, 1, 2]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;N[1] + N[0] + 1 = 1 + 0 + 1 = 2: a raiz + a menor AVL de altura 1 + a menor de altura 0&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;h&quot;: &quot;3&quot;, &quot;N&quot;: &quot;[0, 1, 2]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;h&quot;: &quot;3&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;N[2] + N[1] + 1 = 2 + 1 + 1 = 4&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;h&quot;: &quot;4&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;h&quot;: &quot;4&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;4 + 2 + 1 = 7&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;h&quot;: &quot;5&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;h&quot;: &quot;5&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7, 12]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;7 + 4 + 1 = 12&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;h&quot;: &quot;6&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7, 12]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;h&quot;: &quot;6&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7, 12, 20]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;12 + 7 + 1 = 20&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;h&quot;: &quot;6&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7, 12, 20]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;range acabou: sai do for&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;h&quot;: &quot;6&quot;, &quot;N&quot;: &quot;[0, 1, 2, 4, 7, 12, 20]&quot;}, &quot;out&quot;: &quot;[0, 1, 2, 4, 7, 12, 20]\n&quot;, &quot;note&quot;: &quot;cresce como Fibonacci: exponencialmente em h&quot;}]" data-vars="[&quot;h&quot;, &quot;N&quot;]"></div>
+  <div class="cols even">
+    <div>
+      <p><code>N(h) = N(h−1) + N(h−2) + 1</code> é quase a sequência de Fibonacci, que cresce como 1,618ʰ. Se até a AVL mais magra tem um número de nós <strong>exponencial</strong> na altura, então a altura é <strong>logarítmica</strong> no número de nós.</p>
+      <p>Resultado: a altura de uma AVL com n nós é no máximo cerca de <strong>1,44 · log₂ n</strong>. Com um milhão de chaves: no máximo 28 níveis.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="altura_maxima.py">
+import math
+
+N = [0, 1]
+h = 1
+while N[h] < 1000000:
+    h += 1
+    N.append(N[h - 1] + N[h - 2] + 1)
+print("menor AVL com altura", h, "tem", N[h], "nós")
+print("logo, 1 milhão de nós cabe em altura <=", h - 1)
+print("1,44 * log2(1e6) =", round(1.44 * math.log2(1e6), 1))
+print("árvore perfeita:  ", math.ceil(math.log2(1e6 + 1)))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ROTAÇÕES ===================== -->
+<section class="slide" data-mod="rot" data-title="Rotações simples">
+  <h2>Rotações simples</h2>
+  <div class="cols">
+    <div>
+      <p>Uma <strong>rotação</strong> troca pai e filho de lugar, mudando só 2 ponteiros dentro da subárvore (mais a ligação do pai com a nova raiz) e mantendo a ordem da ABB. É uma operação <strong>O(1)</strong>.</p>
+      <p><strong>Rotação à direita em z</strong> (usada quando z pende para a esquerda): o filho esquerdo <code>y</code> sobe, <code>z</code> desce para a direita de <code>y</code> e a subárvore direita de <code>y</code> (T2) passa a ser a esquerda de <code>z</code>.</p>
+      <p><strong>Rotação à esquerda</strong> é o espelho: troque <code>esq</code> por <code>dir</code> em todo lugar.</p>
+      <div class="note">Depois de rotacionar, atualize a altura de <code>z</code> <strong>antes</strong> da de <code>y</code>: agora <code>z</code> é filho de <code>y</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="rotacoes.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir      # T2 muda de dono
+    y.dir = z
+    atualiza(z)
+    atualiza(y)
+    return y           # nova raiz da subárvore
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z)
+    atualiza(y)
+    return y
+
+def pre_ordem(no):
+    return [] if no is None else [no.chave] + pre_ordem(no.esq) + pre_ordem(no.dir)
+
+# 30 -> 20 -> 10 pendendo para a esquerda (caso LL)
+z = No(30); z.esq = No(20); z.esq.esq = No(10)
+atualiza(z.esq); atualiza(z)
+print("antes: ", pre_ordem(z), "altura", z.altura)
+r = rot_direita(z)
+print("depois:", pre_ordem(r), "altura", r.altura)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rot" data-title="Os quatro casos de desbalanceamento">
+  <h2>Os quatro casos de desbalanceamento</h2>
+  <p class="lead">Seja <code>z</code> o nó desbalanceado mais baixo (fb = ±2). O lado para onde ele pende e o fb do filho desse lado decidem a rotação. Escolha o caso e avance os passos.</p>
+  <div class="edviz" data-viz="rotacoes" data-caso="LL"></div>
+  <div class="tblwrap"><table class="tbl">
+    <tr><th>Caso</th><th>fb(z)</th><th>fb do filho pesado</th><th>Solução</th></tr>
+    <tr><td><strong>LL</strong> esquerda-esquerda</td><td>+2</td><td>esquerdo com fb ≥ 0</td><td>rotação à direita em z</td></tr>
+    <tr><td><strong>RR</strong> direita-direita</td><td>−2</td><td>direito com fb ≤ 0</td><td>rotação à esquerda em z</td></tr>
+    <tr><td><strong>LR</strong> esquerda-direita</td><td>+2</td><td>esquerdo com fb −1</td><td>à esquerda no filho, depois à direita em z</td></tr>
+    <tr><td><strong>RL</strong> direita-esquerda</td><td>−2</td><td>direito com fb +1</td><td>à direita no filho, depois à esquerda em z</td></tr>
+  </table></div>
+  <p class="keys">Nos desenhos, T1…T4 são subárvores quaisquer e o número pequeno ao lado é a altura de cada uma (h, h+1…). Nos nós x, y e z, o número é o fator de balanceamento.</p>
+</section>
+
+<section class="slide" data-mod="rot" data-title="Rotações duplas">
+  <h2>Rotações duplas</h2>
+  <div class="cols">
+    <div>
+      <p>No caso <strong>LR</strong> o peso está no “joelho”: <code>z</code> pende para a esquerda, mas o filho esquerdo pende para a direita (um triângulo). Uma rotação simples só espelharia o problema.</p>
+      <p>A solução é rotacionar duas vezes: primeiro <strong>à esquerda no filho</strong>, o que transforma o triângulo em linha (caso LL), e depois <strong>à direita em z</strong>. O neto sobe duas posições e vira a raiz da subárvore.</p>
+      <p>O caso <strong>RL</strong> é o espelho.</p>
+      <div class="minis"><span class="mini">30, 10, 20 <b>→</b> LR</span><span class="mini">10, 30, 20 <b>→</b> RL</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="rotacao_dupla.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir
+    y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+def pre_ordem(no):
+    return [] if no is None else [no.chave] + pre_ordem(no.esq) + pre_ordem(no.dir)
+
+# 30 com filho esquerdo 10, que tem filho direito 20 (caso LR)
+z = No(30); z.esq = No(10); z.esq.dir = No(20)
+atualiza(z.esq); atualiza(z)
+
+tentativa = rot_direita(z)              # só uma rotação: não resolve
+print("simples:", pre_ordem(tentativa), "-> agora pende para a direita")
+
+z = No(30); z.esq = No(10); z.esq.dir = No(20)
+atualiza(z.esq); atualiza(z)
+z.esq = rot_esquerda(z.esq)             # 1ª: vira o caso LL
+r = rot_direita(z)                      # 2ª: resolve
+print("dupla:  ", pre_ordem(r), "altura", r.altura)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rot" data-title="Qual rotação?">
+  <h2>Qual rotação?</h2>
+  <p class="lead">Desenhe a árvore no papel, calcule os fatores e só então clique. As inserções partem de uma árvore vazia.</p>
+  <div class="quiz" data-quiz="rotacao" data-label="Situação"></div>
+</section>
+
+<section class="slide" data-mod="rot" data-title="Inserção na AVL">
+  <h2>Inserção na AVL</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Insira como em uma ABB comum (recursivamente).</li>
+        <li>Na <strong>volta</strong> da recursão, cada nó do caminho atualiza sua altura e confere seu fb.</li>
+        <li>Se fb = ±2, aplique a rotação do caso e devolva a nova raiz da subárvore, que o pai pendura no lugar certo (<code>no.esq = inserir(...)</code>).</li>
+      </ol>
+      <p>Na inserção, <strong>uma única</strong> rotação (simples ou dupla) basta: a subárvore volta à altura que tinha antes, e os ancestrais acima não mudam.</p>
+      <p>Custo: descer O(log n) + subir O(log n) + rotação O(1) = <strong>O(log n)</strong>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="avl_insercao.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def fb(no):
+    return altura(no.esq) - altura(no.dir)
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir
+    y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+def balancear(no):
+    atualiza(no)
+    if fb(no) > 1:                      # pende para a esquerda
+        if fb(no.esq) < 0:              # caso LR
+            no.esq = rot_esquerda(no.esq)
+        return rot_direita(no)          # caso LL
+    if fb(no) < -1:                     # pende para a direita
+        if fb(no.dir) > 0:              # caso RL
+            no.dir = rot_direita(no.dir)
+        return rot_esquerda(no)         # caso RR
+    return no
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    else:
+        return no                       # repetida: ignora
+    return balancear(no)
+
+def mostrar(no, nivel=0):
+    if no:
+        mostrar(no.dir, nivel + 1)
+        print("      " * nivel + f"{no.chave} (fb={fb(no)})")
+        mostrar(no.esq, nivel + 1)
+
+raiz = None
+for x in range(1, 16):                  # chaves em ordem: o pior caso da ABB
+    raiz = inserir(raiz, x)
+mostrar(raiz)
+print("altura:", raiz.altura, "com 15 chaves")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rot" data-title="AVL passo a passo">
+  <h2>AVL passo a passo</h2>
+  <p class="lead">Digite valores (separados por espaço) e clique em <strong>Inserir</strong>: eles entram na árvore atual, um de cada vez. O número ao lado de cada nó é o seu fator de balanceamento.</p>
+  <div class="edviz" data-viz="avl" data-valores="40 50" data-inicial="10 20 30 25 28"></div>
+  <div class="note">Comece com <strong>Crescente 1–10</strong> e observe: sem as rotações, essa seria a lista degenerada de altura 10. Depois clique em <strong>Limpar</strong> e experimente <code>30 10 20</code> (caso LR) e, de novo a partir da árvore vazia, <code>10 30 20</code> (caso RL).</div>
+</section>
+
+<section class="slide" data-mod="rot" data-title="Remoção na AVL">
+  <h2>Remoção na AVL</h2>
+  <div class="cols">
+    <div>
+      <p>A remoção segue a da ABB:</p>
+      <ul>
+        <li>nó com 0 ou 1 filho: o filho (ou <code>None</code>) toma o lugar dele;</li>
+        <li>nó com 2 filhos: copia o <strong>sucessor</strong> (menor da subárvore direita) e remove o sucessor lá embaixo.</li>
+      </ul>
+      <p>Na volta da recursão, cada nó chama o mesmo <code>balancear</code>. Duas diferenças em relação à inserção:</p>
+      <ul>
+        <li>o filho pesado pode ter fb = 0; aí a rotação <strong>simples</strong> resolve (por isso o teste é <code>&lt; 0</code> e <code>&gt; 0</code>, e não <code>!= 0</code>);</li>
+        <li>uma rotação pode diminuir a altura da subárvore, desbalanceando um ancestral: na remoção podem ocorrer até O(log n) rotações.</li>
+      </ul>
+    </div>
+    <div>
+<textarea class="py" data-label="avl_remocao.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no): return no.altura if no else 0
+def fb(no): return altura(no.esq) - altura(no.dir)
+def atualiza(no): no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq; z.esq = y.dir; y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir; z.dir = y.esq; y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+def balancear(no):
+    atualiza(no)
+    if fb(no) > 1:
+        if fb(no.esq) < 0:
+            no.esq = rot_esquerda(no.esq)
+        return rot_direita(no)
+    if fb(no) < -1:
+        if fb(no.dir) > 0:
+            no.dir = rot_direita(no.dir)
+        return rot_esquerda(no)
+    return no
+
+def inserir(no, chave):
+    if no is None: return No(chave)
+    if chave < no.chave: no.esq = inserir(no.esq, chave)
+    elif chave > no.chave: no.dir = inserir(no.dir, chave)
+    return balancear(no)
+
+def remover(no, chave):
+    if no is None:
+        return None
+    if chave < no.chave:
+        no.esq = remover(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = remover(no.dir, chave)
+    else:
+        if no.esq is None: return no.dir
+        if no.dir is None: return no.esq
+        suc = no.dir
+        while suc.esq:
+            suc = suc.esq
+        no.chave = suc.chave            # copia o sucessor
+        no.dir = remover(no.dir, suc.chave)
+    return balancear(no)
+
+def pre_ordem(no):
+    return [] if no is None else [no.chave] + pre_ordem(no.esq) + pre_ordem(no.dir)
+
+raiz = None
+for x in [20, 10, 30, 5, 25, 40, 35]:
+    raiz = inserir(raiz, x)
+print("inicial:      ", pre_ordem(raiz))
+raiz = remover(raiz, 5)      # 10 fica sem filhos; 20 passa a pender para a direita
+print("sem o 5:      ", pre_ordem(raiz))
+raiz = remover(raiz, 30)     # nó com dois filhos
+print("sem o 30:     ", pre_ordem(raiz), "altura", raiz.altura)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RUBRO-NEGRA ===================== -->
+<section class="slide" data-mod="rb" data-title="Árvore rubro-negra: as cinco propriedades">
+  <h2>Árvore rubro-negra: as cinco propriedades</h2>
+  <div class="cols">
+    <div>
+      <p>Em vez de alturas, cada nó guarda <strong>um bit de cor</strong>. Uma ABB é rubro-negra quando:</p>
+      <ol>
+        <li>Todo nó é <strong>vermelho</strong> ou <strong>preto</strong>.</li>
+        <li>A <strong>raiz</strong> é preta.</li>
+        <li>As folhas nulas (<code>None</code>, chamadas de NIL) são consideradas pretas.</li>
+        <li>Um nó vermelho <strong>não tem filho vermelho</strong> (não há dois vermelhos seguidos).</li>
+        <li>Todo caminho de um nó até as folhas nulas abaixo dele passa pelo <strong>mesmo número de nós pretos</strong>.</li>
+      </ol>
+    </div>
+    <div>
+      <div class="edviz" data-viz="rubronegra" data-valores="" data-inicial="10 20 30 15 25 5 1 28"></div>
+      <p class="keys">Árvore montada a partir de <code>10 20 30 15 25 5 1 28</code>. Volte os passos para ver como ela chegou aqui.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="Altura preta e a garantia de altura">
+  <h2>Altura preta e a garantia de altura</h2>
+  <div class="cols">
+    <div>
+      <p>A <strong>altura preta</strong> de uma árvore é o número de nós pretos em qualquer caminho da raiz até um <code>None</code> (nesta aula, contando a raiz). A propriedade 5 diz que esse número é o mesmo em todos os caminhos.</p>
+      <p>Pela propriedade 4, entre dois pretos há no máximo um vermelho. Então o caminho mais longo (alternando preto e vermelho) tem no máximo o <strong>dobro</strong> do caminho mais curto (só pretos).</p>
+      <p>Daí sai a garantia: altura ≤ <strong>2 · log₂(n + 1)</strong>. Um pouco mais alta que a AVL (1,44 · log₂ n), mas ainda O(log n).</p>
+    </div>
+    <div>
+<textarea class="py" data-label="altura_preta.py">
+class NoRB:
+    def __init__(self, chave, cor, esq=None, dir=None):
+        self.chave, self.cor = chave, cor
+        self.esq, self.dir = esq, dir
+
+def altura_preta(no):
+    """Devolve a altura preta, ou -1 se os caminhos discordam."""
+    if no is None:
+        return 0
+    e = altura_preta(no.esq)
+    d = altura_preta(no.dir)
+    if e == -1 or d == -1 or e != d:
+        return -1
+    return e + (1 if no.cor == "B" else 0)
+
+#        20B
+#       /    \
+#     10R    30B
+#    /   \
+#  5B    15B
+boa = NoRB(20, "B", NoRB(10, "R", NoRB(5, "B"), NoRB(15, "B")), NoRB(30, "B"))
+print("altura preta:", altura_preta(boa))
+
+ruim = NoRB(20, "B", NoRB(10, "B"), NoRB(30, "R"))
+print("altura preta:", altura_preta(ruim), "-> viola a propriedade 5")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="Inserção: os três casos">
+  <h2>Inserção: os três casos</h2>
+  <div class="cols">
+    <div>
+      <p>Insira como na ABB e pinte o novo nó de <strong>vermelho</strong>: assim nenhuma altura preta muda. O único problema possível é o pai também ser vermelho (propriedade 4). Olhamos então o <strong>tio</strong> (irmão do pai):</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Caso</th><th>Situação</th><th>O que fazer</th></tr>
+        <tr><td><strong>1</strong></td><td>tio <strong>vermelho</strong></td><td>pai e tio ficam pretos, avô fica vermelho; repita a verificação a partir do avô</td></tr>
+        <tr><td><strong>2</strong></td><td>tio preto e nó em “triângulo” (é filho direito de um filho esquerdo, ou o espelho)</td><td>rotação no pai: vira o caso 3</td></tr>
+        <tr><td><strong>3</strong></td><td>tio preto e nó em “linha”</td><td>pai fica preto, avô fica vermelho, rotação no avô: <strong>fim</strong></td></tr>
+      </table></div>
+      <p>No fim, a raiz é pintada de preto. São no máximo <strong>2 rotações</strong> por inserção; recolorações podem subir até a raiz, mas cada uma é O(1).</p>
+    </div>
+    <div>
+      <div class="note">Compare com a AVL: o caso 1 só troca cores (barato) e “empurra” o problema para cima. Os casos 2 e 3 correspondem às rotações duplas e simples da AVL.</div>
+      <div class="minis"><span class="mini">novo nó <b>→</b> vermelho</span><span class="mini">tio vermelho <b>→</b> recolorir</span><span class="mini">tio preto <b>→</b> rotacionar</span><span class="mini">raiz <b>→</b> sempre preta</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="Inserção rubro-negra em Python">
+  <h2>Inserção rubro-negra em Python</h2>
+  <div class="cols">
+    <div>
+      <p>Aqui cada nó guarda também um ponteiro para o <strong>pai</strong>, porque a correção sobe pela árvore com um laço em vez de usar a volta da recursão.</p>
+      <p>A rotação precisa atualizar <strong>três</strong> ligações: o filho que muda de dono, o nó que sobe e o pai (ou a raiz da árvore).</p>
+      <p>O ramo <code>else</code> do laço é o espelho do primeiro: troque <code>esq</code> ↔ <code>dir</code>.</p>
+      <div class="note">Execute com as chaves em ordem de 1 a 10 e compare a altura com a da AVL do slide de inserção.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="rubro_negra.py">
+VERMELHO, PRETO = "R", "B"
+
+class NoRB:
+    def __init__(self, chave):
+        self.chave = chave
+        self.cor = VERMELHO
+        self.esq = self.dir = self.pai = None
+
+class ArvoreRB:
+    def __init__(self):
+        self.raiz = None
+
+    def rot_esquerda(self, x):
+        y = x.dir
+        x.dir = y.esq
+        if y.esq: y.esq.pai = x
+        y.pai = x.pai
+        if x.pai is None: self.raiz = y
+        elif x is x.pai.esq: x.pai.esq = y
+        else: x.pai.dir = y
+        y.esq = x
+        x.pai = y
+
+    def rot_direita(self, x):
+        y = x.esq
+        x.esq = y.dir
+        if y.dir: y.dir.pai = x
+        y.pai = x.pai
+        if x.pai is None: self.raiz = y
+        elif x is x.pai.dir: x.pai.dir = y
+        else: x.pai.esq = y
+        y.dir = x
+        x.pai = y
+
+    def inserir(self, chave):
+        pai, atual = None, self.raiz
+        while atual:                                  # desce como na ABB
+            pai = atual
+            if chave == atual.chave: return
+            atual = atual.esq if chave < atual.chave else atual.dir
+        z = NoRB(chave)
+        z.pai = pai
+        if pai is None: self.raiz = z
+        elif chave < pai.chave: pai.esq = z
+        else: pai.dir = z
+        self.corrigir(z)
+
+    def corrigir(self, z):
+        while z.pai and z.pai.cor == VERMELHO:
+            p, a = z.pai, z.pai.pai
+            if p is a.esq:
+                tio = a.dir
+                if tio and tio.cor == VERMELHO:       # caso 1
+                    p.cor = tio.cor = PRETO
+                    a.cor = VERMELHO
+                    z = a
+                else:
+                    if z is p.dir:                    # caso 2
+                        z = p
+                        self.rot_esquerda(z)
+                        p = z.pai
+                    p.cor, a.cor = PRETO, VERMELHO    # caso 3
+                    self.rot_direita(a)
+            else:
+                tio = a.esq
+                if tio and tio.cor == VERMELHO:
+                    p.cor = tio.cor = PRETO
+                    a.cor = VERMELHO
+                    z = a
+                else:
+                    if z is p.esq:
+                        z = p
+                        self.rot_direita(z)
+                        p = z.pai
+                    p.cor, a.cor = PRETO, VERMELHO
+                    self.rot_esquerda(a)
+        self.raiz.cor = PRETO
+
+def pre_ordem(no):
+    return [] if no is None else [f"{no.chave}{no.cor}"] + pre_ordem(no.esq) + pre_ordem(no.dir)
+
+def altura(no):
+    return 0 if no is None else 1 + max(altura(no.esq), altura(no.dir))
+
+t = ArvoreRB()
+for x in range(1, 11):
+    t.inserir(x)
+print(pre_ordem(t.raiz))
+print("altura:", altura(t.raiz))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="Rubro-negra passo a passo">
+  <h2>Rubro-negra passo a passo</h2>
+  <p class="lead">Os valores digitados entram na árvore atual, um de cada vez. A cada passo, a explicação mostra qual caso foi aplicado.</p>
+  <div class="edviz" data-viz="rubronegra" data-valores="5 1" data-inicial="10 20 30"></div>
+  <div class="note">Insira <code>15</code> e veja o caso 1 (tio vermelho). Depois limpe e tente <code>30 10 20</code> (caso 2 seguido do caso 3). Por fim, compare <strong>Crescente 1–10</strong> aqui e na AVL: quem fez mais rotações?</div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="AVL × rubro-negra">
+  <h2>AVL × rubro-negra</h2>
+  <div class="edviz" data-viz="alturas" data-n="1000" data-ordem="cres"></div>
+  <div class="cols">
+    <div>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th></th><th>AVL</th><th>Rubro-negra</th></tr>
+        <tr><td>altura máxima</td><td>≈ 1,44 log₂ n</td><td>2 log₂(n + 1)</td></tr>
+        <tr><td>busca</td><td>um pouco mais rápida</td><td>um pouco mais lenta</td></tr>
+        <tr><td>rotações na inserção</td><td>até 2</td><td>até 2</td></tr>
+        <tr><td>rotações na remoção</td><td>até O(log n)</td><td>até 3</td></tr>
+        <tr><td>informação extra por nó</td><td>altura (ou fb)</td><td>1 bit de cor</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <p><strong>AVL</strong> é mais rigidamente equilibrada: boa quando há <strong>muitas buscas</strong> e poucas alterações (índices em memória, dicionários de consulta).</p>
+      <p><strong>Rubro-negra</strong> aceita um desequilíbrio maior em troca de <strong>menos reestruturações</strong>: boa quando há muitas inserções e remoções. Por isso é a escolha de bibliotecas de uso geral: <code>TreeMap</code> do Java, <code>std::map</code> e <code>std::set</code> do C++ e o escalonador de processos (CFS) do Linux.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="Conceitos e saídas">
+  <h2>Conceitos e saídas</h2>
+  <p class="lead">Responda primeiro no papel. Nas questões com código, considere as funções vistas nesta aula.</p>
+  <div class="quiz" data-quiz="conceitos" data-label="Questão"></div>
+</section>
+
+<section class="slide" data-mod="rb" data-title="Desafio: AVL a partir de um vetor ordenado">
+  <h2>Desafio: AVL a partir de um vetor ordenado</h2>
+  <div class="cols">
+    <div>
+      <p>Inserir n chaves uma a uma custa O(n log n). Se as chaves já estão <strong>ordenadas</strong>, dá para montar uma árvore balanceada em <strong>O(n)</strong>, sem nenhuma rotação.</p>
+      <p>Escreva <code>construir(v, ini, fim)</code>, recursiva: o elemento do <strong>meio</strong> vira a raiz; a metade esquerda vira a subárvore esquerda e a direita, a subárvore direita. Lembre de calcular a altura de cada nó.</p>
+      <p>Com <code>v = 1..15</code> você deve obter altura 4, pré-ordem começando por <code>8 4 2 1</code> e <code>eh_avl</code> verdadeiro.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_construir.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def eh_avl(no):
+    if no is None:
+        return True
+    return abs(altura(no.esq) - altura(no.dir)) <= 1 and eh_avl(no.esq) and eh_avl(no.dir)
+
+def pre_ordem(no):
+    return [] if no is None else [no.chave] + pre_ordem(no.esq) + pre_ordem(no.dir)
+
+def construir(v, ini, fim):
+    # escreva aqui: devolva a raiz da árvore com os elementos v[ini..fim]
+    return None
+
+v = list(range(1, 16))
+raiz = construir(v, 0, len(v) - 1)
+print(pre_ordem(raiz))
+print("altura:", altura(raiz), "| AVL?", eh_avl(raiz))
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def eh_avl(no):
+    if no is None:
+        return True
+    return abs(altura(no.esq) - altura(no.dir)) <= 1 and eh_avl(no.esq) and eh_avl(no.dir)
+
+def pre_ordem(no):
+    return [] if no is None else [no.chave] + pre_ordem(no.esq) + pre_ordem(no.dir)
+
+def construir(v, ini, fim):
+    if ini > fim:
+        return None
+    meio = (ini + fim) // 2
+    no = No(v[meio])
+    no.esq = construir(v, ini, meio - 1)
+    no.dir = construir(v, meio + 1, fim)
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+    return no
+
+v = list(range(1, 16))
+raiz = construir(v, 0, len(v) - 1)
+print(pre_ordem(raiz))
+print("altura:", altura(raiz), "| AVL?", eh_avl(raiz))
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: alturas e fatores">
+  <h2>Prática 1: alturas e fatores</h2>
+  <p class="lead">Nos dois exercícios, as chaves (inteiros na mesma linha) são inseridas, nessa ordem, em uma <strong>ABB comum, sem balanceamento</strong>; repetidas são ignoradas. Altura de <code>None</code> = 0, folha = 1 e <code>fb = altura(esq) − altura(dir)</code>.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. Altura e fatores <span class="lvl l1">básico</span></h3>
+      <p>Mostre <code>Altura: H</code> e depois, <strong>em ordem crescente de chave</strong>, uma linha <code>chave: fb=F</code> para cada nó (F sem sinal de +, como o Python imprime).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>20 10 30 25</pre></td><td><pre>Altura: 3
+10: fb=0
+20: fb=-1
+25: fb=0
+30: fb=1</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_alturas.py" data-stdin="20 10 30 25" data-tests='[{"in": "20 10 30 25", "out": ["Altura: 3", "10: fb=0", "20: fb=-1", "25: fb=0", "30: fb=1"]}, {"in": "1 2 3 4", "out": ["Altura: 4", "1: fb=-3", "2: fb=-2", "3: fb=-1", "4: fb=0"]}, {"in": "5", "out": ["Altura: 1", "5: fb=0"]}, {"in": "50 30 70 20 40 60 80", "out": ["Altura: 3", "50: fb=0", "30: fb=0", "80: fb=0"]}, {"in": "3 3 1", "out": ["Altura: 2", "1: fb=0\n3: fb=1"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+
+# calcule a altura e mostre o fb de cada nó em ordem crescente
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="20 10 30 25">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def altura(no):
+    if no is None:
+        return 0
+    return 1 + max(altura(no.esq), altura(no.dir))
+
+def mostrar(no):                  # em ordem: esquerda, nó, direita
+    if no:
+        mostrar(no.esq)
+        print(f"{no.chave}: fb={altura(no.esq) - altura(no.dir)}")
+        mostrar(no.dir)
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+print("Altura:", altura(raiz))
+mostrar(raiz)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. É AVL? <span class="lvl l1">básico</span></h3>
+      <p>Mostre <code>AVL: sim</code> se <strong>todos</strong> os nós da ABB têm fb entre −1 e +1, ou <code>AVL: não</code> caso contrário. Desafio extra: faça em O(n), com uma função que devolve a altura, ou −1 se a subárvore não for AVL.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>20 10 30 25</pre></td><td><pre>AVL: sim</pre></td></tr><tr><td><pre>1 2 3</pre></td><td><pre>AVL: não</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_eh_avl.py" data-stdin="20 10 30 25" data-tests='[{"in": "20 10 30 25", "out": ["AVL: sim"], "nao": ["AVL: não"]}, {"in": "1 2 3", "out": ["AVL: não"], "nao": ["AVL: sim"]}, {"in": "50 30 70 20 40 60 80", "out": ["AVL: sim"], "nao": ["AVL: não"]}, {"in": "10 5 15 3 7 1", "out": ["AVL: não"], "nao": ["AVL: sim"]}, {"in": "10 5 20 3 15 25 1", "out": ["AVL: não"], "nao": ["AVL: sim"]}, {"in": "8", "out": ["AVL: sim"], "nao": ["AVL: não"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+
+# verifique se a árvore é AVL
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="20 10 30 25">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def altura_avl(no):
+    """Altura da subárvore, ou -1 se ela não for AVL. Visita cada nó uma vez."""
+    if no is None:
+        return 0
+    e = altura_avl(no.esq)
+    d = altura_avl(no.dir)
+    if e == -1 or d == -1 or abs(e - d) > 1:
+        return -1
+    return 1 + max(e, d)
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+if altura_avl(raiz) == -1:
+    print("AVL: não")
+else:
+    print("AVL: sim")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: inserção na AVL">
+  <h2>Prática 2: inserção na AVL</h2>
+  <p class="lead">Agora as chaves são inseridas em uma <strong>AVL</strong>, nessa ordem; repetidas são ignoradas. O código inicial já traz o nó, as alturas e as duas rotações simples.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Inserir e mostrar a pré-ordem <span class="lvl l2">médio</span></h3>
+      <p>Complete <code>balancear</code> e <code>inserir</code>. Mostre <code>Pré-ordem: …</code> (chaves separadas por um espaço) e <code>Altura: H</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>10 20 30</pre></td><td><pre>Pré-ordem: 20 10 30
+Altura: 2</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_avl_preordem.py" data-stdin="10 20 30" data-tests='[{"in": "10 20 30", "out": ["Pré-ordem: 20 10 30", "Altura: 2"]}, {"in": "1 2 3 4 5 6 7", "out": ["Pré-ordem: 4 2 1 3 6 5 7", "Altura: 3"]}, {"in": "30 10 20", "out": ["Pré-ordem: 20 10 30", "Altura: 2"]}, {"in": "10 30 20", "out": ["Pré-ordem: 20 10 30", "Altura: 2"]}, {"in": "5 5 5", "out": ["Pré-ordem: 5", "Altura: 1"]}, {"in": "41 38 31 12 19 8", "out": ["Pré-ordem: 19 12 8 38 31 41", "Altura: 3"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def fb(no):
+    return altura(no.esq) - altura(no.dir)
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir
+    y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+def balancear(no):
+    # atualize a altura e trate os casos LL, LR, RR e RL
+    return no
+
+def inserir(no, chave):
+    # insira como na ABB e balanceie na volta
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="10 20 30">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def fb(no):
+    return altura(no.esq) - altura(no.dir)
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir
+    y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+def balancear(no):
+    atualiza(no)
+    if fb(no) > 1:
+        if fb(no.esq) < 0:
+            no.esq = rot_esquerda(no.esq)
+        return rot_direita(no)
+    if fb(no) < -1:
+        if fb(no.dir) > 0:
+            no.dir = rot_direita(no.dir)
+        return rot_esquerda(no)
+    return no
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    else:
+        return no
+    return balancear(no)
+
+def pre_ordem(no, saida):
+    if no:
+        saida.append(str(no.chave))
+        pre_ordem(no.esq, saida)
+        pre_ordem(no.dir, saida)
+    return saida
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+print("Pré-ordem:", " ".join(pre_ordem(raiz, [])))
+print("Altura:", altura(raiz))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. Contando rotações <span class="lvl l2">médio</span></h3>
+      <p>Insira as chaves em uma AVL e conte quantas vezes cada tipo de correção foi aplicado: caso LL ou RR conta como <strong>rotação simples</strong>; caso LR ou RL conta como <strong>uma rotação dupla</strong>. Mostre <code>Rotações simples: S</code> e <code>Rotações duplas: D</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3 1 2</pre></td><td><pre>Rotações simples: 0
+Rotações duplas: 1</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_contar_rotacoes.py" data-stdin="3 1 2" data-tests='[{"in": "1 2 3", "out": ["Rotações simples: 1", "Rotações duplas: 0"]}, {"in": "3 1 2", "out": ["Rotações simples: 0", "Rotações duplas: 1"]}, {"in": "1 2 3 4 5 6 7", "out": ["Rotações simples: 4", "Rotações duplas: 0"]}, {"in": "50", "out": ["Rotações simples: 0", "Rotações duplas: 0"]}, {"in": "41 38 31 12 19 8", "out": ["Rotações simples: 2", "Rotações duplas: 1"]}, {"in": "10 30 20 25 27", "out": ["Rotações simples: 0", "Rotações duplas: 2"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def fb(no):
+    return altura(no.esq) - altura(no.dir)
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir
+    y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+simples = 0
+duplas = 0
+
+# escreva balancear e inserir contando as rotações
+# (use global simples, duplas dentro da função para alterar os contadores)
+
+raiz = None
+for x in input("Chaves: ").split():
+    pass   # insira int(x) na AVL
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3 1 2">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+        self.altura = 1
+
+def altura(no):
+    return no.altura if no else 0
+
+def fb(no):
+    return altura(no.esq) - altura(no.dir)
+
+def atualiza(no):
+    no.altura = 1 + max(altura(no.esq), altura(no.dir))
+
+def rot_direita(z):
+    y = z.esq
+    z.esq = y.dir
+    y.dir = z
+    atualiza(z); atualiza(y)
+    return y
+
+def rot_esquerda(z):
+    y = z.dir
+    z.dir = y.esq
+    y.esq = z
+    atualiza(z); atualiza(y)
+    return y
+
+simples = 0
+duplas = 0
+
+def balancear(no):
+    global simples, duplas
+    atualiza(no)
+    if fb(no) > 1:
+        if fb(no.esq) < 0:
+            no.esq = rot_esquerda(no.esq)
+            duplas += 1
+        else:
+            simples += 1
+        return rot_direita(no)
+    if fb(no) < -1:
+        if fb(no.dir) > 0:
+            no.dir = rot_direita(no.dir)
+            duplas += 1
+        else:
+            simples += 1
+        return rot_esquerda(no)
+    return no
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    else:
+        return no
+    return balancear(no)
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+print("Rotações simples:", simples)
+print("Rotações duplas:", duplas)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: rubro-negra">
+  <h2>Prática 3: rubro-negra</h2>
+  <p class="lead">Altura preta: número de nós pretos em um caminho da raiz até um <code>None</code>, contando a raiz. Cores: <code>R</code> (vermelho) e <code>B</code> (preto).</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Verificando as propriedades <span class="lvl l2">médio</span></h3>
+      <p>Cada item da entrada é uma chave seguida da cor (<code>10B 5R 20R</code>). Insira os nós, nessa ordem, em uma ABB comum, com as cores dadas. Confira, <strong>nesta ordem</strong>: raiz preta, nenhum vermelho com filho vermelho, mesma altura preta em todos os caminhos. Mostre <code>Rubro-negra: sim</code> e <code>Altura preta: K</code>, ou <code>Rubro-negra: não (MOTIVO)</code> com o primeiro problema encontrado: <code>raiz vermelha</code>, <code>vermelho com filho vermelho</code> ou <code>altura preta diferente</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>10B 5R 20R</pre></td><td><pre>Rubro-negra: sim
+Altura preta: 1</pre></td></tr><tr><td><pre>10B 5B 20R</pre></td><td><pre>Rubro-negra: não (altura preta diferente)</pre></td></tr></table></div>
+<textarea class="py" data-label="ex5_propriedades_rb.py" data-stdin="10B 5R 20R" data-tests='[{"in": "10B 5R 20R", "out": ["Rubro-negra: sim", "Altura preta: 1"], "nao": ["Rubro-negra: não"]}, {"in": "10R 5B 20B", "out": ["Rubro-negra: não (raiz vermelha)"], "nao": ["Rubro-negra: sim"]}, {"in": "10B 5R 3R", "out": ["Rubro-negra: não (vermelho com filho vermelho)"], "nao": ["Rubro-negra: sim", "altura preta diferente"]}, {"in": "10B 5B 20R", "out": ["Rubro-negra: não (altura preta diferente)"], "nao": ["Rubro-negra: sim"]}, {"in": "10B 5B 20B 15R 25R", "out": ["Rubro-negra: sim", "Altura preta: 2"]}, {"in": "7B", "out": ["Rubro-negra: sim", "Altura preta: 1"]}, {"in": "10B 5R 20B 3B 7B", "out": ["Rubro-negra: sim", "Altura preta: 2"]}]'>
+class No:
+    def __init__(self, chave, cor):
+        self.chave = chave
+        self.cor = cor
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave, cor):
+    if no is None:
+        return No(chave, cor)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave, cor)
+    else:
+        no.dir = inserir(no.dir, chave, cor)
+    return no
+
+raiz = None
+for item in input("Nós: ").split():
+    raiz = inserir(raiz, int(item[:-1]), item[-1])
+
+# confira as propriedades na ordem pedida
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="10B 5R 20R">
+class No:
+    def __init__(self, chave, cor):
+        self.chave = chave
+        self.cor = cor
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave, cor):
+    if no is None:
+        return No(chave, cor)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave, cor)
+    else:
+        no.dir = inserir(no.dir, chave, cor)
+    return no
+
+def vermelho(no):
+    return no is not None and no.cor == "R"
+
+def vermelho_duplo(no):
+    if no is None:
+        return False
+    if vermelho(no) and (vermelho(no.esq) or vermelho(no.dir)):
+        return True
+    return vermelho_duplo(no.esq) or vermelho_duplo(no.dir)
+
+def altura_preta(no):              # -1 se os caminhos discordam
+    if no is None:
+        return 0
+    e = altura_preta(no.esq)
+    d = altura_preta(no.dir)
+    if e == -1 or d == -1 or e != d:
+        return -1
+    return e + (1 if no.cor == "B" else 0)
+
+raiz = None
+for item in input("Nós: ").split():
+    raiz = inserir(raiz, int(item[:-1]), item[-1])
+
+if vermelho(raiz):
+    print("Rubro-negra: não (raiz vermelha)")
+elif vermelho_duplo(raiz):
+    print("Rubro-negra: não (vermelho com filho vermelho)")
+elif altura_preta(raiz) == -1:
+    print("Rubro-negra: não (altura preta diferente)")
+else:
+    print("Rubro-negra: sim")
+    print("Altura preta:", altura_preta(raiz))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. Inserção rubro-negra <span class="lvl l3">desafio</span></h3>
+      <p>Insira as chaves, nessa ordem, em uma árvore rubro-negra (repetidas são ignoradas). Mostre a pré-ordem com a cor colada à chave (<code>Pré-ordem: 20B 10R 30R</code>) e <code>Altura preta: K</code>. Use o algoritmo da aula (casos 1, 2 e 3).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>10 20 30</pre></td><td><pre>Pré-ordem: 20B 10R 30R
+Altura preta: 1</pre></td></tr></table></div>
+<textarea class="py" data-label="ex6_insercao_rb.py" data-stdin="10 20 30" data-tests='[{"in": "10 20 30", "out": ["Pré-ordem: 20B 10R 30R", "Altura preta: 1"]}, {"in": "30 20 10", "out": ["Pré-ordem: 20B 10R 30R", "Altura preta: 1"]}, {"in": "10 30 20", "out": ["Pré-ordem: 20B 10R 30R", "Altura preta: 1"]}, {"in": "1 2 3 4 5 6 7 8", "out": ["Pré-ordem: 4B 2R 1B 3B 6R 5B 7B 8R", "Altura preta: 2"]}, {"in": "50", "out": ["Pré-ordem: 50B", "Altura preta: 1"]}, {"in": "41 38 31 12 19 8", "out": ["Pré-ordem: 38B 19R 12B 8R 31B 41B", "Altura preta: 2"]}]'>
+VERMELHO, PRETO = "R", "B"
+
+class NoRB:
+    def __init__(self, chave):
+        self.chave = chave
+        self.cor = VERMELHO
+        self.esq = self.dir = self.pai = None
+
+raiz = None
+
+# escreva as rotações, a inserção e a correção (casos 1, 2 e 3)
+
+for x in input("Chaves: ").split():
+    pass   # insira int(x)
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="10 20 30">
+VERMELHO, PRETO = "R", "B"
+
+class NoRB:
+    def __init__(self, chave):
+        self.chave = chave
+        self.cor = VERMELHO
+        self.esq = self.dir = self.pai = None
+
+raiz = None
+
+def rotacionar(x, lado):
+    """lado = "esq": rotação à esquerda em x; "dir": à direita."""
+    global raiz
+    outro = "dir" if lado == "esq" else "esq"
+    y = getattr(x, outro)
+    setattr(x, outro, getattr(y, lado))
+    if getattr(y, lado):
+        getattr(y, lado).pai = x
+    y.pai = x.pai
+    if x.pai is None:
+        raiz = y
+    elif x is x.pai.esq:
+        x.pai.esq = y
+    else:
+        x.pai.dir = y
+    setattr(y, lado, x)
+    x.pai = y
+
+def inserir(chave):
+    global raiz
+    pai, atual = None, raiz
+    while atual:
+        if chave == atual.chave:
+            return
+        pai = atual
+        atual = atual.esq if chave < atual.chave else atual.dir
+    z = NoRB(chave)
+    z.pai = pai
+    if pai is None:
+        raiz = z
+    elif chave < pai.chave:
+        pai.esq = z
+    else:
+        pai.dir = z
+    while z.pai and z.pai.cor == VERMELHO:
+        p, a = z.pai, z.pai.pai
+        lado_p = "esq" if p is a.esq else "dir"
+        outro = "dir" if lado_p == "esq" else "esq"
+        tio = getattr(a, outro)
+        if tio and tio.cor == VERMELHO:              # caso 1
+            p.cor = tio.cor = PRETO
+            a.cor = VERMELHO
+            z = a
+        else:
+            if z is getattr(p, outro):               # caso 2: triângulo
+                z = p
+                rotacionar(z, lado_p)
+                p = z.pai
+            p.cor, a.cor = PRETO, VERMELHO           # caso 3: linha
+            rotacionar(a, outro)
+    raiz.cor = PRETO
+
+def pre_ordem(no, saida):
+    if no:
+        saida.append(f"{no.chave}{no.cor}")
+        pre_ordem(no.esq, saida)
+        pre_ordem(no.dir, saida)
+    return saida
+
+for x in input("Chaves: ").split():
+    inserir(int(x))
+print("Pré-ordem:", " ".join(pre_ordem(raiz, [])))
+k, no = 0, raiz
+while no:                    # qualquer caminho serve: todos têm a mesma altura preta
+    if no.cor == PRETO:
+        k += 1
+    no = no.esq
+print("Altura preta:", k)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: insira 1.000 chaves em ordem em uma AVL e compare a altura com 1,44 · log₂ 1000; conte as rotações da AVL e da rubro-negra para as mesmas chaves; aplique uma rotação simples no caso LR e veja por que ela não resolve.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-arvores-balanceadas",
+ "mods": {
+  "intro": { "name": "Introdução", "color": "#1f5297" },
+  "avl": { "name": "AVL: conceitos", "color": "#0f7a62" },
+  "rot": { "name": "AVL: rotações e inserção", "color": "#0b78b0" },
+  "rb": { "name": "Rubro-negra", "color": "#a12a2a" },
+  "pratica": { "name": "Prática", "color": "#be3455" }
+ },
+ "quizzes": {
+  "rotacao": [
+   { "q": "Inserimos 10, 20 e 30, nessa ordem. Qual correção a AVL aplica?", "opts": ["simples à direita", "simples à esquerda", "dupla esquerda-direita", "dupla direita-esquerda"], "ans": 1, "why": "10 fica com fb −2 e o filho direito 20 com fb −1: caso RR, rotação à esquerda em 10. O 20 vira a raiz." },
+   { "q": "Inserimos 30, 20 e 10, nessa ordem. Qual correção?", "opts": ["simples à direita", "simples à esquerda", "dupla esquerda-direita", "dupla direita-esquerda"], "ans": 0, "why": "30 fica com fb +2 e o filho esquerdo 20 com fb +1: caso LL, rotação à direita em 30." },
+   { "q": "Inserimos 30, 10 e 20, nessa ordem. Qual correção?", "opts": ["simples à direita", "simples à esquerda", "dupla esquerda-direita", "dupla direita-esquerda"], "ans": 2, "why": "30 pende para a esquerda (fb +2), mas o filho 10 pende para a direita (fb −1): triângulo, caso LR. Rotação à esquerda em 10 e depois à direita em 30." },
+   { "q": "Inserimos 10, 30 e 20, nessa ordem. Qual correção?", "opts": ["simples à direita", "simples à esquerda", "dupla esquerda-direita", "dupla direita-esquerda"], "ans": 3, "why": "10 pende para a direita (fb −2) e o filho 30 pende para a esquerda (fb +1): caso RL. Rotação à direita em 30 e depois à esquerda em 10." },
+   { "q": "O nó z tem fb = −2 e seu filho direito tem fb = −1. Qual correção?", "opts": ["simples à direita", "simples à esquerda", "dupla esquerda-direita", "dupla direita-esquerda"], "ans": 1, "why": "Pesado à direita, e o filho também pende para a direita: linha, caso RR." },
+   { "q": "A ABB tem raiz 10, filho esquerdo 5 e, abaixo do 5, filho esquerdo 2. O 10 não tem filho direito. Ela é AVL?", "opts": ["sim", "não, fb(10) = +2", "não, fb(5) = +2", "não, fb(2) = +1"], "ans": 1, "why": "altura(5) = 2 e altura(None) = 0, então fb(10) = 2 − 0 = +2. O 5 tem fb +1 e o 2 tem fb 0." },
+   { "q": "Depois de inserir uma chave em uma AVL, quantas correções (simples ou duplas) podem ser necessárias, no máximo?", "opts": ["1", "2", "log n", "n"], "ans": 0, "why": "A correção devolve a subárvore à altura que ela tinha antes da inserção, então nenhum ancestral muda. Na remoção, isso não vale: podem ser O(log n)." }
+  ],
+  "conceitos": [
+   { "q": "Qual é a cor de um nó recém-inserido em uma rubro-negra?", "opts": ["preto", "vermelho", "a cor do pai", "a cor oposta à do pai"], "ans": 1, "why": "Vermelho não altera a altura preta de nenhum caminho; o único risco é ficar com pai vermelho, que os casos 1 a 3 corrigem." },
+   { "q": "O novo nó vermelho tem pai vermelho e tio vermelho. O que fazer?", "opts": ["rotação no avô", "rotação no pai", "pai e tio pretos, avô vermelho", "pintar o novo nó de preto"], "ans": 2, "why": "Caso 1: só recolorir. A altura preta continua igual em todos os caminhos, mas o avô agora vermelho pode ter pai vermelho: a verificação sobe para ele." },
+   { "q": "Com 1 milhão de chaves, qual é a altura máxima garantida de uma rubro-negra?", "opts": ["20", "cerca de 40", "1.000", "1.000.000"], "ans": 1, "why": "2 · log₂(10⁶ + 1) ≈ 2 · 20 = 40. A AVL garante cerca de 28, e uma ABB comum pode chegar a 1 milhão." },
+   { "q": "Para um dicionário com milhões de consultas e raras alterações, qual árvore tende a ser um pouco mais rápida?", "opts": ["AVL", "rubro-negra", "ABB comum", "tanto faz, sempre"], "ans": 0, "why": "A AVL é mais baixa (mais equilibrada), então as buscas fazem menos comparações. A rubro-negra ganha quando há muitas inserções e remoções." },
+   { "code": "raiz = None\nfor x in [1, 2, 3]:\n    raiz = inserir(raiz, x)    # inserção AVL\nprint(raiz.chave, raiz.esq.chave, raiz.dir.chave)", "opts": ["1 None 2", "2 1 3", "3 2 1", "1 2 3"], "ans": 1, "why": "Ao inserir o 3, o 1 fica com fb −2 (caso RR): rotação à esquerda e o 2 vira a raiz." },
+   { "code": "# AVL com as chaves 1..7 inseridas em ordem\nprint(raiz.altura, raiz.chave)", "opts": ["7 1", "3 4", "4 4", "3 1"], "ans": 1, "why": "As rotações deixam a árvore perfeita: 4 na raiz, 2 e 6 no meio, e 1, 3, 5, 7 nas folhas. Altura 3." },
+   { "code": "def fb(no):\n    return altura(no.esq) - altura(no.dir)\n# raiz 8 com filho direito 9; o 9 tem filho direito 10\nprint(fb(raiz))", "opts": ["2", "-2", "-1", "0"], "ans": 1, "why": "altura(None) = 0 à esquerda e altura(9) = 2 à direita: 0 − 2 = −2. É o caso RR." }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/arvores-balanceadas.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

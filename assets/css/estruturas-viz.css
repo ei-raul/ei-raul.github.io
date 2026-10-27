@@ -1,0 +1,154 @@
+/*
+  Visualizações de estruturas de dados — complementa aula-interativa.css
+  Usado pelas aulas de Estruturas de Dados (assets/js/estruturas-viz.js).
+*/
+
+:root {
+  --ev-cmp:   #d39b2a;
+  --ev-swap:  #d24b4b;
+  --ev-done:  #2fa36b;
+}
+
+.edviz { background: var(--bg-section); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: .8rem 0; min-width: 0; }
+.ev-ctl { display: flex; flex-wrap: wrap; gap: .5rem .7rem; align-items: center; font-size: .88rem; }
+.ev-ctl:empty { display: none; }
+.ev-ctl + .ev-stage { margin-top: .9rem; }
+.ev-field { display: inline-flex; align-items: center; gap: .35rem; color: var(--text-muted); }
+.ev-field input, .ev-field select {
+  font-family: var(--mono);
+  font-size: .9rem;
+  padding: .28rem .5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  width: 5rem;
+}
+.ev-field select { width: auto; font-family: "Open Sans", sans-serif; }
+.ev-btn { border: 1px solid var(--border); border-radius: 6px; padding: .28rem .7rem; background: #fff; font-size: .85rem; font-weight: 600; color: var(--primary-dark); }
+.ev-btn:hover { border-color: var(--mod); color: var(--mod); }
+.ev-btn.main { background: var(--mod); border-color: var(--mod); color: #fff; }
+.ev-btn.main:hover { filter: brightness(1.1); color: #fff; }
+.ev-btn:disabled { opacity: .4; cursor: default; }
+
+.ev-stage { overflow-x: auto; padding: .2rem 0 .4rem; min-height: 3rem; }
+.ev-stage > * + * { margin-top: .8rem; }
+.ev-note { min-height: 1.6rem; margin: .5rem 0 .2rem; font-size: .95rem; }
+.ev-note code { font-family: var(--mono); font-size: .86em; background: var(--surface2); padding: .05em .35em; border-radius: 4px; }
+.ev-play { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: .4rem; }
+.ev-play button { border: 1px solid var(--border); border-radius: 6px; padding: .3rem .7rem; background: #fff; font-size: .85rem; }
+.ev-play .ev-next { background: var(--mod); border-color: var(--mod); color: #fff; font-weight: 700; }
+.ev-play button:disabled { opacity: .4; cursor: default; }
+.ev-speed { font-size: .8rem; padding: .25rem .3rem; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+.ev-count { font-family: var(--mono); font-size: .8rem; color: var(--text-muted); margin-left: .2rem; }
+.ev-counts { display: inline-flex; gap: .35rem; flex-wrap: wrap; margin-left: auto; }
+.ev-chip { font-size: .78rem; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: .1rem .55rem; color: var(--text-muted); }
+.ev-chip b { color: var(--mod); font-family: var(--mono); }
+.ev-empty { color: var(--text-muted); font-style: italic; font-size: .9rem; }
+.ev-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-bottom: .2rem; }
+
+/* ── Vetor ──────────────────────────────────────────── */
+.ev-arrwrap { display: flex; align-items: center; gap: .6rem; }
+.ev-arrname { font-family: var(--mono); font-weight: 600; color: var(--primary-dark); }
+.ev-arr { display: flex; gap: .25rem; }
+.ev-cell { display: flex; flex-direction: column; align-items: center; min-width: 2.7rem; }
+.ev-cell .ev-tag, .ev-barcol .ev-tag, .ev-node .ev-tag { font-family: var(--mono); font-size: .7rem; font-weight: 700; color: var(--mod); height: 1.1rem; white-space: nowrap; }
+.ev-val {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  min-width: 2.7rem;
+  height: 2.7rem;
+  padding: 0 .4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+  border-radius: 7px;
+  background: #fff;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.ev-idx { font-family: var(--mono); font-size: .7rem; color: var(--text-muted); height: 1.1rem; margin-top: .1rem; }
+.ev-cell.on .ev-val    { background: var(--mod); border-color: var(--mod); color: #fff; transform: translateY(-3px); }
+.ev-cell.cmp .ev-val   { background: #fff3d6; border-color: var(--ev-cmp); }
+.ev-cell.swap .ev-val  { background: #fde6e6; border-color: var(--ev-swap); }
+.ev-cell.done .ev-val  { background: #e3f5ec; border-color: var(--ev-done); }
+.ev-cell.found .ev-val { background: var(--ev-done); border-color: var(--ev-done); color: #fff; transform: translateY(-3px); }
+.ev-cell.path .ev-val  { background: color-mix(in srgb, var(--mod) 14%, #fff); border-color: color-mix(in srgb, var(--mod) 45%, #fff); }
+.ev-cell.new .ev-val   { border-style: dashed; border-color: var(--mod); }
+.ev-cell.dim .ev-val   { opacity: .35; }
+.ev-cell.empty .ev-val { background: repeating-linear-gradient(135deg, #fff, #fff 5px, #eef4fa 5px, #eef4fa 10px); color: var(--text-muted); }
+
+/* ── Barras ─────────────────────────────────────────── */
+.ev-bars { display: flex; align-items: flex-end; gap: .25rem; height: 11rem; }
+.ev-barcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 2rem; flex: 1 1 0; max-width: 3rem; }
+.ev-bar { display: block; width: 100%; border-radius: 4px 4px 0 0; background: color-mix(in srgb, var(--mod) 35%, #fff); transition: height .2s, background .15s; }
+.ev-bv { font-family: var(--mono); font-size: .75rem; margin-top: .15rem; }
+.ev-barcol.cmp .ev-bar  { background: var(--ev-cmp); }
+.ev-barcol.swap .ev-bar { background: var(--ev-swap); }
+.ev-barcol.done .ev-bar { background: var(--ev-done); }
+.ev-barcol.on .ev-bar   { background: var(--mod); }
+.ev-barcol.dim .ev-bar  { opacity: .3; }
+
+/* ── Lista encadeada ────────────────────────────────── */
+.ev-chainwrap { display: inline-block; min-width: 100%; }
+.ev-chain { display: flex; align-items: flex-end; gap: .2rem; }
+.ev-head { font-family: var(--mono); font-size: .85rem; font-weight: 600; color: var(--primary-dark); padding-bottom: .65rem; white-space: nowrap; }
+.ev-node { display: flex; flex-direction: column; align-items: center; }
+.ev-nbox { display: flex; border: 2px solid var(--border); border-radius: 7px; background: #fff; overflow: hidden; transition: background .15s, border-color .15s; }
+.ev-nv { font-family: var(--mono); font-size: 1.05rem; font-weight: 600; min-width: 2.6rem; height: 2.5rem; padding: 0 .4rem; display: flex; align-items: center; justify-content: center; }
+.ev-np { width: 1.4rem; display: flex; align-items: center; justify-content: center; color: var(--mod); border-left: 2px solid var(--border); font-size: .9rem; }
+.ev-np:first-child { border-left: 0; border-right: 2px solid var(--border); }
+.ev-link { font-family: var(--mono); font-size: 1.2rem; color: var(--mod); padding: 0 .1rem .55rem; white-space: nowrap; }
+.ev-null { font-family: var(--mono); font-size: .85rem; color: var(--text-muted); }
+.ev-chain > .ev-null { padding-bottom: .7rem; }
+.ev-node.on .ev-nbox    { background: var(--mod); border-color: var(--mod); color: #fff; }
+.ev-node.on .ev-np      { color: #fff; border-color: rgba(255,255,255,.4); }
+.ev-node.cmp .ev-nbox   { background: #fff3d6; border-color: var(--ev-cmp); }
+.ev-node.found .ev-nbox { background: #e3f5ec; border-color: var(--ev-done); }
+.ev-node.new .ev-nbox   { border-style: dashed; border-color: var(--mod); }
+.ev-node.swap .ev-nbox  { background: #fde6e6; border-color: var(--ev-swap); }
+.ev-node.dim .ev-nbox   { opacity: .35; }
+.ev-circ { position: relative; height: 1.4rem; margin: .1rem 0 0 4.2rem; border: 2px solid var(--mod); border-top: 0; border-radius: 0 0 10px 10px; width: calc(100% - 5rem); }
+.ev-circ span { position: absolute; left: 50%; bottom: -1.3rem; transform: translateX(-50%); font-size: .72rem; color: var(--text-muted); white-space: nowrap; }
+.ev-circ::before { content: "▲"; position: absolute; left: -.42rem; top: -.75rem; color: var(--mod); font-size: .7rem; }
+.ev-circ + * { margin-top: 1.6rem; }
+
+/* ── Árvores e grafos (SVG) ─────────────────────────── */
+.ev-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ev-edge, .ev-gedge { stroke: #b9cde0; stroke-width: 2.5; }
+.ev-edge.path, .ev-gedge.path { stroke: var(--mod); stroke-width: 3.5; }
+.ev-gedge.on   { stroke: var(--ev-cmp); stroke-width: 3.5; }
+.ev-gedge.done { stroke: var(--ev-done); stroke-width: 3.5; }
+.ev-gedge.dim  { opacity: .3; }
+.ev-arrowhead { fill: #9fb7cf; }
+.ev-gw { font-family: var(--mono); font-size: 13px; font-weight: 600; fill: var(--primary-dark); paint-order: stroke; stroke: var(--bg-section); stroke-width: 4px; }
+.ev-tnode circle { fill: #fff; stroke: #9fb7cf; stroke-width: 2.5; transition: fill .15s, stroke .15s; }
+.ev-tnode text { font-family: var(--mono); font-size: 14px; font-weight: 600; fill: var(--text); }
+.ev-tnode .ev-badge { font-size: 11px; font-weight: 700; fill: var(--mod); }
+.ev-tnode.on circle    { fill: var(--mod); stroke: var(--mod); }
+.ev-tnode.on text      { fill: #fff; }
+.ev-tnode.on .ev-badge { fill: var(--mod); }
+.ev-tnode.cmp circle   { fill: #fff3d6; stroke: var(--ev-cmp); }
+.ev-tnode.path circle  { fill: color-mix(in srgb, var(--mod) 16%, #fff); stroke: var(--mod); }
+.ev-tnode.found circle { fill: var(--ev-done); stroke: var(--ev-done); }
+.ev-tnode.found text   { fill: #fff; }
+.ev-tnode.found .ev-badge { fill: var(--ev-done); }
+.ev-tnode.done circle  { fill: #e3f5ec; stroke: var(--ev-done); }
+.ev-tnode.swap circle  { fill: #fde6e6; stroke: var(--ev-swap); }
+.ev-tnode.new circle   { stroke: var(--mod); stroke-dasharray: 4 3; }
+.ev-tnode.dim          { opacity: .35; }
+.ev-tnode.red circle   { fill: #d24b4b; stroke: #a12a2a; }
+.ev-tnode.red text     { fill: #fff; }
+.ev-tnode.black circle { fill: #27303a; stroke: #000; }
+.ev-tnode.black text   { fill: #fff; }
+.ev-tnode.red.on circle, .ev-tnode.black.on circle { stroke: var(--ev-cmp); stroke-width: 5; }
+.ev-tnode .ev-badge    { fill: var(--mod); }
+
+/* Painéis lado a lado dentro do palco (ex.: grafo + fila, árvore + vetor) */
+.ev-split { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 1.2rem; align-items: start; }
+@media (max-width: 900px) { .ev-split { grid-template-columns: minmax(0, 1fr); } }
+
+/* Tabela de crescimento das funções (aula de complexidade) */
+.ev-growth td { vertical-align: middle; }
+.ev-gbar { display: block; height: .7rem; border-radius: 3px; background: var(--mod); }

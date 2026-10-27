@@ -1,0 +1,46 @@
+/* Visualizações da aula "Listas encadeadas, pilhas e filas" — complementa estruturas-viz.css */
+
+.lp-code {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .85rem;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 6px;
+  padding: .3rem .7rem;
+  white-space: pre;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.lp-row { display: flex; flex-wrap: wrap; gap: 1.2rem 2.2rem; align-items: flex-end; }
+.lp-stackwrap { display: inline-flex; flex-direction: column; align-items: center; gap: .3rem; }
+.lp-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: .25rem;
+  min-width: 5.5rem;
+  min-height: 3.2rem;
+  padding: .35rem;
+  border: 2px solid #9fb7cf;
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+}
+.lp-item {
+  font-family: var(--mono);
+  font-weight: 600;
+  text-align: center;
+  padding: .3rem .8rem;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-section);
+  position: relative;
+}
+.lp-item.top { border-color: var(--mod); background: color-mix(in srgb, var(--mod) 14%, #fff); }
+.lp-item.top::after { content: "← topo"; position: absolute; left: calc(100% + .5rem); top: 50%; transform: translateY(-50%); font-size: .72rem; font-weight: 700; color: var(--mod); white-space: nowrap; }
+.lp-item.new { border-style: dashed; }
+.lp-item.out { border-color: var(--ev-swap); background: #fde6e6; }
+.lp-cap { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+.lp-novo { display: flex; align-items: flex-end; gap: .4rem; }
+.lp-info { font-family: var(--mono); font-size: .85rem; color: var(--primary-dark); }
+.lp-info b { color: var(--mod); }

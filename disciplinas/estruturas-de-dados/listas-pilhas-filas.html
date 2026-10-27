@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listas encadeadas, pilhas e filas — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: listas encadeadas (simples, duplas e circulares), pilhas e filas, com aplicações. Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+  <link href="../../assets/css/ed-viz/listas-pilhas-filas.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Listas encadeadas, pilhas e filas</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Listas encadeadas, pilhas e filas</h1>
+  <p class="sub">No vetor, os elementos ficam colados uns nos outros. Hoje vamos espalhá-los pela memória e ligá-los por referências, e usar essa ideia para construir as duas estruturas mais usadas da computação: a pilha e a fila.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="lista" style="color:var(--c-lista)"><span class="sym">10 → 20 → None</span><span class="nm">Lista encadeada</span><span class="ds">nós ligados por referências</span></a>
+    <a href="#" data-goto="dupla" style="color:var(--c-dupla)"><span class="sym">⇄ ↺</span><span class="nm">Dupla e circular</span><span class="ds">andar para trás e dar a volta</span></a>
+    <a href="#" data-goto="pilha" style="color:var(--c-pilha)"><span class="sym">LIFO</span><span class="nm">Pilha</span><span class="ds">o último a entrar sai primeiro</span></a>
+    <a href="#" data-goto="fila" style="color:var(--c-fila)"><span class="sym">FIFO</span><span class="nm">Fila</span><span class="ds">o primeiro a entrar sai primeiro</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram cada ligação sendo feita: escolha a operação, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Vetor ou corrente de nós?">
+  <h2>Vetor ou corrente de nós?</h2>
+  <div class="cols">
+    <div>
+      <p>Na aula passada vimos que, no vetor, inserir ou remover no início desloca <strong>todos</strong> os elementos: O(n).</p>
+      <p>A <strong>lista encadeada</strong> resolve isso guardando cada elemento em um <strong>nó</strong> separado, que pode estar em qualquer lugar da memória. Cada nó guarda:</p>
+      <ul>
+        <li>o <strong>valor</strong>;</li>
+        <li>uma <strong>referência</strong> (<code>prox</code>) para o próximo nó, ou <code>None</code> se for o último.</li>
+      </ul>
+      <p>Para inserir no meio, basta mudar duas referências. Nada é deslocado.</p>
+      <div class="note">Em Python, uma variável que guarda um objeto guarda na verdade uma <strong>referência</strong> para ele. É exatamente isso que o campo <code>prox</code> faz: aponta para outro nó.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="nos.py">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None      # referência para o próximo nó
+
+a = No("Ana")
+b = No("Bia")
+c = No("Caio")
+a.prox = b                    # Ana -> Bia
+b.prox = c                    # Bia -> Caio
+
+print(a.valor, "->", a.prox.valor, "->", a.prox.prox.valor)
+print(c.prox)                 # o último aponta para None
+
+# inserir "Beto" entre Ana e Bia: nada é deslocado
+d = No("Beto")
+d.prox = a.prox
+a.prox = d
+
+p = a
+while p is not None:
+    print(p.valor, end=" -> ")
+    p = p.prox
+print("None")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LISTA ENCADEADA ===================== -->
+<section class="slide" data-mod="lista" data-title="Percorrendo a lista">
+  <h2>Percorrendo a lista</h2>
+  <p class="lead">Não há índices: só conhecemos o <strong>primeiro</strong> nó. Para visitar os outros, uma variável <code>p</code> segue as referências até chegar a <code>None</code>.</p>
+  <div class="trace" data-code="class No:
+    def __init__(self, valor, prox=None):
+        self.valor = valor
+        self.prox = prox
+
+inicio = No(10, No(20, No(30)))
+total = 0
+p = inicio
+while p is not None:
+    total += p.valor
+    p = p.prox
+print(&quot;Soma:&quot;, total)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;define a classe No (o corpo só roda quando criamos nós)&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;cria três nós encadeados: 10 -&gt; 20 -&gt; 30 -&gt; None&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;total&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;acumulador começa em 0&quot;}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 10&quot;, &quot;total&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;p começa no primeiro nó&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 10&quot;, &quot;total&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;p não é None: entra no laço&quot;}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 10&quot;, &quot;total&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;soma o valor do nó atual&quot;}, {&quot;line&quot;: 11, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 20&quot;, &quot;total&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;p = p.prox: anda para o nó 20&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 20&quot;, &quot;total&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 20&quot;, &quot;total&quot;: &quot;30&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 11, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 30&quot;, &quot;total&quot;: &quot;30&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;anda para o nó 30&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 30&quot;, &quot;total&quot;: &quot;30&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;p&quot;: &quot;nó 30&quot;, &quot;total&quot;: &quot;60&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;soma 30&quot;}, {&quot;line&quot;: 11, &quot;vars&quot;: {&quot;p&quot;: &quot;None&quot;, &quot;total&quot;: &quot;60&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;p = p.prox: o último aponta para None&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;p&quot;: &quot;None&quot;, &quot;total&quot;: &quot;60&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;p é None: sai do laço&quot;}, {&quot;line&quot;: 12, &quot;vars&quot;: {&quot;p&quot;: &quot;None&quot;, &quot;total&quot;: &quot;60&quot;}, &quot;out&quot;: &quot;Soma: 60\n&quot;, &quot;note&quot;: &quot;nenhum índice foi usado: só as referências prox&quot;}]" data-vars="[&quot;p&quot;, &quot;total&quot;]"></div>
+  <div class="cols even">
+    <div>
+      <p>Esse laço é o “<code>for</code>” das listas encadeadas e aparece em quase toda operação:</p>
+      <div class="minis"><span class="mini">p = inicio</span><span class="mini">while p is not None:</span><span class="mini">p = p.prox</span></div>
+    </div>
+    <div>
+      <div class="note warn">Esquecer o <code>p = p.prox</code> deixa o laço preso no mesmo nó para sempre. E nunca ande com o próprio <code>inicio</code>: você perderia a entrada da lista.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="lista" data-title="A classe ListaEncadeada">
+  <h2>A classe <code>ListaEncadeada</code></h2>
+  <div class="cols">
+    <div>
+      <p>Uma classe guarda a “entrada” da lista e esconde os detalhes dos nós:</p>
+      <ul>
+        <li><code>inicio</code>: o primeiro nó (ou <code>None</code>, se vazia);</li>
+        <li><code>fim</code>: o último nó. Sem ele, inserir no fim exigiria percorrer tudo;</li>
+        <li><code>tamanho</code>: atualizado a cada operação, para <code>len()</code> ser O(1).</li>
+      </ul>
+      <p>Os métodos especiais <code>__len__</code> e <code>__str__</code> fazem <code>len(lista)</code> e <code>print(lista)</code> funcionarem.</p>
+      <div class="note">Todo método precisa tratar a <strong>lista vazia</strong>: é o caso que mais causa erros como <code>AttributeError: 'NoneType' object has no attribute 'prox'</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="lista_encadeada.py">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+class ListaEncadeada:
+    def __init__(self):
+        self.inicio = None
+        self.fim = None
+        self.tamanho = 0
+
+    def inserir_inicio(self, valor):     # O(1)
+        novo = No(valor)
+        novo.prox = self.inicio
+        self.inicio = novo
+        if self.fim is None:             # estava vazia
+            self.fim = novo
+        self.tamanho += 1
+
+    def inserir_fim(self, valor):        # O(1) graças a self.fim
+        novo = No(valor)
+        if self.fim is None:
+            self.inicio = novo
+        else:
+            self.fim.prox = novo
+        self.fim = novo
+        self.tamanho += 1
+
+    def __len__(self):
+        return self.tamanho
+
+    def __str__(self):
+        partes = []
+        p = self.inicio
+        while p is not None:
+            partes.append(str(p.valor))
+            p = p.prox
+        return " -> ".join(partes + ["None"])
+
+lista = ListaEncadeada()
+lista.inserir_fim(20)
+lista.inserir_fim(30)
+lista.inserir_inicio(10)
+print(lista)
+print("tamanho:", len(lista))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="lista" data-title="Lista encadeada passo a passo">
+  <h2>Lista encadeada passo a passo</h2>
+  <p class="lead">Escolha a operação e acompanhe cada linha de código. As etiquetas mostram para onde apontam <code>início</code>, <code>fim</code>, <code>p</code> e <code>ant</code>. A lista resultante vira o ponto de partida da próxima operação.</p>
+  <div class="edviz" data-viz="lista" data-tipo="simples" data-list="10 20 30 40" data-op="pos" data-pos="2" data-valor="25"></div>
+  <div class="note">Compare as operações: inserir no início e no fim não visitam nenhum nó; inserir na posição, buscar e remover precisam andar pela lista. Quantos nós são visitados para remover o último?</div>
+</section>
+
+<section class="slide" data-mod="lista" data-title="Inserir na posição, buscar e remover">
+  <h2>Inserir na posição, buscar e remover</h2>
+  <div class="cols">
+    <div>
+      <h3>Inserir na posição <code>pos</code></h3>
+      <p>Ande até o nó <strong>anterior</strong> (posição <code>pos − 1</code>) e faça duas ligações, nesta ordem: o novo aponta para o sucessor; o anterior aponta para o novo.</p>
+      <h3>Remover um valor</h3>
+      <p>Ande com <strong>dois</strong> ponteiros: <code>p</code> procura o valor e <code>ant</code> fica um passo atrás. Achou? <code>ant.prox = p.prox</code>: o anterior “pula” o nó removido.</p>
+      <p>Casos especiais: remover o <strong>primeiro</strong> (não há anterior: muda <code>inicio</code>) e remover o <strong>último</strong> (atualize <code>fim</code>).</p>
+      <div class="minis"><span class="mini">inserir na posição <b>→</b> O(n)</span><span class="mini">buscar <b>→</b> O(n)</span><span class="mini">remover <b>→</b> O(n)</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="operacoes_lista.py">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+class ListaEncadeada:
+    def __init__(self):
+        self.inicio = None
+        self.fim = None
+        self.tamanho = 0
+
+    def inserir_fim(self, valor):
+        novo = No(valor)
+        if self.fim is None:
+            self.inicio = novo
+        else:
+            self.fim.prox = novo
+        self.fim = novo
+        self.tamanho += 1
+
+    def inserir_posicao(self, pos, valor):
+        if pos <= 0 or self.inicio is None:
+            novo = No(valor)
+            novo.prox = self.inicio
+            self.inicio = novo
+            if self.fim is None:
+                self.fim = novo
+            self.tamanho += 1
+        elif pos >= self.tamanho:
+            self.inserir_fim(valor)
+        else:
+            ant = self.inicio
+            for _ in range(pos - 1):     # anda até o nó anterior
+                ant = ant.prox
+            novo = No(valor)
+            novo.prox = ant.prox         # 1º: o novo aponta para o sucessor
+            ant.prox = novo              # 2º: o anterior aponta para o novo
+            self.tamanho += 1
+
+    def buscar(self, valor):             # devolve a posição ou -1
+        p, i = self.inicio, 0
+        while p is not None:
+            if p.valor == valor:
+                return i
+            p, i = p.prox, i + 1
+        return -1
+
+    def remover(self, valor):
+        ant, p = None, self.inicio
+        while p is not None and p.valor != valor:
+            ant, p = p, p.prox
+        if p is None:
+            return False                 # não estava na lista
+        if ant is None:
+            self.inicio = p.prox         # removendo o primeiro
+        else:
+            ant.prox = p.prox            # o anterior "pula" p
+        if p is self.fim:
+            self.fim = ant               # removendo o último
+        self.tamanho -= 1
+        return True
+
+    def __str__(self):
+        partes, p = [], self.inicio
+        while p is not None:
+            partes.append(str(p.valor))
+            p = p.prox
+        return " -> ".join(partes + ["None"])
+
+lista = ListaEncadeada()
+for x in [10, 20, 30, 40]:
+    lista.inserir_fim(x)
+lista.inserir_posicao(2, 25)
+print(lista)
+print("posição do 30:", lista.buscar(30))
+print("remove 10:", lista.remover(10), "|", lista)
+print("remove 40:", lista.remover(40), "|", lista, "| fim =", lista.fim.valor)
+print("remove 99:", lista.remover(99))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="lista" data-title="Cuidado com a ordem das ligações">
+  <h2>Cuidado com a ordem das ligações</h2>
+  <div class="cols">
+    <div>
+      <p>Um nó só continua acessível enquanto alguém aponta para ele. Se você sobrescrever a única referência para o resto da lista, ela se perde.</p>
+      <p>No exemplo errado, <code>a.prox = novo</code> acontece <strong>antes</strong> de guardar quem vinha depois de <code>a</code>. Resultado: o 20 e o 30 saem da lista, e <code>novo.prox = a.prox</code> faz o novo nó apontar <strong>para ele mesmo</strong>, um laço sem fim.</p>
+      <div class="note warn">Regra prática: ao inserir, <strong>primeiro</strong> ligue o nó novo ao resto da lista; <strong>depois</strong> ligue a lista ao nó novo. Na dúvida, desenhe as setas no papel antes de programar.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="ordem_ligacoes.py">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+def mostrar(inicio, limite=8):
+    p, passos = inicio, 0
+    while p is not None and passos < limite:
+        print(p.valor, end=" -> ")
+        p, passos = p.prox, passos + 1
+    print("None" if p is None else "... (não termina!)")
+
+# lista 10 -> 20 -> 30
+a, b, c = No(10), No(20), No(30)
+a.prox, b.prox = b, c
+
+# ERRADO: liga o anterior antes de guardar o sucessor
+novo = No(15)
+a.prox = novo          # o 20 e o 30 saíram da lista...
+novo.prox = a.prox     # ...e o novo aponta para ele mesmo!
+mostrar(a)
+
+# CERTO: primeiro o novo aponta para o sucessor
+a.prox = b
+novo = No(15)
+novo.prox = a.prox
+a.prox = novo
+mostrar(a)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="lista" data-title="Vetor × lista encadeada">
+  <h2>Vetor × lista encadeada: quanto custa cada operação</h2>
+  <div class="tblwrap">
+    <table class="tbl">
+      <tr><th>Operação</th><th>Vetor (<code>list</code>)</th><th>Lista encadeada simples (com <code>fim</code>)</th></tr>
+      <tr><td>acessar a posição i</td><td>O(1)</td><td>O(n): é preciso andar i nós</td></tr>
+      <tr><td>inserir ou remover no início</td><td>O(n): desloca todos</td><td><strong>O(1)</strong></td></tr>
+      <tr><td>inserir no fim</td><td>O(1) amortizado</td><td>O(1)</td></tr>
+      <tr><td>remover do fim</td><td>O(1)</td><td>O(n): precisa achar o penúltimo (O(1) na dupla)</td></tr>
+      <tr><td>inserir ou remover no meio, já estando no lugar</td><td>O(n) deslocamentos</td><td><strong>O(1)</strong>: só troca referências</td></tr>
+      <tr><td>buscar um valor</td><td>O(n), ou O(log n) se ordenado</td><td>O(n): busca binária não funciona sem acesso direto</td></tr>
+      <tr><td>memória extra</td><td>pouca (algum espaço reservado)</td><td>uma referência por nó (duas na dupla)</td></tr>
+    </table>
+  </div>
+  <div class="cols even">
+    <div><p>Não existe vencedor absoluto. A lista encadeada brilha quando há muitas inserções e remoções nas pontas ou em lugares que já conhecemos; o vetor, quando precisamos de acesso por posição.</p></div>
+    <div><div class="note">Listas encadeadas são a base de pilhas, filas, tabelas hash com encadeamento e listas de adjacência de grafos, que veremos nas próximas aulas.</div></div>
+  </div>
+</section>
+
+<!-- ===================== DUPLA E CIRCULAR ===================== -->
+<section class="slide" data-mod="dupla" data-title="Lista duplamente encadeada">
+  <h2>Lista duplamente encadeada</h2>
+  <div class="cols">
+    <div>
+      <p>Cada nó guarda <strong>duas</strong> referências: <code>prox</code> (para frente) e <code>ant</code> (para trás).</p>
+      <ul>
+        <li>Dá para percorrer nos dois sentidos.</li>
+        <li>Com um nó em mãos, removê-lo é <strong>O(1)</strong>: ele mesmo sabe quem é o anterior.</li>
+        <li>Remover do fim também fica O(1): <code>fim.ant</code> é o novo último.</li>
+      </ul>
+      <p>O custo: mais memória por nó e o dobro de ligações para manter corretas em cada operação.</p>
+      <div class="note">Exemplos: a lista de músicas de um player (anterior/próxima), o histórico do navegador e o <code>collections.deque</code> do Python, que usa uma lista dupla de blocos.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="lista_dupla.py">
+class NoD:
+    def __init__(self, valor):
+        self.valor = valor
+        self.ant = None
+        self.prox = None
+
+class ListaDupla:
+    def __init__(self):
+        self.inicio = None
+        self.fim = None
+
+    def inserir_fim(self, valor):
+        novo = NoD(valor)
+        if self.fim is None:
+            self.inicio = self.fim = novo
+        else:
+            novo.ant = self.fim
+            self.fim.prox = novo
+            self.fim = novo
+        return novo
+
+    def remover_no(self, no):           # O(1): o nó conhece o anterior
+        if no.ant is None:
+            self.inicio = no.prox
+        else:
+            no.ant.prox = no.prox
+        if no.prox is None:
+            self.fim = no.ant
+        else:
+            no.prox.ant = no.ant
+
+    def frente_para_tras(self):
+        p, r = self.inicio, []
+        while p is not None:
+            r.append(p.valor)
+            p = p.prox
+        return r
+
+    def tras_para_frente(self):
+        p, r = self.fim, []
+        while p is not None:
+            r.append(p.valor)
+            p = p.ant
+        return r
+
+playlist = ListaDupla()
+playlist.inserir_fim("Intro")
+faixa2 = playlist.inserir_fim("Faixa 2")
+playlist.inserir_fim("Faixa 3")
+playlist.inserir_fim("Final")
+print(playlist.frente_para_tras())
+print(playlist.tras_para_frente())
+playlist.remover_no(faixa2)             # sem percorrer nada
+print(playlist.frente_para_tras())
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dupla" data-title="Lista dupla passo a passo">
+  <h2>Lista dupla passo a passo</h2>
+  <p class="lead">As setas <code>⇄</code> representam o par <code>prox</code>/<code>ant</code>. Repare que cada inserção no meio mexe em <strong>quatro</strong> referências, não em duas (e a remoção, em duas, não em uma).</p>
+  <div class="edviz" data-viz="lista" data-tipo="dupla" data-list="10 20 30 40" data-op="rem" data-valor="30" data-pos="2"></div>
+  <div class="note">Na remoção, compare com a lista simples (troque o tipo no seletor): a dupla não precisa do ponteiro <code>ant</code> andando atrás de <code>p</code>, porque cada nó já sabe quem vem antes.</div>
+</section>
+
+<section class="slide" data-mod="dupla" data-title="Lista circular: o rodízio">
+  <h2>Lista circular: o rodízio</h2>
+  <div class="edviz" data-viz="lista" data-tipo="circular" data-list="1 2 3 4" data-op="fim" data-valor="5" data-pos="2"></div>
+  <div class="cols">
+    <div>
+      <p>Na lista <strong>circular</strong>, o último nó aponta de volta para o primeiro. Não existe <code>None</code> no fim: andando sempre para frente, damos voltas.</p>
+      <p>Útil para tudo que funciona em <strong>rodízio</strong>: a vez dos jogadores, o escalonador de processos de um sistema operacional (cada processo usa a CPU um pouco e passa a vez), playlists em repetição.</p>
+      <div class="note warn">Para percorrer uma volta, a condição de parada não é mais <code>p is None</code> (isso nunca acontece!), e sim <strong>voltar ao nó inicial</strong>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="circular.py">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+# monta a roda: Ana -> Bia -> Caio -> Davi -> (volta para Ana)
+nomes = ["Ana", "Bia", "Caio", "Davi"]
+inicio = No(nomes[0])
+p = inicio
+for nome in nomes[1:]:
+    p.prox = No(nome)
+    p = p.prox
+p.prox = inicio            # o último aponta para o primeiro
+
+# rodízio: 10 jogadas, sempre passando a vez
+vez = inicio
+for jogada in range(1, 11):
+    print(f"jogada {jogada:2}: {vez.valor}")
+    vez = vez.prox
+
+# uma volta completa: para ao voltar ao início
+p = inicio
+while True:
+    print(p.valor, end=" -> ")
+    p = p.prox
+    if p is inicio:
+        break
+print("(volta ao início)")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PILHA ===================== -->
+<section class="slide" data-mod="pilha" data-title="Pilha: LIFO">
+  <h2>Pilha: o último a entrar é o primeiro a sair</h2>
+  <div class="cols">
+    <div>
+      <p>Uma <strong>pilha</strong> (<em>stack</em>) só permite mexer no <strong>topo</strong>, como uma pilha de pratos. Política <strong>LIFO</strong>: <em>last in, first out</em>.</p>
+      <table class="tbl">
+        <tr><th>Operação</th><th>Em Python (<code>list</code>)</th><th>Custo</th></tr>
+        <tr><td>empilhar (push)</td><td><code>p.append(x)</code></td><td>O(1)</td></tr>
+        <tr><td>desempilhar (pop)</td><td><code>p.pop()</code></td><td>O(1)</td></tr>
+        <tr><td>ver o topo (peek)</td><td><code>p[-1]</code></td><td>O(1)</td></tr>
+        <tr><td>está vazia?</td><td><code>not p</code> ou <code>len(p) == 0</code></td><td>O(1)</td></tr>
+      </table>
+      <p>O topo é o <strong>fim</strong> da <code>list</code>: lá, inserir e remover não deslocam ninguém.</p>
+    </div>
+    <div>
+      <div class="edviz" data-viz="pilhafila" data-modo="pilha" data-list="1 2 3"></div>
+    </div>
+  </div>
+<textarea class="py" data-label="pilha_lista.py">
+pilha = []
+pilha.append("página 1")      # empilhar: O(1)
+pilha.append("página 2")
+pilha.append("página 3")
+print(pilha, "| topo:", pilha[-1])
+
+print("voltar:", pilha.pop())  # desempilhar: O(1)
+print("voltar:", pilha.pop())
+print(pilha)
+
+while pilha:                   # enquanto não estiver vazia
+    print("desempilhando", pilha.pop())
+print("vazia?", len(pilha) == 0)
+</textarea>
+</section>
+
+<section class="slide" data-mod="pilha" data-title="Pilha com nós">
+  <h2>Pilha com nós</h2>
+  <div class="cols">
+    <div>
+      <p>Também dá para montar a pilha sobre uma lista encadeada: o <strong>topo é o início</strong> da lista. Empilhar é inserir no início e desempilhar é remover do início, ambos O(1).</p>
+      <p>Desempilhar de uma pilha vazia é um erro de quem usa a estrutura. A classe avisa lançando uma exceção com <code>raise</code>, como a <code>list</code> faz em <code>[].pop()</code>.</p>
+      <div class="note">Execute: a última linha tenta desempilhar de uma pilha vazia. Leia a mensagem de erro. Como evitar? Teste <code>p.vazia()</code> antes.</div>
+      <p>Repare: quem usa a classe só enxerga <code>empilhar</code>, <code>desempilhar</code>, <code>espiar</code> e <code>vazia</code>. Isso é um <strong>tipo abstrato de dados</strong>: o “o quê” separado do “como”. Trocar a implementação (list ou nós) não muda o resto do programa.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="pilha_nos.py" data-erro="IndexError">
+class No:
+    def __init__(self, valor, prox=None):
+        self.valor = valor
+        self.prox = prox
+
+class Pilha:
+    def __init__(self):
+        self.topo = None
+        self.tamanho = 0
+
+    def empilhar(self, valor):        # O(1): insere no início
+        self.topo = No(valor, self.topo)
+        self.tamanho += 1
+
+    def desempilhar(self):            # O(1): remove do início
+        if self.topo is None:
+            raise IndexError("desempilhar de pilha vazia")
+        valor = self.topo.valor
+        self.topo = self.topo.prox
+        self.tamanho -= 1
+        return valor
+
+    def espiar(self):
+        if self.topo is None:
+            raise IndexError("pilha vazia")
+        return self.topo.valor
+
+    def vazia(self):
+        return self.topo is None
+
+p = Pilha()
+for x in [1, 2, 3]:
+    p.empilhar(x)
+print("topo:", p.espiar(), "| tamanho:", p.tamanho)
+while not p.vazia():
+    print(p.desempilhar())
+p.desempilhar()                       # e agora?
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pilha" data-title="Aplicação: parênteses balanceados">
+  <h2>Aplicação: parênteses balanceados</h2>
+  <p class="lead">Todo compilador verifica se <code>( )</code>, <code>[ ]</code> e <code>{ }</code> estão bem aninhados. O último que abriu tem de ser o primeiro a fechar: é uma pilha.</p>
+  <div class="edviz" data-viz="parenteses" data-expr="{[a+(b*c)]-d}"></div>
+  <div class="cols">
+    <div>
+      <p>Três jeitos de errar, três testes:</p>
+      <ul>
+        <li>fecha com a pilha <strong>vazia</strong>: <code>(a+b))</code>;</li>
+        <li>fecha com o <strong>par errado</strong> no topo: <code>([)]</code>;</li>
+        <li>termina com a pilha <strong>não vazia</strong>: <code>((x)</code>.</li>
+      </ul>
+    </div>
+    <div>
+<textarea class="py" data-label="balanceada.py">
+def balanceada(expr):
+    pares = {")": "(", "]": "[", "}": "{"}
+    pilha = []
+    for c in expr:
+        if c in "([{":
+            pilha.append(c)
+        elif c in ")]}":
+            if not pilha or pilha.pop() != pares[c]:
+                return False
+    return len(pilha) == 0      # sobrou alguém aberto?
+
+for e in ["{[a+(b*c)]-d}", "(a+b))", "([)]", "((x)", ""]:
+    print(repr(e), "->", balanceada(e))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pilha" data-title="Aplicação: expressões pós-fixas">
+  <h2>Aplicação: expressões pós-fixas</h2>
+  <p class="lead">Na notação <strong>pós-fixa</strong> (polonesa reversa), o operador vem depois dos operandos: <code>3 4 +</code> significa <code>3 + 4</code>. Não precisa de parênteses nem de regras de precedência, e uma pilha avalia tudo em uma passada.</p>
+  <div class="edviz" data-viz="posfixa" data-expr="5 1 2 + 4 * + 3 -"></div>
+  <div class="cols">
+    <div>
+      <div class="minis"><span class="mini">(2 + 3) * 4 <b>→</b> 2 3 + 4 *</span><span class="mini">2 + 3 * 4 <b>→</b> 2 3 4 * +</span><span class="mini">5 + (1 + 2) * 4 − 3 <b>→</b> 5 1 2 + 4 * + 3 −</span></div>
+      <p>Calculadoras HP, a máquina virtual do Java e o próprio Python (que compila seu código para instruções de uma pilha) usam essa ideia.</p>
+      <div class="note warn">O primeiro valor desempilhado é o <strong>segundo</strong> operando. Em <code>8 2 -</code>, desempilhamos 2 e depois 8, e calculamos 8 − 2.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="posfixa.py">
+def avaliar(expr):
+    pilha = []
+    for tk in expr.split():
+        if tk in "+-*/":
+            b = pilha.pop()          # o de cima é o 2º operando
+            a = pilha.pop()
+            if tk == "+":
+                pilha.append(a + b)
+            elif tk == "-":
+                pilha.append(a - b)
+            elif tk == "*":
+                pilha.append(a * b)
+            else:
+                pilha.append(a / b)
+        else:
+            pilha.append(float(tk))
+    return pilha.pop()
+
+print(avaliar("3 4 +"))              # 3 + 4
+print(avaliar("5 1 2 + 4 * + 3 -"))  # 5 + (1 + 2) * 4 - 3
+print(avaliar("2 3 4 * +"))          # 2 + 3 * 4
+print(avaliar("2 3 + 4 *"))          # (2 + 3) * 4
+print(avaliar("8 2 -"))              # 8 - 2
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pilha" data-title="Aplicação: desfazer e refazer">
+  <h2>Aplicação: desfazer e refazer</h2>
+  <div class="cols">
+    <div>
+      <p>O <kbd>Ctrl</kbd>+<kbd>Z</kbd> de qualquer editor usa <strong>duas pilhas</strong>:</p>
+      <ul>
+        <li>cada ação empilha o estado anterior em <code>desfazer</code>;</li>
+        <li><strong>desfazer</strong> tira o topo de <code>desfazer</code> e guarda o estado atual em <code>refazer</code>;</li>
+        <li><strong>refazer</strong> faz o caminho inverso;</li>
+        <li>uma ação nova <strong>esvazia</strong> <code>refazer</code>: o futuro alternativo se perde.</li>
+      </ul>
+      <p>O botão “voltar” do navegador funciona do mesmo jeito, com páginas no lugar de textos. E a <strong>pilha de chamadas</strong> de funções, que veremos em recursão, também.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desfazer.py">
+texto = ""
+desfazer = []      # pilha de estados anteriores
+refazer = []
+
+def digitar(s):
+    global texto
+    desfazer.append(texto)
+    refazer.clear()           # ação nova invalida o "refazer"
+    texto += s
+
+def ctrl_z():
+    global texto
+    if desfazer:
+        refazer.append(texto)
+        texto = desfazer.pop()
+
+def ctrl_y():
+    global texto
+    if refazer:
+        desfazer.append(texto)
+        texto = refazer.pop()
+
+digitar("Olá")
+digitar(", mundo")
+digitar("!!!")
+print(repr(texto))
+ctrl_z()
+print("Ctrl+Z:", repr(texto))
+ctrl_z()
+print("Ctrl+Z:", repr(texto))
+ctrl_y()
+print("Ctrl+Y:", repr(texto))
+digitar(" Tchau")
+ctrl_y()
+print("Ctrl+Y depois de digitar:", repr(texto))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FILA ===================== -->
+<section class="slide" data-mod="fila" data-title="Fila: FIFO">
+  <h2>Fila: o primeiro a entrar é o primeiro a sair</h2>
+  <div class="cols">
+    <div>
+      <p>Na <strong>fila</strong> (<em>queue</em>), quem chega entra no <strong>fim</strong> e quem é atendido sai da <strong>frente</strong>. Política <strong>FIFO</strong>: <em>first in, first out</em>.</p>
+      <p>Exemplos: fila de impressão, requisições a um servidor, mensagens entre programas, a ordem de visita em um grafo (busca em largura, mais adiante).</p>
+      <div class="note warn">Com <code>list</code>, <code>append</code> é O(1), mas tirar da frente com <code>pop(0)</code> <strong>desloca todos</strong> os outros: O(n). Para filas, use <code>collections.deque</code>, que faz as duas pontas em O(1).</div>
+    </div>
+    <div>
+      <div class="edviz" data-viz="pilhafila" data-modo="fila" data-list="1 2 3"></div>
+    </div>
+  </div>
+<textarea class="py" data-label="fila_deque.py">
+from collections import deque
+
+fila = deque()
+fila.append("Ana")         # enfileirar: entra no fim, O(1)
+fila.append("Bia")
+fila.append("Caio")
+print("frente:", fila[0], "| fila:", list(fila))
+
+print("atendendo", fila.popleft())   # sai da frente, O(1)
+print("atendendo", fila.popleft())
+fila.append("Davi")
+print(list(fila))
+
+# com list também funciona, mas pop(0) desloca os demais: O(n)
+lista = ["Ana", "Bia", "Caio"]
+print(lista.pop(0), lista)
+</textarea>
+</section>
+
+<section class="slide" data-mod="fila" data-title="Fila com nós">
+  <h2>Fila com nós</h2>
+  <div class="cols">
+    <div>
+      <p>Sobre uma lista encadeada simples com <code>inicio</code> e <code>fim</code>:</p>
+      <ul>
+        <li><strong>enfileirar</strong> = inserir no <strong>fim</strong>: O(1);</li>
+        <li><strong>desenfileirar</strong> = remover do <strong>início</strong>: O(1).</li>
+      </ul>
+      <p>Por que não o contrário (entrar no início e sair pelo fim)? Porque remover do fim de uma lista simples exige achar o penúltimo: O(n).</p>
+      <div class="note">Detalhe fácil de esquecer: quando a fila fica vazia, <code>fim</code> também precisa voltar a <code>None</code>. Senão, o próximo <code>enfileirar</code> liga o nó novo a um nó que já saiu.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="fila_nos.py">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+class Fila:
+    def __init__(self):
+        self.inicio = None    # frente: de onde sai
+        self.fim = None       # trás: onde entra
+        self.tamanho = 0
+
+    def enfileirar(self, valor):      # O(1): insere no fim
+        novo = No(valor)
+        if self.fim is None:
+            self.inicio = novo
+        else:
+            self.fim.prox = novo
+        self.fim = novo
+        self.tamanho += 1
+
+    def desenfileirar(self):          # O(1): remove do início
+        if self.inicio is None:
+            raise IndexError("fila vazia")
+        valor = self.inicio.valor
+        self.inicio = self.inicio.prox
+        if self.inicio is None:       # esvaziou: fim também
+            self.fim = None
+        self.tamanho -= 1
+        return valor
+
+f = Fila()
+for doc in ["relatorio.pdf", "foto.png", "notas.txt"]:
+    f.enfileirar(doc)
+    print("na fila:", doc)
+while f.tamanho > 0:
+    print("imprimindo", f.desenfileirar())
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="fila" data-title="Fila circular em vetor">
+  <h2>Fila circular em vetor</h2>
+  <p class="lead">Dá para fazer uma fila O(1) em um vetor de tamanho fixo sem deslocar ninguém: em vez de mover os elementos, movemos o índice da <strong>frente</strong>. Quando um índice passa do fim do vetor, volta ao 0 com o operador <code>%</code>.</p>
+  <div class="edviz" data-viz="filacircular" data-cap="6"></div>
+  <div class="cols">
+    <div>
+      <div class="minis"><span class="mini">trás = (frente + tamanho) % capacidade</span><span class="mini">frente = (frente + 1) % capacidade</span></div>
+      <p>Enfileire até encher, desenfileire alguns e enfileire de novo: veja os novos elementos ocupando o início do vetor.</p>
+      <div class="note">Esse é o <em>buffer circular</em> usado em teclados, placas de rede e players de áudio: memória fixa, sem alocação, tudo O(1). A desvantagem é a capacidade limitada.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="fila_circular.py">
+class FilaCircular:
+    def __init__(self, capacidade):
+        self.dados = [None] * capacidade
+        self.frente = 0
+        self.tamanho = 0
+
+    def enfileirar(self, x):
+        if self.tamanho == len(self.dados):
+            raise OverflowError("fila cheia")
+        tras = (self.frente + self.tamanho) % len(self.dados)
+        self.dados[tras] = x
+        self.tamanho += 1
+
+    def desenfileirar(self):
+        if self.tamanho == 0:
+            raise IndexError("fila vazia")
+        x = self.dados[self.frente]
+        self.dados[self.frente] = None
+        self.frente = (self.frente + 1) % len(self.dados)
+        self.tamanho -= 1
+        return x
+
+f = FilaCircular(4)
+for x in [10, 20, 30]:
+    f.enfileirar(x)
+print(f.desenfileirar(), f.desenfileirar())
+f.enfileirar(40)
+f.enfileirar(50)             # dá a volta: entra no índice 0
+f.enfileirar(60)
+print(f.dados, "frente =", f.frente)
+while f.tamanho:
+    print(f.desenfileirar(), end=" ")
+print()
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="fila" data-title="collections.deque">
+  <h2><code>collections.deque</code>: pilha e fila prontas</h2>
+  <div class="cols">
+    <div>
+      <p><code>deque</code> (<em>double-ended queue</em>, “fila de duas pontas”) permite inserir e remover nas <strong>duas pontas</strong> em O(1). Serve como pilha, como fila ou como os dois.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Método</th><th>O que faz</th></tr>
+        <tr><td><code>append(x)</code> / <code>pop()</code></td><td>direita (fim)</td></tr>
+        <tr><td><code>appendleft(x)</code> / <code>popleft()</code></td><td>esquerda (frente)</td></tr>
+        <tr><td><code>d[0]</code>, <code>d[-1]</code></td><td>espia as pontas</td></tr>
+        <tr><td><code>rotate(k)</code></td><td>gira k posições (circular!)</td></tr>
+        <tr><td><code>deque(maxlen=n)</code></td><td>guarda só os n últimos</td></tr>
+      </table></div>
+      <div class="note warn">Acessar o meio, <code>d[i]</code>, é O(n) em um deque. Ele é feito para as pontas.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="deque.py">
+from collections import deque
+
+d = deque([1, 2, 3])
+d.appendleft(0)          # O(1) nas duas pontas
+d.append(4)
+print(list(d))
+print(d.popleft(), d.pop(), list(d))
+
+d.rotate(1)              # gira para a direita
+print("rotate(1): ", list(d))
+d.rotate(-1)
+print("rotate(-1):", list(d))
+
+ultimos = deque(maxlen=3)    # guarda só os 3 mais recentes
+for pagina in ["home", "cursos", "notas", "perfil", "sair"]:
+    ultimos.append(pagina)
+print("histórico recente:", list(ultimos))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="fila" data-title="Desafio: inverter uma lista encadeada">
+  <h2>Desafio: inverter uma lista encadeada</h2>
+  <div class="cols">
+    <div>
+      <p>Inverta a lista <strong>sem criar nós novos</strong> e sem usar listas do Python: apenas mude os campos <code>prox</code>, para que cada nó aponte para o anterior.</p>
+      <p>Dica: ande com três referências. <code>p</code> é o nó atual, <code>ant</code> é o que ficou para trás e <code>prox</code> guarda o resto da lista <strong>antes</strong> de você mudar <code>p.prox</code>.</p>
+      <p>Depois de resolver: qual é a complexidade? Quanta memória extra ela usa?</p>
+      <div class="minis"><span class="mini">1 → 2 → 3 → 4 → None</span><span class="mini"><b>→</b> 4 → 3 → 2 → 1 → None</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_inverter.py">
+class No:
+    def __init__(self, valor, prox=None):
+        self.valor = valor
+        self.prox = prox
+
+def mostrar(inicio):
+    p = inicio
+    while p is not None:
+        print(p.valor, end=" -> ")
+        p = p.prox
+    print("None")
+
+inicio = No(1, No(2, No(3, No(4))))
+mostrar(inicio)
+
+# inverta a lista mudando só os .prox (use ant, p e prox)
+
+
+mostrar(inicio)   # deve mostrar 4 -> 3 -> 2 -> 1 -> None
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+class No:
+    def __init__(self, valor, prox=None):
+        self.valor = valor
+        self.prox = prox
+
+def mostrar(inicio):
+    p = inicio
+    while p is not None:
+        print(p.valor, end=" -> ")
+        p = p.prox
+    print("None")
+
+inicio = No(1, No(2, No(3, No(4))))
+mostrar(inicio)
+
+ant, p = None, inicio
+while p is not None:
+    prox = p.prox      # guarda o resto antes de mudar
+    p.prox = ant       # inverte a seta
+    ant, p = p, prox   # avança os dois
+inicio = ant           # o antigo último é o novo início
+
+mostrar(inicio)        # O(n) de tempo, O(1) de memória extra
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual estrutura usar?">
+  <h2>Qual estrutura usar?</h2>
+  <p class="lead">Leia a situação para a turma, colete as respostas e só então clique.</p>
+  <div class="quiz" data-quiz="estrutura" data-label="Situação"></div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: listas encadeadas">
+  <h2>Prática 1: listas encadeadas</h2>
+  <p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Tente antes de abrir a solução!</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. Tamanho, soma e maior <span class="lvl l1">básico</span></h3>
+      <p>O código já lê os números e monta uma lista encadeada com eles. <strong>Percorrendo os nós</strong> (sem usar a lista <code>numeros</code>), mostre o tamanho, a soma e o maior valor.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>4 8 1</pre></td><td><pre>Tamanho: 3
+Soma: 13
+Maior: 8</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_percorrer.py" data-stdin="4 8 1" data-tests='[{"in": "4 8 1", "out": ["Tamanho: 3", "Soma: 13", "Maior: 8"]}, {"in": "-5 -2 -9", "out": ["Tamanho: 3", "Soma: -16", "Maior: -2"], "nao": ["Maior: 0"]}, {"in": "7", "out": ["Tamanho: 1", "Soma: 7", "Maior: 7"]}, {"in": "1 2 3 4 5 6", "out": ["Tamanho: 6", "Soma: 21", "Maior: 6"]}, {"in": "0 0", "out": ["Tamanho: 2", "Soma: 0", "Maior: 0"]}]'>
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+numeros = [int(x) for x in input("Números: ").split()]
+inicio = None
+fim = None
+for x in numeros:              # monta a lista encadeada
+    novo = No(x)
+    if inicio is None:
+        inicio = novo
+    else:
+        fim.prox = novo
+    fim = novo
+
+# percorra a partir de inicio e mostre Tamanho, Soma e Maior
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="4 8 1">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+numeros = [int(x) for x in input("Números: ").split()]
+inicio = None
+fim = None
+for x in numeros:
+    novo = No(x)
+    if inicio is None:
+        inicio = novo
+    else:
+        fim.prox = novo
+    fim = novo
+
+tamanho, soma = 0, 0
+maior = inicio.valor           # começa pelo primeiro, não por 0
+p = inicio
+while p is not None:
+    tamanho += 1
+    soma += p.valor
+    if p.valor > maior:
+        maior = p.valor
+    p = p.prox
+print("Tamanho:", tamanho)
+print("Soma:", soma)
+print("Maior:", maior)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. Remover todas as ocorrências <span class="lvl l2">médio</span></h3>
+      <p>Complete o método <code>remover_todos(x)</code>: ele remove <strong>todos</strong> os nós com valor <code>x</code> e devolve quantos removeu. Cuidado com os casos em que o removido é o primeiro, o último ou todos. O programa principal já está pronto e testa também se <code>fim</code> ficou certo, inserindo um 0 no fim.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1 2 3 2 4
+2</pre></td><td><pre>Removidos: 2
+Lista: 1 -> 3 -> 4 -> None
+Com 0 no fim: 1 -> 3 -> 4 -> 0 -> None</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_remover_todos.py" data-stdin="1 2 3 2 4
+2" data-tests='[{"in": "1 2 3 2 4\n2", "out": ["Removidos: 2", "Lista: 1 -> 3 -> 4 -> None", "Com 0 no fim: 1 -> 3 -> 4 -> 0 -> None"]}, {"in": "5 5 5\n5", "out": ["Removidos: 3", "Lista: None", "Com 0 no fim: 0 -> None"]}, {"in": "5 1 5\n5", "out": ["Removidos: 2", "Lista: 1 -> None", "Com 0 no fim: 1 -> 0 -> None"]}, {"in": "1 2 3\n9", "out": ["Removidos: 0", "Lista: 1 -> 2 -> 3 -> None", "Com 0 no fim: 1 -> 2 -> 3 -> 0 -> None"]}, {"in": "7 7 8 7\n7", "out": ["Removidos: 3", "Lista: 8 -> None", "Com 0 no fim: 8 -> 0 -> None"]}]'>
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+class ListaEncadeada:
+    def __init__(self):
+        self.inicio = None
+        self.fim = None
+
+    def inserir_fim(self, valor):
+        novo = No(valor)
+        if self.fim is None:
+            self.inicio = novo
+        else:
+            self.fim.prox = novo
+        self.fim = novo
+
+    def remover_todos(self, x):
+        # remova todos os nós com valor x e devolva quantos foram removidos
+        # não esqueça de atualizar self.inicio e self.fim quando preciso
+        return 0
+
+    def __str__(self):
+        partes, p = [], self.inicio
+        while p is not None:
+            partes.append(str(p.valor))
+            p = p.prox
+        return " -> ".join(partes + ["None"])
+
+lista = ListaEncadeada()
+for v in input("Números: ").split():
+    lista.inserir_fim(int(v))
+x = int(input("Remover: "))
+print("Removidos:", lista.remover_todos(x))
+print("Lista:", lista)
+lista.inserir_fim(0)
+print("Com 0 no fim:", lista)
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1 2 3 2 4
+2">
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.prox = None
+
+class ListaEncadeada:
+    def __init__(self):
+        self.inicio = None
+        self.fim = None
+
+    def inserir_fim(self, valor):
+        novo = No(valor)
+        if self.fim is None:
+            self.inicio = novo
+        else:
+            self.fim.prox = novo
+        self.fim = novo
+
+    def remover_todos(self, x):
+        cont = 0
+        ant, p = None, self.inicio
+        while p is not None:
+            if p.valor == x:
+                if ant is None:
+                    self.inicio = p.prox     # era o primeiro
+                else:
+                    ant.prox = p.prox        # ant continua no lugar
+                cont += 1
+            else:
+                ant = p                      # só avança ant se p ficou
+            p = p.prox
+        self.fim = ant                       # o último que sobrou (ou None)
+        return cont
+
+    def __str__(self):
+        partes, p = [], self.inicio
+        while p is not None:
+            partes.append(str(p.valor))
+            p = p.prox
+        return " -> ".join(partes + ["None"])
+
+lista = ListaEncadeada()
+for v in input("Números: ").split():
+    lista.inserir_fim(int(v))
+x = int(input("Remover: "))
+print("Removidos:", lista.remover_todos(x))
+print("Lista:", lista)
+lista.inserir_fim(0)
+print("Com 0 no fim:", lista)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: pilhas">
+  <h2>Prática 2: pilhas</h2>
+  <p class="lead">Use uma <code>list</code> como pilha: só <code>append</code>, <code>pop</code> e <code>[-1]</code>.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Delimitadores balanceados <span class="lvl l1">básico</span></h3>
+      <p>Leia uma linha de texto e verifique se <code>( )</code>, <code>[ ]</code> e <code>{ }</code> estão balanceados e bem aninhados. Outros caracteres são ignorados. Mostre <code>Balanceada</code> ou <code>Não balanceada</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>{[a+(b*c)]-d}</pre></td><td><pre>Balanceada</pre></td></tr><tr><td><pre>([)]</pre></td><td><pre>Não balanceada</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_balanceada.py" data-stdin="{[a+(b*c)]-d}" data-tests='[{"in": "{[a+(b*c)]-d}", "out": ["Balanceada"], "nao": ["Não balanceada"]}, {"in": "(a+b))", "out": ["Não balanceada"]}, {"in": "([)]", "out": ["Não balanceada"]}, {"in": "((x)", "out": ["Não balanceada"]}, {"in": "sem delimitadores", "out": ["Balanceada"], "nao": ["Não balanceada"]}, {"in": "}{", "out": ["Não balanceada"]}, {"in": "print(v[i] + d[\"k\"])", "out": ["Balanceada"], "nao": ["Não balanceada"]}]'>
+texto = input("Texto: ")
+
+# use uma pilha para conferir os delimitadores
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="{[a+(b*c)]-d}">
+texto = input("Texto: ")
+pares = {")": "(", "]": "[", "}": "{"}
+pilha = []
+ok = True
+for c in texto:
+    if c in "([{":
+        pilha.append(c)
+    elif c in ")]}":
+        if not pilha or pilha[-1] != pares[c]:
+            ok = False
+            break
+        pilha.pop()
+if ok and not pilha:
+    print("Balanceada")
+else:
+    print("Não balanceada")
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. Calculadora pós-fixa <span class="lvl l2">médio</span></h3>
+      <p>Leia uma expressão pós-fixa com inteiros não negativos e os operadores <code>+ - * /</code> separados por espaço (<code>/</code> é a divisão inteira, <code>//</code>). Mostre <code>Resultado: R</code>. Se faltarem operandos para algum operador, ou sobrar mais de um valor no fim, mostre <code>Expressão inválida</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3 4 + 2 *</pre></td><td><pre>Resultado: 14</pre></td></tr><tr><td><pre>2 3</pre></td><td><pre>Expressão inválida</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_posfixa.py" data-stdin="3 4 + 2 *" data-tests='[{"in": "3 4 + 2 *", "out": ["Resultado: 14"], "nao": ["inválida"]}, {"in": "10 2 8 * + 3 -", "out": ["Resultado: 23"]}, {"in": "7 2 /", "out": ["Resultado: 3"], "nao": ["3.5"]}, {"in": "4 5 - 2 *", "out": ["Resultado: -2"]}, {"in": "2 3", "out": ["Expressão inválida"], "nao": ["Resultado"]}, {"in": "+", "out": ["Expressão inválida"], "nao": ["Resultado"]}, {"in": "1 +", "out": ["Expressão inválida"], "nao": ["Resultado"]}, {"in": "9", "out": ["Resultado: 9"]}]'>
+tokens = input("Expressão: ").split()
+
+# número: empilha; operador: desempilha dois, calcula, empilha
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3 4 + 2 *">
+tokens = input("Expressão: ").split()
+pilha = []
+valida = True
+for tk in tokens:
+    if tk in ("+", "-", "*", "/"):
+        if len(pilha) < 2:
+            valida = False
+            break
+        b = pilha.pop()
+        a = pilha.pop()
+        if tk == "+":
+            pilha.append(a + b)
+        elif tk == "-":
+            pilha.append(a - b)
+        elif tk == "*":
+            pilha.append(a * b)
+        else:
+            pilha.append(a // b)
+    else:
+        pilha.append(int(tk))
+if valida and len(pilha) == 1:
+    print("Resultado:", pilha[0])
+else:
+    print("Expressão inválida")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: filas">
+  <h2>Prática 3: filas</h2>
+  <p class="lead">Use <code>collections.deque</code> (ou a sua classe <code>Fila</code>): nada de <code>pop(0)</code> em <code>list</code>.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Fila de atendimento <span class="lvl l2">médio</span></h3>
+      <p>Leia comandos, um por linha, até <code>fim</code>:</p>
+      <ul>
+        <li><code>chega NOME</code>: a pessoa entra na fila (o nome pode ter espaços);</li>
+        <li><code>atende</code>: mostra <code>Atendendo: NOME</code> para quem está na frente, ou <code>Fila vazia</code>;</li>
+        <li><code>fim</code>: mostra <code>Restam na fila: K</code> e termina.</li>
+      </ul>
+<textarea class="py" data-label="ex5_atendimento.py" data-stdin="chega Ana
+chega Bia
+atende
+chega Caio
+atende
+atende
+atende
+fim" data-tests='[{"in": "chega Ana\nchega Bia\natende\nchega Caio\natende\natende\natende\nfim", "out": ["Atendendo: Ana", "Atendendo: Bia", "Atendendo: Caio", "Fila vazia", "Restam na fila: 0"]}, {"in": "atende\nfim", "out": ["Fila vazia", "Restam na fila: 0"], "nao": ["Atendendo"]}, {"in": "chega Zé\nchega Lu\nfim", "out": ["Restam na fila: 2"], "nao": ["Atendendo", "Fila vazia"]}, {"in": "chega A\natende\nchega B\nchega C\natende\nfim", "out": ["Atendendo: A", "Atendendo: B", "Restam na fila: 1"], "nao": ["Atendendo: C", "Fila vazia"]}, {"in": "chega Maria José\nchega Ana\natende\nfim", "out": ["Atendendo: Maria José", "Restam na fila: 1"], "nao": ["Atendendo: Ana"]}]'>
+from collections import deque
+
+fila = deque()
+cmd = input()
+while cmd != "fim":
+    # trate "chega NOME" e "atende"
+    cmd = input()
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="chega Ana
+chega Bia
+atende
+chega Caio
+atende
+atende
+atende
+fim">
+from collections import deque
+
+fila = deque()
+cmd = input()
+while cmd != "fim":
+    partes = cmd.split(maxsplit=1)     # "chega Maria José" -> 2 partes
+    if partes[0] == "chega":
+        fila.append(partes[1])
+    elif partes[0] == "atende":
+        if fila:
+            print("Atendendo:", fila.popleft())
+        else:
+            print("Fila vazia")
+    cmd = input()
+print("Restam na fila:", len(fila))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. A roda da eliminação <span class="lvl l3">desafio</span></h3>
+      <p>Há <code>n</code> pessoas numeradas de 1 a <code>n</code> em roda. Começando pela pessoa 1, conta-se <code>k</code> pessoas (a primeira contada é a 1) e a <code>k</code>-ésima sai; a contagem recomeça pela pessoa seguinte. Leia <code>n k</code> e mostre a ordem de eliminação e o sobrevivente (problema de Josephus).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>7 3</pre></td><td><pre>Eliminados: 3 6 2 7 5 1
+Sobrevivente: 4</pre></td></tr></table></div>
+      <p>Dica: em um <code>deque</code>, passar as <code>k − 1</code> primeiras pessoas da frente para o fim simula a roda.</p>
+<textarea class="py" data-label="ex6_josephus.py" data-stdin="7 3" data-tests='[{"in": "7 3", "out": ["Eliminados: 3 6 2 7 5 1", "Sobrevivente: 4"]}, {"in": "5 2", "out": ["Eliminados: 2 4 1 5", "Sobrevivente: 3"]}, {"in": "6 1", "out": ["Eliminados: 1 2 3 4 5", "Sobrevivente: 6"]}, {"in": "10 2", "out": ["Eliminados: 2 4 6 8 10 3 7 1 9", "Sobrevivente: 5"]}, {"in": "1 4", "out": ["Sobrevivente: 1"]}, {"in": "4 10", "out": ["Eliminados: 2 3 1", "Sobrevivente: 4"]}]'>
+from collections import deque
+
+n, k = [int(x) for x in input("n e k: ").split()]
+
+# simule a roda e mostre Eliminados e Sobrevivente
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="7 3">
+from collections import deque
+
+n, k = [int(x) for x in input("n e k: ").split()]
+roda = deque(range(1, n + 1))
+eliminados = []
+while len(roda) > 1:
+    for _ in range(k - 1):
+        roda.append(roda.popleft())    # passa a vez: frente vai para o fim
+    eliminados.append(roda.popleft())  # a k-ésima sai
+print("Eliminados:", *eliminados)
+print("Sobrevivente:", roda[0])
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: acrescente à <code>ListaEncadeada</code> um método <code>remover_fim()</code> e conte quantos nós ele visita; implemente uma pilha com dois métodos e use-a para inverter uma palavra; simule uma fila de impressão em que cada documento leva um tempo diferente.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-listas-pilhas-filas",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "lista": {
+   "name": "Lista encadeada",
+   "color": "#0b78b0"
+  },
+  "dupla": {
+   "name": "Dupla e circular",
+   "color": "#0f7a62"
+  },
+  "pilha": {
+   "name": "Pilha",
+   "color": "#c2410c"
+  },
+  "fila": {
+   "name": "Fila",
+   "color": "#8e3a8f"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "quizzes": {
+  "estrutura": [
+   {
+    "q": "O botão “desfazer” de um editor de texto.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 0,
+    "why": "A última ação feita é a primeira a ser desfeita: LIFO."
+   },
+   {
+    "q": "Documentos enviados para uma impressora compartilhada.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 1,
+    "why": "Quem mandou primeiro imprime primeiro: FIFO."
+   },
+   {
+    "q": "Ler muitas vezes a nota do aluno na posição i de uma turma que quase não muda.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 3,
+    "why": "Acesso por posição é O(1) no vetor e O(n) na lista encadeada."
+   },
+   {
+    "q": "Uma playlist com botões “anterior” e “próxima” e músicas removidas a todo momento do meio.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 2,
+    "why": "Uma lista duplamente encadeada anda nos dois sentidos e remove um nó conhecido em O(1)."
+   },
+   {
+    "q": "Conferir se as tags de um HTML estão bem aninhadas (<b><i></i></b>).",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 0,
+    "why": "É o problema dos parênteses balanceados: a última tag aberta deve ser a primeira fechada."
+   },
+   {
+    "q": "Atender clientes de um banco por ordem de chegada.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 1,
+    "why": "Ordem de chegada é FIFO."
+   },
+   {
+    "q": "Percorrer sem parar os jogadores de uma partida (depois do último, volta ao primeiro), sem tirar ninguém da estrutura.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 2,
+    "why": "Uma lista circular dá a volta naturalmente: basta seguir prox, sem remover nem reinserir ninguém (uma fila em que cada um volta para o fim também simula o rodízio, mas tirando e recolocando)."
+   },
+   {
+    "q": "O botão “voltar” do navegador.",
+    "opts": [
+     "pilha",
+     "fila",
+     "lista encadeada",
+     "vetor (list)"
+    ],
+    "ans": 0,
+    "why": "Volta para a página visitada mais recentemente: LIFO."
+   }
+  ],
+  "saida": [
+   {
+    "code": "p = []\np.append(1)\np.append(2)\np.append(3)\np.pop()\nprint(p[-1])",
+    "opts": [
+     "1",
+     "2",
+     "3",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "pop() tira o 3 (topo); o novo topo é 2."
+   },
+   {
+    "code": "from collections import deque\nf = deque([1, 2, 3])\nf.append(4)\nf.popleft()\nprint(f[0])",
+    "opts": [
+     "1",
+     "2",
+     "4",
+     "3"
+    ],
+    "ans": 1,
+    "why": "popleft() tira o 1 da frente; a nova frente é 2."
+   },
+   {
+    "code": "class No:\n    def __init__(self, v, prox=None):\n        self.v = v\n        self.prox = prox\n\na = No(1, No(2, No(3)))\nprint(a.prox.prox.v)",
+    "opts": [
+     "1",
+     "2",
+     "3",
+     "None"
+    ],
+    "ans": 2,
+    "why": "a é o nó 1; a.prox é o 2; a.prox.prox é o 3."
+   },
+   {
+    "code": "s = \"abc\"\np = list(s)\nr = \"\"\nwhile p:\n    r += p.pop()\nprint(r)",
+    "opts": [
+     "abc",
+     "cba",
+     "a",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "Desempilhar devolve os caracteres na ordem inversa: inverter com pilha."
+   },
+   {
+    "q": "Qual o resultado da expressão pós-fixa 2 3 4 * + ?",
+    "opts": [
+     "20",
+     "14",
+     "24",
+     "9"
+    ],
+    "ans": 1,
+    "why": "3 4 * dá 12; depois 2 12 + dá 14. Equivale a 2 + 3 * 4."
+   },
+   {
+    "q": "Fila circular com capacidade 4, frente = 3 e tamanho = 2. Em que índice entra o próximo elemento?",
+    "opts": [
+     "5",
+     "1",
+     "0",
+     "2"
+    ],
+    "ans": 1,
+    "why": "trás = (frente + tamanho) % capacidade = (3 + 2) % 4 = 1."
+   },
+   {
+    "code": "class No:\n    def __init__(self, v):\n        self.v = v\n        self.prox = None\n\na, b = No(1), No(2)\na.prox = b\nb.prox = a\np, c = a, 0\nwhile c < 5:\n    p = p.prox\n    c += 1\nprint(p.v)",
+    "opts": [
+     "1",
+     "2",
+     "None",
+     "laço infinito"
+    ],
+    "ans": 1,
+    "why": "Lista circular de dois nós: 5 passos a partir de a alternam 2, 1, 2, 1, 2."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/listas-pilhas-filas.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

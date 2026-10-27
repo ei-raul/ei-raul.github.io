@@ -1,0 +1,24 @@
+/* Aula "Grafos" — complementa estruturas-viz.css */
+
+.gf-mat { border-collapse: collapse; font-family: var(--mono); font-size: .85rem; background: #fff; }
+.gf-mat th, .gf-mat td { width: 2rem; height: 1.9rem; text-align: center; border: 1px solid var(--line); }
+.gf-mat th { color: var(--text-muted); font-weight: 600; background: var(--bg-section); }
+.gf-mat td { color: #b3c0cc; }
+.gf-mat td.um { color: var(--primary-dark); font-weight: 700; }
+.gf-mat tr.sel td { background: color-mix(in srgb, var(--mod) 14%, #fff); }
+.gf-mat tr.sel td.um { background: var(--mod); color: #fff; }
+.gf-mat tr.sel th { color: var(--mod); }
+.ev-label + .tblwrap + .ev-label, div + div > .ev-label { margin-top: .8rem; }
+
+.gf-list { font-family: var(--mono); font-size: .88rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: .4rem .7rem; }
+.gf-list div { padding: .1rem .3rem; border-radius: 4px; }
+.gf-list div.sel { background: var(--mod); color: #fff; }
+.gf-list b { color: var(--mod); }
+.gf-list div.sel b { color: #fff; }
+
+.gf-dist td { font-family: var(--mono); text-align: center; }
+.gf-dist td:first-child { font-family: "Open Sans", sans-serif; color: var(--text-muted); text-align: left; }
+.gf-dist td.fix { background: #e3f5ec; font-weight: 700; }
+.gf-dist td.upd { background: #fff3d6; font-weight: 700; }
+
+.ev-split .ev-arr { flex-wrap: wrap; }

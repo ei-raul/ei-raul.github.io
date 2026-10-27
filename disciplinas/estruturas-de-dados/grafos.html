@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grafos — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: grafos, matriz e lista de adjacência, busca em largura e em profundidade, componentes conexas, menor caminho, Dijkstra e ordenação topológica. Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+  <link href="../../assets/css/ed-viz/grafos.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Grafos</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Grafos</h1>
+  <p class="sub">Redes sociais, mapas, a internet e a grade de disciplinas do curso têm a mesma forma: coisas ligadas a outras coisas. Hoje vamos representar essas ligações no computador e percorrê-las para responder perguntas como “qual o caminho mais curto?” e “em que ordem fazer?”.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="rep" style="color:var(--c-rep)"><span class="sym">G = (V, E)</span><span class="nm">Conceitos e representações</span><span class="ds">matriz, lista e lista de arestas</span></a>
+    <a href="#" data-goto="perc" style="color:var(--c-perc)"><span class="sym">BFS · DFS</span><span class="nm">Percursos</span><span class="ds">em largura e em profundidade</span></a>
+    <a href="#" data-goto="apl" style="color:var(--c-apl)"><span class="sym">s → t</span><span class="nm">Aplicações</span><span class="ds">caminhos mínimos, Dijkstra, ordem topológica</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram os algoritmos passo a passo: escolha a origem, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="O que é um grafo?">
+  <h2>O que é um grafo?</h2>
+  <div class="cols">
+    <div>
+      <p>Um <strong>grafo</strong> <code>G = (V, E)</code> é um conjunto de <strong>vértices</strong> (V, os objetos) ligados por <strong>arestas</strong> (E, as relações entre pares de objetos).</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Situação</th><th>Vértices</th><th>Arestas</th></tr>
+        <tr><td>rede social</td><td>pessoas</td><td>amizades ou “segue”</td></tr>
+        <tr><td>mapa</td><td>cidades, esquinas</td><td>estradas, ruas (com distância)</td></tr>
+        <tr><td>curso</td><td>disciplinas</td><td>pré-requisitos</td></tr>
+        <tr><td>internet</td><td>páginas, roteadores</td><td>links, cabos</td></tr>
+      </table></div>
+      <p>Listas e árvores são casos particulares de grafos. A diferença é que, num grafo geral, qualquer vértice pode se ligar a qualquer outro, inclusive formando <strong>ciclos</strong>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="amizades.py">
+# Uma rede de amizades: cada pessoa aponta para seus amigos
+amigos = {
+    "Ana":  ["Bia", "Caio"],
+    "Bia":  ["Ana", "Davi"],
+    "Caio": ["Ana", "Davi", "Eva"],
+    "Davi": ["Bia", "Caio"],
+    "Eva":  ["Caio"],
+}
+print("vértices:", len(amigos))
+arestas = sum(len(lista) for lista in amigos.values()) // 2
+print("arestas:", arestas)        # cada amizade aparece duas vezes
+print("amigos da Eva:", amigos["Eva"])
+print("Ana e Davi são amigos?", "Davi" in amigos["Ana"])
+</textarea>
+      <div class="note">Desenhe essa rede no quadro com a turma: 5 vértices e quantas arestas? Quem tem mais amigos?</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONCEITOS E REPRESENTAÇÕES ===================== -->
+<section class="slide" data-mod="rep" data-title="Vocabulário dos grafos">
+  <h2>Vocabulário dos grafos</h2>
+  <div class="cols">
+    <div>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Termo</th><th>Significado</th></tr>
+        <tr><td><strong>não dirigido</strong></td><td>a aresta vale nos dois sentidos (amizade)</td></tr>
+        <tr><td><strong>dirigido</strong> (dígrafo)</td><td>a aresta tem sentido u → v (“segue”, pré-requisito)</td></tr>
+        <tr><td><strong>ponderado</strong></td><td>cada aresta tem um peso (distância, custo, tempo)</td></tr>
+        <tr><td><strong>grau</strong></td><td>número de arestas de um vértice; no dirigido, grau de <em>entrada</em> e de <em>saída</em></td></tr>
+        <tr><td><strong>caminho</strong></td><td>sequência de vértices ligados por arestas</td></tr>
+        <tr><td><strong>ciclo</strong></td><td>caminho que volta ao vértice inicial</td></tr>
+        <tr><td><strong>conexo</strong></td><td>existe caminho entre quaisquer dois vértices</td></tr>
+        <tr><td><strong>árvore</strong></td><td>grafo conexo e sem ciclos: tem exatamente V − 1 arestas</td></tr>
+      </table></div>
+      <div class="minis"><span class="mini">soma dos graus (não dirigido) <b>=</b> 2E</span><span class="mini">soma dos graus de saída <b>=</b> E</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="graus.py">
+# grafo dirigido: quem segue quem
+segue = {
+    "ana":  ["bia", "caio"],
+    "bia":  ["caio"],
+    "caio": ["ana"],
+    "davi": ["caio"],
+}
+entrada = {v: 0 for v in segue}
+for v in segue:
+    for w in segue[v]:
+        entrada[w] += 1
+
+for v in segue:
+    print(f"{v:5} segue {len(segue[v])} | é seguido por {entrada[v]}")
+total = sum(len(lista) for lista in segue.values())
+print("soma dos graus de saída =", total, "= número de arestas")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rep" data-title="Três formas de guardar o mesmo grafo">
+  <h2>Três formas de guardar o mesmo grafo</h2>
+  <p class="lead">O desenho é só para nós. O programa precisa de uma estrutura: <strong>matriz de adjacência</strong>, <strong>lista de adjacência</strong> ou <strong>lista de arestas</strong>. Clique em um vértice e compare.</p>
+  <div class="edviz" data-viz="grafo-rep" data-tipo="nd"></div>
+  <div class="note">Troque para <em>dirigido</em>: a matriz deixa de ser simétrica e cada aresta aparece só uma vez na lista. A lista de arestas é simplesmente <code>[(0, 1), (0, 3), (1, 2), (4, 1), …]</code>.</div>
+</section>
+
+<section class="slide" data-mod="rep" data-title="Matriz de adjacência">
+  <h2>Matriz de adjacência</h2>
+  <div class="cols">
+    <div>
+      <p>Uma matriz <code>V × V</code> em que <code>m[u][v] = 1</code> se existe a aresta u–v (ou o <strong>peso</strong> dela, num grafo ponderado), e 0 caso contrário.</p>
+      <ul>
+        <li><strong>Existe a aresta u–v?</strong> Basta olhar <code>m[u][v]</code>: O(1).</li>
+        <li><strong>Quais os vizinhos de v?</strong> Percorre a linha toda: O(V), mesmo que v tenha 1 vizinho.</li>
+        <li><strong>Memória:</strong> V² posições, sempre.</li>
+      </ul>
+      <p>Num grafo não dirigido a matriz é <strong>simétrica</strong>: <code>m[u][v] == m[v][u]</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="matriz_adj.py">
+n = 5
+arestas = [(0, 1), (0, 2), (1, 3), (2, 3), (3, 4)]
+m = [[0] * n for _ in range(n)]
+for u, v in arestas:
+    m[u][v] = 1
+    m[v][u] = 1          # não dirigido: vale nos dois sentidos
+
+for linha in m:
+    print(linha)
+
+print("existe 1-3?", m[1][3] == 1)       # O(1)
+vizinhos = [j for j in range(n) if m[3][j]]
+print("vizinhos de 3:", vizinhos)        # O(V): olha a linha toda
+print("grau de 3:", sum(m[3]))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rep" data-title="Lista de adjacência">
+  <h2>Lista de adjacência</h2>
+  <div class="cols">
+    <div>
+      <p>Para cada vértice, uma lista só com os seus vizinhos. Em Python, um <code>dict</code> de listas (ou uma lista de listas, se os vértices forem 0, 1, …, V−1).</p>
+      <ul>
+        <li><strong>Vizinhos de v:</strong> direto, O(grau de v). É o que os percursos mais usam.</li>
+        <li><strong>Existe u–v?</strong> Procura na lista de u: O(grau de u).</li>
+        <li><strong>Memória:</strong> O(V + E).</li>
+      </ul>
+      <p>Num grafo ponderado, cada vizinho vira um par <code>(vizinho, peso)</code>.</p>
+      <div class="note">A <strong>lista de arestas</strong> (<code>[(u, v), …]</code>) é o formato mais simples de ler da entrada e de ordenar por peso, mas responder “quem são os vizinhos de v” exige olhar todas as E arestas.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="lista_adj.py">
+n = 5
+arestas = [(0, 1), (0, 2), (1, 3), (2, 3), (3, 4)]
+g = {v: [] for v in range(n)}       # ou [[] for _ in range(n)]
+for u, v in arestas:
+    g[u].append(v)
+    g[v].append(u)
+
+for v in g:
+    print(v, "->", g[v])
+
+print("vizinhos de 3:", g[3])          # O(grau): direto
+print("existe 1-3?", 3 in g[1])        # O(grau de 1)
+
+# ponderado: pares (vizinho, peso)
+rotas = {"A": [("B", 7), ("C", 2)], "B": [("A", 7)], "C": [("A", 2)]}
+for destino, km in rotas["A"]:
+    print("A ->", destino, km, "km")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rep" data-title="Qual representação usar?">
+  <h2>Qual representação usar?</h2>
+  <div class="cols">
+    <div>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Operação</th><th>Matriz</th><th>Lista de adjacência</th><th>Lista de arestas</th></tr>
+        <tr><td>memória</td><td>O(V²)</td><td>O(V + E)</td><td>O(E)</td></tr>
+        <tr><td>existe u–v?</td><td><strong>O(1)</strong></td><td>O(grau u)</td><td>O(E)</td></tr>
+        <tr><td>vizinhos de v</td><td>O(V)</td><td><strong>O(grau v)</strong></td><td>O(E)</td></tr>
+        <tr><td>percorrer o grafo todo</td><td>O(V²)</td><td><strong>O(V + E)</strong></td><td>—</td></tr>
+      </table></div>
+      <p>A maioria dos grafos reais é <strong>esparsa</strong>: cada vértice tem poucos vizinhos comparado com V. Uma rede com 1 milhão de pessoas e 100 amigos por pessoa teria uma matriz de 10¹² posições, quase todas zero.</p>
+      <p><strong>Regra prática:</strong> lista de adjacência por padrão; matriz para grafos pequenos ou <strong>densos</strong>, ou quando a pergunta “existe u–v?” domina.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="memoria.py">
+for V, E in [(100, 300), (2000, 6000), (100000, 500000)]:
+    matriz = V * V
+    lista = V + 2 * E            # V listas + cada aresta duas vezes
+    densidade = E / (V * (V - 1) / 2) * 100
+    print(f"V = {V:6}, E = {E:6}: matriz {matriz:>14,} | lista {lista:>9,} | {densidade:.3f}% das arestas possíveis")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rep" data-title="Lendo um grafo da entrada">
+  <h2>Lendo um grafo da entrada</h2>
+  <div class="cols">
+    <div>
+      <p>Formato usado nos exercícios desta aula (e em maratonas de programação):</p>
+      <ul>
+        <li>primeira linha: <code>V E</code> — número de vértices e de arestas;</li>
+        <li>depois, <code>E</code> linhas <code>u v</code> (ou <code>u v peso</code>);</li>
+        <li>os vértices são numerados de <code>0</code> a <code>V − 1</code>.</li>
+      </ul>
+      <p>Como os vértices são números, uma <strong>lista de listas</strong> basta: <code>g[u]</code> é a lista de vizinhos de u.</p>
+      <div class="note">Ordenar cada lista de vizinhos deixa a saída <strong>determinística</strong>: os percursos sempre visitam os vizinhos do menor para o maior. Os exercícios contam com isso.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="ler_grafo.py" data-stdin="5 5
+0 1
+0 2
+1 3
+2 3
+3 4">
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    g[a].append(b)
+    g[b].append(a)          # retire esta linha se for dirigido
+
+for i in range(v):
+    g[i].sort()             # vizinhos em ordem crescente
+    print(i, ":", g[i])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PERCURSOS ===================== -->
+<section class="slide" data-mod="perc" data-title="Busca em largura (BFS)">
+  <h2>Busca em largura (BFS)</h2>
+  <p class="lead">A BFS explora o grafo em <strong>ondas</strong>: primeiro a origem, depois todos os vizinhos dela, depois os vizinhos dos vizinhos… Uma <strong>fila</strong> garante essa ordem.</p>
+  <div class="edviz" data-viz="percurso" data-modo="bfs" data-origem="0"></div>
+  <div class="note">Os números acima dos vértices são as distâncias em <strong>número de arestas</strong> a partir da origem. Troque a origem para 6 e preveja a ordem de visita antes de animar.</div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="BFS em Python">
+  <h2>BFS em Python</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Coloque a origem na fila com distância 0.</li>
+        <li>Enquanto a fila não estiver vazia, tire o <strong>primeiro</strong> vértice <code>v</code>.</li>
+        <li>Para cada vizinho <code>w</code> ainda não descoberto: <code>dist[w] = dist[v] + 1</code> e <code>w</code> entra no <strong>fim</strong> da fila.</li>
+      </ol>
+      <p>Cada vértice entra na fila uma vez e cada aresta é olhada uma vez (duas, se não dirigido): <strong>O(V + E)</strong>.</p>
+      <div class="note warn">Use <code>collections.deque</code>: <code>popleft()</code> é O(1). Com uma <code>list</code>, <code>pop(0)</code> desloca todos os elementos (O(n)) e a BFS fica quadrática.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="bfs.py">
+from collections import deque
+
+def bfs(g, s):
+    dist = {s: 0}
+    fila = deque([s])
+    while fila:
+        v = fila.popleft()          # o mais antigo da fila
+        for w in g[v]:
+            if w not in dist:       # ainda não descoberto
+                dist[w] = dist[v] + 1
+                fila.append(w)
+    return dist
+
+g = {0: [1, 3], 1: [0, 2, 4], 2: [1, 5], 3: [0, 4],
+     4: [1, 3, 5, 6], 5: [2, 4], 6: [4]}
+d = bfs(g, 0)
+for v in sorted(d):
+    print("distância de 0 até", v, "=", d[v])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="Teste de mesa da BFS">
+  <h2>Teste de mesa da BFS</h2>
+  <p class="lead">Acompanhe a fila e o dicionário <code>dist</code>. Repare que um vértice entra em <code>dist</code> no momento em que é <strong>descoberto</strong>, não quando sai da fila; por isso o 3 não entra duas vezes.</p>
+  <div class="trace" data-code="from collections import deque
+g = {0: [1, 2], 1: [3], 2: [3], 3: []}
+dist = {0: 0}
+fila = deque([0])
+while fila:
+    v = fila.popleft()
+    for w in g[v]:
+        if w not in dist:
+            dist[w] = dist[v] + 1
+            fila.append(w)
+print(dist)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;dist&quot;: &quot;{0: 0}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;a origem 0 está a 0 arestas de si mesma&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;fila&quot;: &quot;deque([0])&quot;, &quot;dist&quot;: &quot;{0: 0}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;a fila começa só com a origem&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;fila&quot;: &quot;deque([0])&quot;, &quot;dist&quot;: &quot;{0: 0}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tira o primeiro da fila: v = 0&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;1&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;primeiro vizinho de 0: w = 1&quot;}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;1&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;1&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;1 é novo: dist[1] = dist[0] + 1 = 1&quot;}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;1&quot;, &quot;fila&quot;: &quot;deque([1])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;1 entra no FIM da fila&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([1])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([1])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([1])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;2 é novo: dist[2] = 1&quot;}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([1, 2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([1, 2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;acabaram os vizinhos de 0&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;0&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([1, 2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;2&quot;, &quot;fila&quot;: &quot;deque([2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tira o próximo da fila: v = 1&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([2])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;3 é novo: dist[3] = dist[1] + 1 = 2&quot;}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([2, 3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([2, 3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;1&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([2, 3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;2&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v = 2&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;2&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;2&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;3 já está em dist: não entra de novo&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;2&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;2&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([3])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;3&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v = 3, que não tem vizinhos&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;3&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;3&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;fila vazia: o while termina&quot;}, {&quot;line&quot;: 11, &quot;vars&quot;: {&quot;v&quot;: &quot;3&quot;, &quot;w&quot;: &quot;3&quot;, &quot;fila&quot;: &quot;deque([])&quot;, &quot;dist&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}&quot;}, &quot;out&quot;: &quot;{0: 0, 1: 1, 2: 1, 3: 2}\n&quot;, &quot;note&quot;: &quot;distâncias de 0 até cada vértice&quot;}]" data-vars="[&quot;v&quot;, &quot;w&quot;, &quot;fila&quot;, &quot;dist&quot;]"></div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="Busca em profundidade (DFS)">
+  <h2>Busca em profundidade (DFS)</h2>
+  <p class="lead">A DFS faz o contrário: segue um caminho o mais fundo possível e só volta (<em>backtracking</em>) quando não há vizinho novo. É o jeito de explorar um labirinto com a mão na parede.</p>
+  <div class="edviz" data-viz="percurso" data-modo="dfs" data-origem="0"></div>
+  <div class="note">Compare com a BFS a partir do mesmo vértice: os vértices visitados são os mesmos, a <strong>ordem</strong> e as arestas usadas mudam. Os números agora indicam a ordem de visita.</div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="DFS recursiva e com pilha">
+  <h2>DFS recursiva e com pilha</h2>
+  <div class="cols">
+    <div>
+      <p>A versão recursiva é a mais curta: visitar <code>v</code> é marcar <code>v</code> e chamar a DFS para cada vizinho não visitado. A pilha de chamadas do Python guarda o caminho de volta.</p>
+      <p>Em grafos grandes, a recursão pode estourar o limite do Python (cerca de 1000 chamadas). Aí trocamos a pilha de chamadas por uma <strong>pilha explícita</strong> (<code>list</code> com <code>append</code>/<code>pop</code>).</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th></th><th>BFS</th><th>DFS</th></tr>
+        <tr><td>estrutura</td><td>fila (FIFO)</td><td>pilha (LIFO) ou recursão</td></tr>
+        <tr><td>explora</td><td>por camadas de distância</td><td>um caminho até o fim</td></tr>
+        <tr><td>bom para</td><td>menor caminho sem pesos</td><td>componentes, ciclos, ordem topológica</td></tr>
+        <tr><td>custo</td><td>O(V + E)</td><td>O(V + E)</td></tr>
+      </table></div>
+    </div>
+    <div>
+<textarea class="py" data-label="dfs.py">
+g = {0: [1, 3], 1: [0, 2, 4], 2: [1, 5], 3: [0, 4],
+     4: [1, 3, 5, 6], 5: [2, 4], 6: [4]}
+
+def dfs(v, visitado, ordem):
+    visitado.add(v)
+    ordem.append(v)
+    for w in g[v]:
+        if w not in visitado:
+            dfs(w, visitado, ordem)    # mergulha antes de ver os outros
+
+ordem = []
+dfs(0, set(), ordem)
+print("recursiva:", ordem)
+
+def dfs_pilha(s):
+    visitado, ordem = set(), []
+    pilha = [s]
+    while pilha:
+        v = pilha.pop()                # o último que entrou
+        if v in visitado:
+            continue
+        visitado.add(v)
+        ordem.append(v)
+        for w in reversed(g[v]):       # invertido para imitar a recursiva
+            if w not in visitado:
+                pilha.append(w)
+    return ordem
+
+print("com pilha:", dfs_pilha(0))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="Componentes conexas">
+  <h2>Componentes conexas</h2>
+  <div class="cols">
+    <div>
+      <p>Um grafo pode estar dividido em “ilhas” sem ligação entre si: as <strong>componentes conexas</strong>.</p>
+      <p>Para encontrá-las, percorra a partir de cada vértice ainda não visitado. Cada novo percurso (BFS ou DFS, tanto faz) descobre uma componente inteira.</p>
+      <p>Apesar do laço sobre todos os vértices, cada vértice e cada aresta são tratados uma vez só no total: <strong>O(V + E)</strong>.</p>
+      <div class="note">Aplicações: grupos de amigos, regiões de uma imagem com a mesma cor (o “balde de tinta” dos editores), verificar se uma rede de computadores está toda ligada.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="componentes.py">
+def componentes(n, g):
+    comp = [-1] * n               # componente de cada vértice
+    c = 0
+    for s in range(n):
+        if comp[s] == -1:         # começa uma componente nova
+            comp[s] = c
+            pilha = [s]
+            while pilha:
+                v = pilha.pop()
+                for w in g[v]:
+                    if comp[w] == -1:
+                        comp[w] = c
+                        pilha.append(w)
+            c += 1
+    return c, comp
+
+n = 8
+arestas = [(0, 1), (1, 2), (3, 4), (5, 6), (6, 7), (7, 5)]
+g = [[] for _ in range(n)]
+for u, v in arestas:
+    g[u].append(v)
+    g[v].append(u)
+
+total, comp = componentes(n, g)
+print("componentes:", total)
+print("componente de cada vértice:", comp)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="Detectando ciclos">
+  <h2>Detectando ciclos</h2>
+  <div class="cols">
+    <div>
+      <p>Num grafo <strong>não dirigido</strong>, durante a DFS, encontrar um vizinho já visitado que <strong>não é</strong> o vértice de onde viemos significa que há dois caminhos até ele: existe um ciclo.</p>
+      <p>Por isso a pilha guarda pares <code>(vértice, pai)</code>: a aresta de volta para o pai não conta como ciclo.</p>
+      <p>Uma <strong>árvore</strong> é justamente um grafo conexo sem ciclos. Ela tem sempre V − 1 arestas: uma a menos e ficaria desconexa, uma a mais e formaria um ciclo.</p>
+      <div class="note">Em grafos <strong>dirigidos</strong> a regra muda (um vértice visitado por outro ramo não forma ciclo). Veremos um jeito simples de detectar ciclos dirigidos na ordenação topológica.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="ciclo.py">
+def tem_ciclo(n, g):
+    visitado = [False] * n
+    for s in range(n):
+        if visitado[s]:
+            continue
+        visitado[s] = True
+        pilha = [(s, -1)]               # (vértice, de onde veio)
+        while pilha:
+            v, pai = pilha.pop()
+            for w in g[v]:
+                if not visitado[w]:
+                    visitado[w] = True
+                    pilha.append((w, v))
+                elif w != pai:
+                    return True         # chegou a w por outro caminho
+    return False
+
+def monta(n, arestas):
+    g = [[] for _ in range(n)]
+    for u, v in arestas:
+        g[u].append(v)
+        g[v].append(u)
+    return g
+
+arvore = monta(5, [(0, 1), (0, 2), (1, 3), (1, 4)])
+print("árvore tem ciclo?", tem_ciclo(5, arvore))
+outro = monta(5, [(0, 1), (1, 2), (2, 3), (3, 1), (3, 4)])
+print("outro tem ciclo?", tem_ciclo(5, outro))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="perc" data-title="Qual estrutura, qual algoritmo?">
+  <h2>Qual estrutura, qual algoritmo?</h2>
+  <p class="lead">Leia a situação para a turma, colete as respostas e só então clique.</p>
+  <div class="quiz" data-quiz="conceitos" data-label="Situação"></div>
+</section>
+
+<!-- ===================== APLICAÇÕES ===================== -->
+<section class="slide" data-mod="apl" data-title="Menor caminho sem pesos">
+  <h2>Menor caminho sem pesos</h2>
+  <div class="cols">
+    <div>
+      <p>Na BFS, um vértice é descoberto pela primeira vez pelo caminho com <strong>menos arestas</strong>. Guardando quem descobriu cada vértice (o <strong>pai</strong>), dá para reconstruir esse caminho.</p>
+      <p>Para montar a rota até <code>t</code>, siga os pais de <code>t</code> até a origem e inverta a lista.</p>
+      <p>Funciona quando todas as arestas “custam” o mesmo: número de estações, de conexões entre pessoas, de cliques entre páginas.</p>
+      <div class="note">Se o destino for encontrado, dá para parar a BFS ali mesmo (o <code>break</code>), pois a distância dele já é definitiva.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="menor_caminho.py">
+from collections import deque
+
+def caminho(g, s, t):
+    pai = {s: None}
+    fila = deque([s])
+    while fila:
+        v = fila.popleft()
+        if v == t:
+            break
+        for w in g[v]:
+            if w not in pai:
+                pai[w] = v            # w foi descoberto a partir de v
+                fila.append(w)
+    if t not in pai:
+        return None
+    rota = []
+    v = t
+    while v is not None:              # volta pelos pais até a origem
+        rota.append(v)
+        v = pai[v]
+    return rota[::-1]
+
+metro = {
+    "Centro": ["Benfica", "Aldeota"],
+    "Benfica": ["Centro", "Parangaba"],
+    "Aldeota": ["Centro", "Papicu"],
+    "Parangaba": ["Benfica", "Messejana"],
+    "Papicu": ["Aldeota", "Messejana"],
+    "Messejana": ["Parangaba", "Papicu"],
+    "Porto": [],
+}
+print(caminho(metro, "Benfica", "Papicu"))
+print(caminho(metro, "Centro", "Messejana"))
+print(caminho(metro, "Centro", "Porto"))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Labirintos: grafos implícitos">
+  <h2>Labirintos: grafos implícitos</h2>
+  <div class="cols">
+    <div>
+      <p>Nem sempre o grafo aparece como lista de arestas. Num mapa em grade, cada casa livre é um vértice e seus vizinhos são as casas livres acima, abaixo, à esquerda e à direita.</p>
+      <p>Não precisamos montar a lista de adjacência: calculamos os vizinhos <strong>na hora</strong>, somando os deslocamentos <code>(±1, 0)</code> e <code>(0, ±1)</code> e conferindo se a casa existe e não é parede.</p>
+      <p>A BFS a partir do início espalha as distâncias como uma mancha de tinta (<em>flood fill</em>). O mapa impresso mostra, em cada casa, quantos passos ela está do <code>S</code>.</p>
+      <div class="note">Experimente abrir ou fechar paredes (<code>#</code>) no mapa e veja o número de passos até <code>E</code> mudar.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="labirinto.py">
+from collections import deque
+
+mapa = [
+    "S..#....",
+    ".#.#.##.",
+    ".#...#..",
+    ".####.#.",
+    "......#E",
+]
+L, C = len(mapa), len(mapa[0])
+inicio, fim = (0, 0), (4, 7)
+dist = {inicio: 0}
+fila = deque([inicio])
+while fila:
+    i, j = fila.popleft()
+    for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1)):   # 4 direções
+        a, b = i + di, j + dj
+        if 0 <= a < L and 0 <= b < C and mapa[a][b] != "#" and (a, b) not in dist:
+            dist[(a, b)] = dist[(i, j)] + 1
+            fila.append((a, b))
+
+print("passos até E:", dist.get(fim, "sem caminho"))
+for i in range(L):
+    linha = ""
+    for j in range(C):
+        if mapa[i][j] == "#":
+            linha += " ##"
+        elif (i, j) in dist:
+            linha += f"{dist[(i, j)]:3}"
+        else:
+            linha += "  ."
+    print(linha)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Arestas com peso: Dijkstra">
+  <h2>Arestas com peso: algoritmo de Dijkstra</h2>
+  <p class="lead">Com pesos diferentes, o caminho com menos arestas pode não ser o mais curto. O <strong>Dijkstra</strong> sempre fixa o vértice pendente <strong>mais próximo</strong> da origem e tenta melhorar (<em>relaxar</em>) as distâncias dos vizinhos dele.</p>
+  <div class="edviz" data-viz="dijkstra" data-origem="0"></div>
+  <div class="note">Repare no vértice 1: a aresta direta 0–1 custa 4, mas o caminho 0 → 2 → 1 custa 1 + 2 = 3. O Dijkstra descobre isso ao relaxar as arestas do 2.</div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Dijkstra em Python">
+  <h2>Dijkstra em Python</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li><code>dist[s] = 0</code> e ∞ para os demais; a fila de prioridade começa com <code>(0, s)</code>.</li>
+        <li>Tire o par de <strong>menor distância</strong> <code>(d, u)</code>. Se <code>d</code> for maior que <code>dist[u]</code>, é uma entrada antiga: ignore.</li>
+        <li>Para cada vizinho <code>v</code> com peso <code>p</code>: se <code>dist[u] + p &lt; dist[v]</code>, atualize e coloque <code>(dist[v], v)</code> na fila.</li>
+      </ol>
+      <p>O <code>heapq</code> implementa a fila de prioridade (um <em>heap</em>, visto na aula de ordenação). Custo: <strong>O((V + E) log V)</strong>.</p>
+      <div class="note warn">O Dijkstra exige pesos <strong>não negativos</strong>. Com pesos negativos, uma distância “definitiva” poderia melhorar depois, e o algoritmo erra. Nesse caso usa-se Bellman-Ford.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="dijkstra.py">
+import heapq
+
+def dijkstra(g, s):
+    dist = {v: float("inf") for v in g}
+    dist[s] = 0
+    heap = [(0, s)]                       # (distância, vértice)
+    while heap:
+        d, u = heapq.heappop(heap)        # o pendente mais próximo
+        if d > dist[u]:
+            continue                      # entrada antiga: ignora
+        for v, peso in g[u]:
+            if dist[u] + peso < dist[v]:  # relaxamento
+                dist[v] = dist[u] + peso
+                heapq.heappush(heap, (dist[v], v))
+    return dist
+
+g = {0: [(1, 4), (2, 1)],
+     1: [(0, 4), (2, 2), (3, 5)],
+     2: [(0, 1), (1, 2), (3, 8), (4, 10)],
+     3: [(1, 5), (2, 8), (4, 2), (5, 6)],
+     4: [(2, 10), (3, 2), (5, 3)],
+     5: [(3, 6), (4, 3)]}
+d = dijkstra(g, 0)
+for v in d:
+    print("0 ->", v, ":", d[v])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Ordenação topológica">
+  <h2>Ordenação topológica</h2>
+  <p class="lead">Em que ordem cursar disciplinas com pré-requisitos? Num grafo dirigido <strong>sem ciclos</strong> (DAG), uma ordem topológica coloca cada vértice depois de todos os que apontam para ele.</p>
+  <div class="edviz" data-viz="topologica" data-grafo="ok"></div>
+  <div class="note">Algoritmo de Kahn: repetidamente retire um vértice com grau de entrada 0 e apague as setas que saem dele. Troque para o grafo com ciclo e veja onde o algoritmo trava.</div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Kahn em Python">
+  <h2>Algoritmo de Kahn em Python</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Calcule o grau de entrada de cada vértice.</li>
+        <li>Coloque os de grau 0 em <code>prontos</code>.</li>
+        <li>Retire um pronto, acrescente-o à ordem e diminua o grau de entrada de cada vizinho; quem chegar a 0 fica pronto.</li>
+        <li>Se a ordem terminar com menos de V vértices, há um ciclo.</li>
+      </ol>
+      <p>Pode haver várias ordens válidas. Usar um <code>heapq</code> em <code>prontos</code> escolhe sempre o <strong>menor</strong> número, deixando a resposta única. Custo: O(V + E), ou O((V + E) log V) com o heap.</p>
+      <div class="note">Outras aplicações: ordem de compilação de arquivos, instalação de pacotes com dependências, etapas de um projeto, células de uma planilha que dependem de outras.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="topologica.py">
+import heapq
+
+nomes = ["Lógica", "Estruturas de Dados", "POO", "Banco de Dados", "Web", "Projeto Integrador"]
+prereq = [(0, 1), (0, 2), (2, 4), (3, 4), (1, 5), (4, 5)]   # (antes, depois)
+n = len(nomes)
+g = [[] for _ in range(n)]
+grau = [0] * n
+for a, b in prereq:
+    g[a].append(b)
+    grau[b] += 1
+
+prontos = [v for v in range(n) if grau[v] == 0]
+heapq.heapify(prontos)                # desempate: menor número primeiro
+ordem = []
+while prontos:
+    u = heapq.heappop(prontos)
+    ordem.append(u)
+    for w in g[u]:
+        grau[w] -= 1
+        if grau[w] == 0:
+            heapq.heappush(prontos, w)
+
+if len(ordem) < n:
+    print("Impossível: há um ciclo de pré-requisitos")
+else:
+    for k, v in enumerate(ordem, 1):
+        print(k, nomes[v])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Desafio: quantas ilhas?">
+  <h2>Desafio: quantas ilhas?</h2>
+  <div class="cols">
+    <div>
+      <p>No mapa, <code>"1"</code> é terra e <code>"0"</code> é água. Uma <strong>ilha</strong> é um grupo de terras ligadas na horizontal ou na vertical (diagonal não conta).</p>
+      <p>Conte quantas ilhas existem. Para o mapa ao lado, a resposta é <strong>5</strong>.</p>
+      <p>É o problema das componentes conexas num grafo implícito em grade: para cada terra ainda não visitada, conte uma ilha nova e “pinte” toda a ilha com uma BFS ou DFS.</p>
+      <div class="minis"><span class="mini">vizinhos de (i, j) <b>→</b> (i±1, j), (i, j±1)</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_ilhas.py">
+mapa = [
+    "11000",
+    "11010",
+    "00100",
+    "00011",
+    "10011",
+]
+# conte as ilhas: grupos de "1" ligados na horizontal ou na vertical
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+from collections import deque
+
+mapa = [
+    "11000",
+    "11010",
+    "00100",
+    "00011",
+    "10011",
+]
+L, C = len(mapa), len(mapa[0])
+visto = set()
+ilhas = 0
+for i in range(L):
+    for j in range(C):
+        if mapa[i][j] == "1" and (i, j) not in visto:
+            ilhas += 1                 # terra nova: outra ilha
+            visto.add((i, j))
+            fila = deque([(i, j)])
+            while fila:                # pinta a ilha inteira
+                a, b = fila.popleft()
+                for x, y in ((a + 1, b), (a - 1, b), (a, b + 1), (a, b - 1)):
+                    if 0 <= x < L and 0 <= y < C and mapa[x][y] == "1" and (x, y) not in visto:
+                        visto.add((x, y))
+                        fila.append((x, y))
+print("Ilhas:", ilhas)
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="apl" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: representação e componentes">
+  <h2>Prática 1: representação e componentes</h2>
+  <p class="lead">Nos exercícios, o grafo vem no formato <code>V E</code> seguido de <code>E</code> linhas <code>u v</code>, com vértices de <code>0</code> a <code>V − 1</code>. <strong>✓ Verificar</strong> testa seu código com vários grafos, inclusive sem arestas.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. Graus dos vértices <span class="lvl l1">básico</span></h3>
+      <p>Leia um grafo <strong>não dirigido</strong> e mostre o grau de cada vértice (<code>Grau de v: g</code>, de 0 a V − 1). Por fim, mostre <code>Maior grau: g (vértice v)</code>; em caso de empate, o vértice de menor número.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>5 5
+0 1
+0 2
+1 2
+1 3
+3 4</pre></td><td><pre>Grau de 0: 2
+Grau de 1: 3
+Grau de 2: 2
+Grau de 3: 2
+Grau de 4: 1
+Maior grau: 3 (vértice 1)</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_graus.py" data-stdin="5 5
+0 1
+0 2
+1 2
+1 3
+3 4" data-tests='[{"in": "5 5\n0 1\n0 2\n1 2\n1 3\n3 4", "out": ["Grau de 0: 2", "Grau de 1: 3", "Grau de 2: 2", "Grau de 3: 2", "Grau de 4: 1", "Maior grau: 3 (vértice 1)"]}, {"in": "3 0", "out": ["Grau de 0: 0", "Grau de 2: 0", "Maior grau: 0 (vértice 0)"]}, {"in": "4 3\n0 3\n1 3\n2 3", "out": ["Grau de 3: 3", "Grau de 0: 1", "Maior grau: 3 (vértice 3)"]}, {"in": "4 2\n2 3\n0 1", "out": ["Grau de 2: 1", "Maior grau: 1 (vértice 0)"], "nao": ["vértice 2)", "vértice 3)"]}]'>
+v, e = [int(x) for x in input("V E: ").split()]
+
+# leia as e arestas e conte o grau de cada vértice
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="5 5
+0 1
+0 2
+1 2
+1 3
+3 4">
+v, e = [int(x) for x in input("V E: ").split()]
+grau = [0] * v
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    grau[a] += 1                 # não dirigido: conta nas duas pontas
+    grau[b] += 1
+for i in range(v):
+    print(f"Grau de {i}: {grau[i]}")
+m = 0
+for i in range(v):
+    if grau[i] > grau[m]:        # > mantém o menor vértice no empate
+        m = i
+print(f"Maior grau: {grau[m]} (vértice {m})")
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. Componentes conexas <span class="lvl l2">médio</span></h3>
+      <p>Leia um grafo <strong>não dirigido</strong> e mostre quantas componentes conexas ele tem (<code>Componentes: k</code>) e quantos vértices tem a maior delas (<code>Maior componente: m vértices</code>). Vértices isolados formam componentes de 1 vértice.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>6 3
+0 1
+1 2
+3 4</pre></td><td><pre>Componentes: 3
+Maior componente: 3 vértices</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_componentes.py" data-stdin="6 3
+0 1
+1 2
+3 4" data-tests='[{"in": "6 3\n0 1\n1 2\n3 4", "out": ["Componentes: 3", "Maior componente: 3 vértices"]}, {"in": "4 0", "out": ["Componentes: 4", "Maior componente: 1 vértices"]}, {"in": "5 4\n0 1\n1 2\n2 3\n3 4", "out": ["Componentes: 1", "Maior componente: 5 vértices"], "nao": ["Componentes: 2"]}, {"in": "7 5\n0 1\n2 3\n3 4\n4 2\n5 6", "out": ["Componentes: 3", "Maior componente: 3 vértices"]}, {"in": "1 0", "out": ["Componentes: 1", "Maior componente: 1 vértices"]}]'>
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    g[a].append(b)
+    g[b].append(a)
+
+# percorra a partir de cada vértice ainda não visitado
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="6 3
+0 1
+1 2
+3 4">
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    g[a].append(b)
+    g[b].append(a)
+
+visitado = [False] * v
+comps = 0
+maior = 0
+for s in range(v):
+    if not visitado[s]:
+        comps += 1
+        visitado[s] = True
+        pilha = [s]
+        tamanho = 0
+        while pilha:
+            x = pilha.pop()
+            tamanho += 1
+            for w in g[x]:
+                if not visitado[w]:
+                    visitado[w] = True
+                    pilha.append(w)
+        maior = max(maior, tamanho)
+print("Componentes:", comps)
+print("Maior componente:", maior, "vértices")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: BFS e menor caminho">
+  <h2>Prática 2: BFS e menor caminho</h2>
+  <p class="lead">Os dois exercícios pedem o menor número de passos: é a BFS, num grafo lido da entrada e num grafo implícito em grade.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Distância entre dois vértices <span class="lvl l1">básico</span></h3>
+      <p>Leia um grafo <strong>não dirigido</strong> e, na última linha, dois vértices <code>s t</code>. Mostre <code>Distância: d</code>, o menor número de arestas de <code>s</code> até <code>t</code>, ou <code>Sem caminho</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>6 6
+0 1
+0 2
+1 3
+2 3
+3 4
+4 5
+0 5</pre></td><td><pre>Distância: 4</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_distancia.py" data-stdin="6 6
+0 1
+0 2
+1 3
+2 3
+3 4
+4 5
+0 5" data-tests='[{"in": "6 6\n0 1\n0 2\n1 3\n2 3\n3 4\n4 5\n0 5", "out": ["Distância: 4"], "nao": ["Sem caminho"]}, {"in": "6 6\n0 1\n0 2\n1 3\n2 3\n3 4\n4 5\n2 2", "out": ["Distância: 0"]}, {"in": "4 1\n0 1\n0 3", "out": ["Sem caminho"], "nao": ["Distância"]}, {"in": "5 5\n0 1\n1 2\n2 3\n3 4\n0 4\n0 3", "out": ["Distância: 2"], "nao": ["Distância: 3"]}, {"in": "3 2\n0 1\n1 2\n2 0", "out": ["Distância: 2"]}]'>
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    g[a].append(b)
+    g[b].append(a)
+s, t = [int(x) for x in input("s t: ").split()]
+
+# BFS a partir de s
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="6 6
+0 1
+0 2
+1 3
+2 3
+3 4
+4 5
+0 5">
+from collections import deque
+
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    g[a].append(b)
+    g[b].append(a)
+s, t = [int(x) for x in input("s t: ").split()]
+
+dist = [-1] * v
+dist[s] = 0
+fila = deque([s])
+while fila:
+    x = fila.popleft()
+    for w in g[x]:
+        if dist[w] == -1:
+            dist[w] = dist[x] + 1
+            fila.append(w)
+if dist[t] == -1:
+    print("Sem caminho")
+else:
+    print("Distância:", dist[t])
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. Saída do labirinto <span class="lvl l2">médio</span></h3>
+      <p>Leia <code>L C</code> e depois <code>L</code> linhas do mapa: <code>.</code> livre, <code>#</code> parede, <code>S</code> início e <code>E</code> saída. Andando nas 4 direções, mostre <code>Passos: d</code> (o menor número de passos de S até E) ou <code>Sem saída</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3 4
+S..E
+.##.
+....</pre></td><td><pre>Passos: 3</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_labirinto.py" data-stdin="3 4
+S..E
+.##.
+...." data-tests='[{"in": "3 4\nS..E\n.##.\n....", "out": ["Passos: 3"], "nao": ["Sem saída"]}, {"in": "5 5\nS.#..\n..#.#\n#...#\n.#...\n...#E", "out": ["Passos: 8"]}, {"in": "5 5\nS.#..\n..#.#\n#...#\n.#.#.\n...#E", "out": ["Sem saída"], "nao": ["Passos"]}, {"in": "3 3\nS#E\n##.\n...", "out": ["Sem saída"], "nao": ["Passos"]}, {"in": "1 2\nSE", "out": ["Passos: 1"]}, {"in": "4 6\nS.....\n####..\n...#..\nE.....", "out": ["Passos: 11"]}]'>
+l, c = [int(x) for x in input("L C: ").split()]
+mapa = [input() for _ in range(l)]
+
+# encontre S e faça uma BFS pelas casas livres até E
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3 4
+S..E
+.##.
+....">
+from collections import deque
+
+l, c = [int(x) for x in input("L C: ").split()]
+mapa = [input() for _ in range(l)]
+for i in range(l):
+    for j in range(c):
+        if mapa[i][j] == "S":
+            inicio = (i, j)
+dist = {inicio: 0}
+fila = deque([inicio])
+resp = -1
+while fila:
+    i, j = fila.popleft()
+    if mapa[i][j] == "E":
+        resp = dist[(i, j)]
+        break
+    for a, b in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
+        if 0 <= a < l and 0 <= b < c and mapa[a][b] != "#" and (a, b) not in dist:
+            dist[(a, b)] = dist[(i, j)] + 1
+            fila.append((a, b))
+if resp == -1:
+    print("Sem saída")
+else:
+    print("Passos:", resp)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: grafos dirigidos e ponderados">
+  <h2>Prática 3: grafos dirigidos e ponderados</h2>
+  <p class="lead">Agora as arestas têm <strong>sentido</strong>: a linha <code>u v</code> significa apenas u → v.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Ordem das disciplinas <span class="lvl l2">médio</span></h3>
+      <p>Cada linha <code>u v</code> diz que a disciplina <code>u</code> é pré-requisito de <code>v</code>. Mostre uma ordem para cursar todas (<code>Ordem: a b c …</code>), escolhendo sempre a de <strong>menor número</strong> entre as disponíveis. Se houver ciclo, mostre <code>Impossível: há ciclo</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>6 6
+0 1
+0 2
+2 4
+3 4
+1 5
+4 5</pre></td><td><pre>Ordem: 0 1 2 3 4 5</pre></td></tr></table></div>
+<textarea class="py" data-label="ex5_topologica.py" data-stdin="6 6
+0 1
+0 2
+2 4
+3 4
+1 5
+4 5" data-tests='[{"in": "6 6\n0 1\n0 2\n2 4\n3 4\n1 5\n4 5", "out": ["Ordem: 0 1 2 3 4 5"]}, {"in": "3 3\n0 1\n1 2\n2 0", "out": ["Impossível: há ciclo"], "nao": ["Ordem:"]}, {"in": "4 0", "out": ["Ordem: 0 1 2 3"]}, {"in": "5 4\n4 0\n3 0\n2 1\n0 1", "out": ["Ordem: 2 3 4 0 1"], "nao": ["Ordem: 0"]}, {"in": "4 4\n0 1\n1 2\n2 1\n0 3", "out": ["Impossível: há ciclo"], "nao": ["Ordem:"]}]'>
+v, e = [int(x) for x in input("V E: ").split()]
+
+# monte as listas de vizinhos e os graus de entrada; use heapq para escolher o menor pronto
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="6 6
+0 1
+0 2
+2 4
+3 4
+1 5
+4 5">
+import heapq
+
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+grau = [0] * v
+for _ in range(e):
+    a, b = [int(x) for x in input().split()]
+    g[a].append(b)
+    grau[b] += 1
+
+prontos = [x for x in range(v) if grau[x] == 0]
+heapq.heapify(prontos)
+ordem = []
+while prontos:
+    u = heapq.heappop(prontos)
+    ordem.append(u)
+    for w in g[u]:
+        grau[w] -= 1
+        if grau[w] == 0:
+            heapq.heappush(prontos, w)
+if len(ordem) < v:
+    print("Impossível: há ciclo")
+else:
+    print("Ordem:", " ".join(str(x) for x in ordem))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. Menores distâncias com pesos <span class="lvl l3">desafio</span></h3>
+      <p>Leia um grafo <strong>dirigido</strong> com linhas <code>u v peso</code> (pesos não negativos) e, na última linha, a origem <code>s</code>. Para cada vértice, de 0 a V − 1, mostre <code>Distância até v: d</code> ou <code>Distância até v: inalcançável</code>. Use o Dijkstra com <code>heapq</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3 2
+0 1 5
+1 2 1
+0</pre></td><td><pre>Distância até 0: 0
+Distância até 1: 5
+Distância até 2: 6</pre></td></tr></table></div>
+<textarea class="py" data-label="ex6_dijkstra.py" data-stdin="3 2
+0 1 5
+1 2 1
+0" data-tests='[{"in": "5 7\n0 1 4\n0 2 1\n2 1 2\n1 3 1\n2 3 5\n3 4 3\n4 0 1\n0", "out": ["Distância até 0: 0", "Distância até 1: 3", "Distância até 2: 1", "Distância até 3: 4", "Distância até 4: 7"], "nao": ["Distância até 1: 4"]}, {"in": "3 1\n0 1 5\n0", "out": ["Distância até 1: 5", "Distância até 2: inalcançável"]}, {"in": "4 4\n0 1 10\n0 2 1\n2 3 1\n3 1 1\n0", "out": ["Distância até 1: 3", "Distância até 2: 1", "Distância até 3: 2"], "nao": ["Distância até 1: 10"]}, {"in": "5 7\n0 1 4\n0 2 1\n2 1 2\n1 3 1\n2 3 5\n3 4 3\n4 0 1\n3", "out": ["Distância até 3: 0", "Distância até 4: 3", "Distância até 0: 4", "Distância até 2: 5", "Distância até 1: 7"]}, {"in": "2 1\n1 0 3\n0", "out": ["Distância até 0: 0", "Distância até 1: inalcançável"], "nao": ["Distância até 1: 3"]}]'>
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b, p = [int(x) for x in input().split()]
+    g[a].append((b, p))         # dirigido: só a -> b
+s = int(input("Origem: "))
+
+# Dijkstra a partir de s
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3 2
+0 1 5
+1 2 1
+0">
+import heapq
+
+v, e = [int(x) for x in input("V E: ").split()]
+g = [[] for _ in range(v)]
+for _ in range(e):
+    a, b, p = [int(x) for x in input().split()]
+    g[a].append((b, p))
+s = int(input("Origem: "))
+
+INF = float("inf")
+dist = [INF] * v
+dist[s] = 0
+heap = [(0, s)]
+while heap:
+    d, u = heapq.heappop(heap)
+    if d > dist[u]:
+        continue
+    for w, p in g[u]:
+        if d + p < dist[w]:
+            dist[w] = d + p
+            heapq.heappush(heap, (dist[w], w))
+for x in range(v):
+    if dist[x] == INF:
+        print(f"Distância até {x}: inalcançável")
+    else:
+        print(f"Distância até {x}: {dist[x]}")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: monte o grafo das suas disciplinas e gere uma ordem topológica; descubra se uma rede de amigos tem alguém a mais de 3 “apertos de mão” de você; adapte o labirinto para contar também os movimentos na diagonal.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-grafos",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "rep": {
+   "name": "Conceitos e representações",
+   "color": "#0b78b0"
+  },
+  "perc": {
+   "name": "Percursos",
+   "color": "#0f7a62"
+  },
+  "apl": {
+   "name": "Aplicações",
+   "color": "#c2410c"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "quizzes": {
+  "conceitos": [
+   {
+    "q": "Rede de seguidores: A seguir B não significa que B segue A. Que tipo de grafo é?",
+    "opts": [
+     "não dirigido",
+     "dirigido",
+     "árvore",
+     "matriz"
+    ],
+    "ans": 1,
+    "why": "A relação tem sentido (A → B), então cada aresta é uma seta: grafo dirigido."
+   },
+   {
+    "q": "Um grafo com 100 mil vértices e 300 mil arestas. Qual representação?",
+    "opts": [
+     "matriz de adjacência",
+     "lista de adjacência"
+    ],
+    "ans": 1,
+    "why": "Ele é esparso: a matriz teria 10 bilhões de posições, quase todas zero. A lista usa O(V + E)."
+   },
+   {
+    "q": "Um programa pergunta milhões de vezes “existe a aresta u–v?” em um grafo pequeno e denso.",
+    "opts": [
+     "matriz de adjacência",
+     "lista de adjacência",
+     "lista de arestas"
+    ],
+    "ans": 0,
+    "why": "Na matriz a resposta é m[u][v]: O(1). Para grafos pequenos ou densos, a memória V² não pesa."
+   },
+   {
+    "q": "Qual o menor número de “apertos de mão” entre você e uma pessoa famosa?",
+    "opts": [
+     "BFS",
+     "DFS",
+     "Dijkstra",
+     "ordenação topológica"
+    ],
+    "ans": 0,
+    "why": "Todas as arestas valem 1: a BFS encontra o caminho com menos arestas."
+   },
+   {
+    "q": "Menor tempo de viagem entre duas cidades, com estradas de durações diferentes.",
+    "opts": [
+     "BFS",
+     "DFS",
+     "Dijkstra",
+     "ordenação topológica"
+    ],
+    "ans": 2,
+    "why": "Arestas com pesos (não negativos): Dijkstra. A BFS só conta arestas."
+   },
+   {
+    "q": "Em que ordem instalar pacotes que dependem uns dos outros?",
+    "opts": [
+     "BFS",
+     "Dijkstra",
+     "ordenação topológica",
+     "busca binária"
+    ],
+    "ans": 2,
+    "why": "Dependências formam um grafo dirigido; cada pacote deve vir depois das suas dependências."
+   },
+   {
+    "q": "Uma árvore com 50 vértices tem quantas arestas?",
+    "opts": [
+     "49",
+     "50",
+     "51",
+     "depende"
+    ],
+    "ans": 0,
+    "why": "Toda árvore (conexa e sem ciclos) com V vértices tem exatamente V − 1 arestas."
+   },
+   {
+    "q": "Num grafo não dirigido com 12 arestas, quanto dá a soma dos graus de todos os vértices?",
+    "opts": [
+     "12",
+     "24",
+     "6",
+     "depende de V"
+    ],
+    "ans": 1,
+    "why": "Cada aresta soma 1 ao grau de cada uma das suas duas pontas: a soma é 2E = 24."
+   },
+   {
+    "q": "Qual o custo da BFS ou da DFS com lista de adjacência?",
+    "opts": [
+     "O(V)",
+     "O(E)",
+     "O(V + E)",
+     "O(V²)"
+    ],
+    "ans": 2,
+    "why": "Cada vértice é visitado uma vez e cada lista de vizinhos é percorrida uma vez."
+   }
+  ],
+  "saida": [
+   {
+    "code": "g = {0: [1, 2], 1: [0], 2: [0]}\nprint(len(g[0]), sum(len(v) for v in g.values()))",
+    "opts": [
+     "2 4",
+     "2 2",
+     "3 4",
+     "2 3"
+    ],
+    "ans": 0,
+    "why": "O vértice 0 tem 2 vizinhos; somando todas as listas, cada uma das 2 arestas aparece duas vezes: 4."
+   },
+   {
+    "code": "m = [[0, 1, 1],\n     [0, 0, 1],\n     [0, 0, 0]]\nprint(sum(m[0]), sum(linha[2] for linha in m))",
+    "opts": [
+     "2 2",
+     "2 1",
+     "1 2",
+     "3 3"
+    ],
+    "ans": 0,
+    "why": "A linha 0 dá o grau de saída de 0 (duas setas); a coluna 2 dá o grau de entrada de 2 (setas vindas de 0 e de 1)."
+   },
+   {
+    "code": "from collections import deque\ng = {0: [2, 1], 1: [3], 2: [3], 3: []}\nvisto, fila, ordem = {0}, deque([0]), []\nwhile fila:\n    v = fila.popleft()\n    ordem.append(v)\n    for w in g[v]:\n        if w not in visto:\n            visto.add(w)\n            fila.append(w)\nprint(ordem)",
+    "opts": [
+     "[0, 2, 1, 3]",
+     "[0, 1, 2, 3]",
+     "[0, 2, 3, 1]",
+     "[0, 1, 3, 2]"
+    ],
+    "ans": 0,
+    "why": "BFS: os vizinhos de 0 entram na ordem da lista (2, depois 1); o 3 só sai da fila depois deles."
+   },
+   {
+    "code": "g = {0: [2, 1], 1: [3], 2: [3], 3: []}\nordem = []\ndef dfs(v):\n    ordem.append(v)\n    for w in g[v]:\n        if w not in ordem:\n            dfs(w)\ndfs(0)\nprint(ordem)",
+    "opts": [
+     "[0, 2, 1, 3]",
+     "[0, 2, 3, 1]",
+     "[0, 1, 3, 2]",
+     "[0, 1, 2, 3]"
+    ],
+    "ans": 1,
+    "why": "DFS: de 0 mergulha em 2, de 2 em 3; só depois volta a 0 e visita o 1."
+   },
+   {
+    "code": "from collections import deque\nf = deque([1, 2])\nf.append(3)\nf.popleft()\nprint(list(f))",
+    "opts": [
+     "[2, 3]",
+     "[1, 2]",
+     "[1, 2, 3]",
+     "[3]"
+    ],
+    "ans": 0,
+    "why": "append coloca no fim e popleft tira do início: sai o 1, ficam 2 e 3 (fila FIFO)."
+   },
+   {
+    "code": "import heapq\nh = []\nheapq.heappush(h, (5, 'a'))\nheapq.heappush(h, (2, 'b'))\nheapq.heappush(h, (9, 'c'))\nprint(heapq.heappop(h)[1])",
+    "opts": [
+     "a",
+     "b",
+     "c",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "heappop devolve o menor par; tuplas comparam primeiro a distância: (2, 'b')."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/grafos.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

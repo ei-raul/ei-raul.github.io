@@ -1,0 +1,4 @@
+/* Aula "Árvores balanceadas": subárvores genéricas (T1, T2…) nas demonstrações de rotação */
+.ev-tnode.sub circle { fill: var(--bg-section); stroke: #9fb7cf; stroke-dasharray: 4 3; }
+.ev-tnode.sub text { font-size: 12px; fill: var(--text-muted); }
+.ev-tnode.sub .ev-badge { fill: var(--text-muted); font-weight: 600; }

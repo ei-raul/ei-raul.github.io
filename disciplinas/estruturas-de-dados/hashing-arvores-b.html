@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hashing, árvores B/B+ e organização de arquivos — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: tabelas hash e tratamento de colisões, organização de arquivos em disco, índices e árvores B e B+. Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+  <link href="../../assets/css/ed-viz/hashing-arvores-b.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Hashing, árvores B/B+ e arquivos</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Hashing, árvores B/B+ e organização de arquivos</h1>
+  <p class="sub">Como um banco de dados encontra um registro entre bilhões lendo só três ou quatro blocos do disco? Hoje vamos ver duas respostas: calcular onde o dado está (hashing) e usar árvores largas e baixas, feitas para o disco (árvores B e B+).</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="hash" style="color:var(--c-hash)"><span class="sym">k mod m</span><span class="nm">Tabelas hash</span><span class="ds">a chave diz onde o dado está</span></a>
+    <a href="#" data-goto="arq" style="color:var(--c-arq)"><span class="sym">▤ ▤ ▤</span><span class="nm">Arquivos</span><span class="ds">registros, blocos e índices</span></a>
+    <a href="#" data-goto="btree" style="color:var(--c-btree)"><span class="sym">[ 20 | 40 ]</span><span class="nm">Árvores B e B+</span><span class="ds">poucos níveis, nós do tamanho de um bloco</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram os algoritmos passo a passo: altere os dados, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Buscar sem procurar">
+  <h2>Buscar sem procurar</h2>
+  <div class="cols">
+    <div>
+      <p>Até aqui, buscar era <strong>comparar</strong>: O(n) na busca sequencial, O(log n) na binária. Dá para fazer melhor?</p>
+      <p>Se as chaves fossem números pequenos, por exemplo matrículas de 0 a 999, bastaria um vetor de 1000 posições e usar a <strong>própria chave como índice</strong>: <code>alunos[427]</code>. Isso é <strong>endereçamento direto</strong>, O(1).</p>
+      <p>O problema: chaves reais vêm de universos enormes (CPF, placas, nomes). A ideia do <strong>hashing</strong> é usar uma função que transforma qualquer chave em um índice de uma tabela pequena:</p>
+      <p><code>posição = h(chave)</code>, com <code>0 ≤ h(chave) &lt; m</code></p>
+      <div class="note">O <code>dict</code> e o <code>set</code> do Python são tabelas hash. É por isso que <code>x in conjunto</code> foi tão mais rápido que <code>x in lista</code> na aula de complexidade.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="enderecamento_direto.py">
+# Matrículas de 0 a 999: um vetor indexado pela própria chave
+alunos = [None] * 1000
+alunos[427] = "Ana"
+alunos[38] = "Bruno"
+print(alunos[427])          # O(1): a chave É o endereço
+
+# CPF tem 11 dígitos: o vetor teria 100 bilhões de posições!
+cpf = 12345678909
+m = 13                       # uma tabela pequena
+print("posição na tabela:", cpf % m)
+
+agenda = {"Ana": "9999-1111", "Bruno": "8888-2222"}
+print(agenda["Bruno"])      # o dict faz isso por nós
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HASHING ===================== -->
+<section class="slide" data-mod="hash" data-title="Funções hash">
+  <h2>Funções hash</h2>
+  <div class="cols">
+    <div>
+      <p>Uma boa função hash é:</p>
+      <ul>
+        <li><strong>determinística:</strong> a mesma chave sempre dá a mesma posição;</li>
+        <li><strong>rápida:</strong> O(1) para números, O(tamanho) para textos;</li>
+        <li><strong>espalhadora:</strong> distribui as chaves por igual entre as <code>m</code> posições.</li>
+      </ul>
+      <table class="tbl">
+        <tr><th>Método</th><th>Fórmula</th></tr>
+        <tr><td>divisão (inteiros)</td><td><code>h(k) = k mod m</code>, com <code>m</code> primo</td></tr>
+        <tr><td>polinomial (textos)</td><td><code>h = (h × 31 + código do caractere) mod m</code></td></tr>
+        <tr><td>djb2 (textos)</td><td><code>h = h × 33 + c</code>, começando em 5381</td></tr>
+      </table>
+      <div class="note warn">Por que <code>m</code> primo? Com <code>m = 10</code>, <code>k mod 10</code> só olha o último dígito: chaves terminadas em 0 colidem todas. Um primo usa todos os dígitos.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="funcoes_hash.py">
+def h_div(k, m):
+    return k % m
+
+def h_str(s, m):
+    h = 0
+    for c in s:
+        h = (h * 31 + ord(c)) % m    # a posição de cada letra importa
+    return h
+
+def h_ruim(s, m):
+    return len(s) % m              # só olha o tamanho: péssima
+
+m = 7
+for nome in ["ana", "bia", "caio", "duda", "eva", "rui", "lia"]:
+    print(f"{nome:5} h_str = {h_str(nome, m)}   h_ruim = {h_ruim(nome, m)}")
+
+print(h_str("roma", m), h_str("amor", m))   # anagramas, posições diferentes
+print([h_div(k, 10) for k in [10, 20, 30, 40]])   # m = 10: tudo colide
+print([h_div(k, 11) for k in [10, 20, 30, 40]])   # m primo: espalha
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Colisões são inevitáveis">
+  <h2>Colisões são inevitáveis</h2>
+  <div class="cols">
+    <div>
+      <p>Uma <strong>colisão</strong> acontece quando duas chaves diferentes caem na mesma posição: <code>h(a) == h(b)</code>.</p>
+      <p>Com mais chaves possíveis do que posições, sempre existem chaves diferentes com a mesma posição (princípio da casa dos pombos). E acontecem <strong>muito antes</strong> de a tabela encher: é o <strong>paradoxo do aniversário</strong>. Com só 23 pessoas, a chance de duas fazerem aniversário no mesmo dia já passa de 50%.</p>
+      <p>Então toda tabela hash precisa de uma <strong>estratégia de tratamento de colisões</strong>. Veremos duas famílias:</p>
+      <ul>
+        <li><strong>encadeamento:</strong> cada posição guarda uma lista;</li>
+        <li><strong>endereçamento aberto:</strong> procura outra posição livre na própria tabela.</li>
+      </ul>
+    </div>
+    <div>
+<textarea class="py" data-label="aniversario.py">
+import random
+
+def tem_colisao(n_chaves, m):
+    usadas = set()
+    for _ in range(n_chaves):
+        pos = random.randrange(m)    # uma função hash "perfeita"
+        if pos in usadas:
+            return True
+        usadas.add(pos)
+    return False
+
+m = 365
+for n in [10, 23, 40, 60]:
+    vezes = sum(tem_colisao(n, m) for _ in range(2000))
+    print(f"{n:3} chaves em {m} posições: colisão em {vezes / 20:.0f}% das vezes")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Encadeamento">
+  <h2>Tratamento por encadeamento</h2>
+  <p class="lead">Cada posição da tabela aponta para uma <strong>lista</strong> com todas as chaves que caíram ali. Inserir é acrescentar na lista; buscar é calcular <code>h(k)</code> e percorrer só aquela lista.</p>
+  <div class="edviz" data-viz="hash-tabela" data-est="enc" data-m="7" data-keys="10 22 31 4 15 28 17" data-chave="24"></div>
+  <div class="cols even">
+    <div>
+      <p>Com <code>n</code> chaves e <code>m</code> posições, as listas têm em média <code>α = n / m</code> elementos: o <strong>fator de carga</strong>. Buscar custa O(1 + α) em média.</p>
+      <p>Se mantivermos α limitado (por exemplo, até 1), a busca é <strong>O(1) em média</strong>.</p>
+    </div>
+    <div>
+      <div class="note warn">Pior caso: uma função hash ruim (ou azar) manda todas as chaves para a mesma lista. A tabela vira uma lista encadeada e a busca cai para <strong>O(n)</strong>. Experimente inserir 3, 10, 17, 24 com m = 7.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="TabelaHash com encadeamento em Python">
+  <h2>Uma TabelaHash com encadeamento</h2>
+  <div class="cols">
+    <div>
+      <p>Cada posição é uma lista de pares <code>[chave, valor]</code>. As três operações começam do mesmo jeito: calcular <code>h(chave)</code> e olhar só a lista daquela posição.</p>
+      <table class="tbl">
+        <tr><th>Operação</th><th>Média</th><th>Pior caso</th></tr>
+        <tr><td><code>inserir</code></td><td>O(1)</td><td>O(n)</td></tr>
+        <tr><td><code>buscar</code></td><td>O(1)</td><td>O(n)</td></tr>
+        <tr><td><code>remover</code></td><td>O(1)</td><td>O(n)</td></tr>
+      </table>
+      <p><code>inserir</code> percorre a lista antes de acrescentar para não duplicar chaves: se a chave já existe, só atualiza o valor, exatamente como <code>d[chave] = valor</code> num <code>dict</code>.</p>
+      <div class="note">A função <code>_h</code> transforma a chave em texto e usa o hash polinomial, então funciona para números e nomes.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="tabela_hash.py">
+class TabelaHash:
+    def __init__(self, m=7):
+        self.m = m
+        self.listas = [[] for _ in range(m)]   # uma lista por posição
+        self.n = 0
+
+    def _h(self, chave):
+        h = 0
+        for c in str(chave):
+            h = (h * 31 + ord(c)) % self.m
+        return h
+
+    def inserir(self, chave, valor):
+        lista = self.listas[self._h(chave)]
+        for par in lista:
+            if par[0] == chave:       # já existe: atualiza
+                par[1] = valor
+                return
+        lista.append([chave, valor])
+        self.n += 1
+
+    def buscar(self, chave):
+        for c, v in self.listas[self._h(chave)]:
+            if c == chave:
+                return v
+        return None
+
+    def remover(self, chave):
+        lista = self.listas[self._h(chave)]
+        for i in range(len(lista)):
+            if lista[i][0] == chave:
+                lista.pop(i)
+                self.n -= 1
+                return True
+        return False
+
+t = TabelaHash()
+for nome, fone in [("Ana", "1111"), ("Bia", "2222"), ("Caio", "3333"), ("Duda", "4444")]:
+    t.inserir(nome, fone)
+print(t.buscar("Caio"), t.buscar("Zeca"))
+t.remover("Bia")
+for i, lista in enumerate(t.listas):
+    print(i, lista)
+print("fator de carga:", round(t.n / t.m, 2))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Endereçamento aberto: sondagem linear">
+  <h2>Endereçamento aberto: sondagem linear</h2>
+  <p class="lead">Sem listas: todas as chaves ficam dentro da própria tabela. Se a posição <code>h(k)</code> está ocupada, tenta a <strong>próxima</strong>, e a próxima, dando a volta no fim: <code>(h(k) + i) mod m</code> para i = 0, 1, 2, …</p>
+  <div class="edviz" data-viz="hash-tabela" data-est="linear" data-m="11" data-keys="22 33 4 15 26" data-chave="37"></div>
+  <div class="cols even">
+    <div>
+      <p>A <strong>busca</strong> segue a mesma sequência de posições e para quando encontra a chave ou uma posição <strong>vazia</strong> (se a chave existisse, estaria ali).</p>
+      <p>Vantagem: nada de ponteiros, tudo em um vetor (bom para cache e para disco). Limite: no máximo <code>m</code> chaves, α ≤ 1.</p>
+    </div>
+    <div>
+      <div class="note warn"><strong>Agrupamento primário:</strong> chaves que colidem formam blocos contíguos, e qualquer chave que caia em um bloco o faz crescer. Insira 37, 48 e 59 acima e veja o bloco aumentar e as sondagens também.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Teste de mesa: sondagem linear">
+  <h2>Teste de mesa: sondagem linear</h2>
+  <p class="lead">Tabela com <code>m = 5</code>. Antes de avançar, preveja em que posição cada chave vai parar. Repare na chave 3: ela colide com uma chave que tinha <code>h(k)</code> diferente.</p>
+  <div class="trace" data-code="tabela = [None] * 5
+for k in [7, 12, 3]:
+    p = k % 5
+    while tabela[p] is not None:
+        p = (p + 1) % 5
+    tabela[p] = k
+print(tabela)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;tabela&quot;: &quot;[None, None, None, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;5 posições vazias&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;k&quot;: &quot;7&quot;, &quot;tabela&quot;: &quot;[None, None, None, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;k&quot;: &quot;7&quot;, &quot;p&quot;: &quot;2&quot;, &quot;tabela&quot;: &quot;[None, None, None, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;h(7) = 7 % 5 = 2&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;k&quot;: &quot;7&quot;, &quot;p&quot;: &quot;2&quot;, &quot;tabela&quot;: &quot;[None, None, None, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tabela[2] está livre: não entra no while&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;k&quot;: &quot;7&quot;, &quot;p&quot;: &quot;2&quot;, &quot;tabela&quot;: &quot;[None, None, 7, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;7 vai para a posição 2&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;k&quot;: &quot;12&quot;, &quot;p&quot;: &quot;2&quot;, &quot;tabela&quot;: &quot;[None, None, 7, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;k&quot;: &quot;12&quot;, &quot;p&quot;: &quot;2&quot;, &quot;tabela&quot;: &quot;[None, None, 7, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;h(12) = 12 % 5 = 2&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;k&quot;: &quot;12&quot;, &quot;p&quot;: &quot;2&quot;, &quot;tabela&quot;: &quot;[None, None, 7, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tabela[2] tem 7: colisão!&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;k&quot;: &quot;12&quot;, &quot;p&quot;: &quot;3&quot;, &quot;tabela&quot;: &quot;[None, None, 7, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tenta a próxima: p = 3&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;k&quot;: &quot;12&quot;, &quot;p&quot;: &quot;3&quot;, &quot;tabela&quot;: &quot;[None, None, 7, None, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tabela[3] está livre&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;k&quot;: &quot;12&quot;, &quot;p&quot;: &quot;3&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;12 vai para a posição 3&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;3&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;3&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;h(3) = 3 % 5 = 3&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;3&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tabela[3] tem 12: colisão com uma chave que nem tinha o mesmo h(k)!&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;4&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;p = 4&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;4&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, None]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;tabela[4] está livre&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;4&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, 3]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;3 vai para a posição 4: o bloco 2-3-4 cresce (agrupamento primário)&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;4&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, 3]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;k&quot;: &quot;3&quot;, &quot;p&quot;: &quot;4&quot;, &quot;tabela&quot;: &quot;[None, None, 7, 12, 3]&quot;}, &quot;out&quot;: &quot;[None, None, 7, 12, 3]\n&quot;, &quot;note&quot;: &quot;fim do for&quot;}]" data-vars="[&quot;k&quot;, &quot;p&quot;, &quot;tabela&quot;]"></div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Sondagem quadrática e hash duplo">
+  <h2>Sondagem quadrática e hash duplo</h2>
+  <p class="lead">Para quebrar os agrupamentos, os saltos não podem ser sempre de 1 em 1.</p>
+  <div class="edviz" data-viz="hash-tabela" data-est="quad" data-m="11" data-keys="22 33 4 15 26" data-chave="37"></div>
+  <div class="cols even">
+    <div>
+      <table class="tbl">
+        <tr><th>Estratégia</th><th>Tentativa i</th></tr>
+        <tr><td>linear</td><td><code>(h(k) + i) mod m</code></td></tr>
+        <tr><td>quadrática</td><td><code>(h(k) + i²) mod m</code></td></tr>
+        <tr><td>hash duplo</td><td><code>(h(k) + i × h₂(k)) mod m</code></td></tr>
+      </table>
+      <p>No <strong>hash duplo</strong>, o tamanho do salto depende da própria chave (aqui, <code>h₂(k) = 1 + k mod (m − 1)</code>): chaves que colidem na primeira posição seguem caminhos diferentes.</p>
+    </div>
+    <div>
+      <p>Compare: mude a estratégia na visualização entre linear, quadrática e hash duplo com as mesmas chaves e insira 37. Quantas sondagens cada uma precisou?</p>
+      <div class="note warn">Na quadrática, a sequência pode não visitar todas as posições: com <code>m</code> primo e α ≤ 0,5 há garantia de achar lugar. Teste com m = 8 e várias chaves iguais em <code>h(k)</code>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Remoção: o marcador “apagado”">
+  <h2>Remoção: o marcador “apagado”</h2>
+  <div class="cols">
+    <div>
+      <p>No endereçamento aberto, a busca para na primeira posição <strong>vazia</strong>. Se removermos uma chave deixando a posição vazia (<code>None</code>), quebramos o caminho de quem colidiu ali e foi parar mais adiante.</p>
+      <p>A solução é marcar a posição como <strong>apagada</strong> (em inglês, <em>tombstone</em>):</p>
+      <ul>
+        <li>a <strong>busca</strong> trata “apagado” como ocupado e continua;</li>
+        <li>a <strong>inserção</strong> pode reaproveitar a posição.</li>
+      </ul>
+      <p>Na visualização da sondagem linear, remova 4 e depois busque 15 e 26, que colidiram na posição 4. O × no lugar do 4 é o marcador que mantém o caminho.</p>
+      <div class="note">Com muitas remoções, os marcadores se acumulam e as buscas ficam longas; de tempos em tempos a tabela é reconstruída (rehash).</div>
+    </div>
+    <div>
+<textarea class="py" data-label="remocao.py">
+m = 7
+tab = [None] * m
+APAGADO = "apagado"
+
+def inserir(k):
+    p = k % m
+    while tab[p] is not None and tab[p] != APAGADO:
+        p = (p + 1) % m
+    tab[p] = k
+
+def buscar(k):
+    p = k % m
+    for _ in range(m):
+        if tab[p] is None:
+            return -1           # vazio de verdade: não existe
+        if tab[p] == k:
+            return p
+        p = (p + 1) % m         # ocupado OU apagado: continua
+    return -1
+
+for k in [10, 17, 24]:          # os três têm h(k) = 3
+    inserir(k)
+print(tab)
+
+tab[3] = None                   # remoção ERRADA do 10
+print("errada ->", buscar(24))  # o 24 "sumiu"
+
+tab[3] = APAGADO                # remoção certa
+print(tab)
+print("certa  ->", buscar(24))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Fator de carga e rehash">
+  <h2>Fator de carga e rehash</h2>
+  <div class="cols">
+    <div>
+      <p>O desempenho depende de <strong>α = n / m</strong>, e não de <code>n</code> sozinho. O programa ao lado mede quantas sondagens a sondagem linear precisa, em média, conforme a tabela enche.</p>
+      <p>Para manter α baixo, quando ele passa de um limite (0,75 é comum) a tabela é <strong>redimensionada</strong>:</p>
+      <ol>
+        <li>cria uma tabela com cerca do dobro de posições;</li>
+        <li><strong>reinsere todas</strong> as chaves, pois <code>k mod m</code> muda quando <code>m</code> muda.</li>
+      </ol>
+      <p>O rehash custa O(n), mas, como acontece cada vez mais raramente, cada inserção continua custando <strong>O(1) amortizado</strong>, o mesmo raciocínio do vetor dinâmico.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="fator_carga.py">
+import random
+
+def media_sondagens(alfa, m=1009):
+    tab = [None] * m
+    n = int(alfa * m)
+    total = 0
+    for _ in range(n):
+        k = random.randrange(10 ** 6)
+        p = k % m
+        s = 1
+        while tab[p] is not None:
+            p = (p + 1) % m
+            s += 1
+        tab[p] = k
+        total += s
+    return total / n
+
+for alfa in [0.25, 0.5, 0.75, 0.9, 0.95]:
+    print(f"α = {alfa:.2f}: {media_sondagens(alfa):5.1f} sondagens por inserção")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="dict e set no Python">
+  <h2><code>dict</code> e <code>set</code> no Python</h2>
+  <div class="cols">
+    <div>
+      <p>O <code>dict</code> e o <code>set</code> são tabelas hash com endereçamento aberto e redimensionamento automático. Inserir, buscar (<code>in</code>) e remover custam <strong>O(1) em média</strong>.</p>
+      <p>A posição depende de <code>hash(chave)</code>. Se a chave mudasse depois de inserida, seu hash mudaria e ela ficaria “perdida” na posição antiga. Por isso as chaves precisam ser <strong>imutáveis</strong> (hasháveis): números, strings, tuplas. Listas, dicts e sets não podem ser chaves.</p>
+      <div class="note warn">O <code>hash()</code> de strings no Python muda a cada execução do programa (proteção contra ataques). Por isso, nos exemplos desta aula, usamos funções hash próprias: os resultados ficam iguais sempre.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="dict_set.py" data-erro="TypeError">
+estoque = {"caneta": 10, "lápis": 25}
+estoque["borracha"] = 7         # inserir: O(1) em média
+print("lápis" in estoque)       # buscar: O(1) em média
+del estoque["caneta"]           # remover: O(1) em média
+print(estoque)
+
+vistos = set()
+for x in [4, 8, 4, 15, 8, 16]:
+    if x in vistos:
+        print("repetido:", x)
+    vistos.add(x)
+
+ponto = {(0, 0): "origem"}      # tupla é imutável: pode ser chave
+print(ponto[(0, 0)])
+ruim = {[0, 0]: "origem"}       # lista pode mudar: não pode ser chave
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Desafio: rehash automático">
+  <h2>Desafio: rehash automático</h2>
+  <div class="cols">
+    <div>
+      <p>Complete a tabela com encadeamento (chaves inteiras, <code>h(k) = k mod m</code>):</p>
+      <ol>
+        <li>em <code>inserir</code>, depois de acrescentar, se <code>n / m</code> passar de <code>0.75</code>, chame <code>_redimensionar()</code>;</li>
+        <li>em <code>_redimensionar</code>, crie <code>2 × m</code> listas vazias e reinsira <strong>todas</strong> as chaves nas novas posições.</li>
+      </ol>
+      <p>Execute e confira: α nunca deve ficar acima de 0,75 depois de uma inserção, e cada chave precisa estar na lista <code>k mod m</code> do novo <code>m</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_rehash.py">
+class TabelaHash:
+    def __init__(self, m=4):
+        self.m = m
+        self.listas = [[] for _ in range(m)]
+        self.n = 0
+
+    def inserir(self, chave):
+        lista = self.listas[chave % self.m]
+        if chave not in lista:
+            lista.append(chave)
+            self.n += 1
+        # TODO: se n / m passar de 0.75, chame self._redimensionar()
+
+    def _redimensionar(self):
+        # TODO: crie 2 * m listas novas e reinsira TODAS as chaves
+        pass
+
+t = TabelaHash()
+for k in [5, 12, 19, 26, 33, 40, 47]:
+    t.inserir(k)
+    print(f"n = {t.n}  m = {t.m}  α = {t.n / t.m:.2f}")
+print(t.listas)
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+class TabelaHash:
+    def __init__(self, m=4):
+        self.m = m
+        self.listas = [[] for _ in range(m)]
+        self.n = 0
+
+    def inserir(self, chave):
+        lista = self.listas[chave % self.m]
+        if chave not in lista:
+            lista.append(chave)
+            self.n += 1
+        if self.n / self.m > 0.75:
+            self._redimensionar()
+
+    def _redimensionar(self):
+        antigas = self.listas
+        self.m = 2 * self.m
+        self.listas = [[] for _ in range(self.m)]
+        for lista in antigas:
+            for chave in lista:
+                self.listas[chave % self.m].append(chave)
+        print(f"  rehash: m agora é {self.m}")
+
+t = TabelaHash()
+for k in [5, 12, 19, 26, 33, 40, 47]:
+    t.inserir(k)
+    print(f"n = {t.n}  m = {t.m}  α = {t.n / t.m:.2f}")
+print(t.listas)
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="hash" data-title="Quiz: tabelas hash">
+  <h2>Quiz: tabelas hash</h2>
+  <p class="lead">Responda mentalmente (ou no caderno) antes de clicar.</p>
+  <div class="quiz" data-quiz="hashing" data-label="Questão"></div>
+</section>
+
+<!-- ===================== ARQUIVOS ===================== -->
+<section class="slide" data-mod="arq" data-title="Memória × disco">
+  <h2>Memória × disco</h2>
+  <div class="cols">
+    <div>
+      <p>Dados que não cabem na memória (ou que precisam sobreviver ao desligamento) ficam em <strong>arquivos</strong>, no disco. E o disco é <strong>muito</strong> mais lento.</p>
+      <table class="tbl">
+        <tr><th>Onde</th><th>Tempo de um acesso</th></tr>
+        <tr><td>cache do processador</td><td>≈ 1 ns</td></tr>
+        <tr><td>memória RAM</td><td>≈ 100 ns</td></tr>
+        <tr><td>SSD</td><td>≈ 100 µs (1.000 × a RAM)</td></tr>
+        <tr><td>HDD (disco rígido)</td><td>≈ 10 ms (100.000 × a RAM)</td></tr>
+      </table>
+      <p>O disco não lê um byte por vez: lê e grava <strong>blocos</strong> (páginas) inteiros, tipicamente de 4 KB a 16 KB. Ler 1 byte ou o bloco todo custa praticamente o mesmo.</p>
+      <div class="note">Regra de ouro dos dados em disco: o custo de um algoritmo é o <strong>número de blocos lidos</strong>. Comparações na memória são quase de graça perto disso.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="escala_humana.py">
+# Se um acesso à cache durasse 1 segundo...
+latencia_ns = {"cache": 1, "RAM": 100, "SSD": 100000, "HDD": 10000000}
+for onde, ns in latencia_ns.items():
+    segundos = ns                       # 1 ns -> 1 s
+    if segundos < 60:
+        escala = f"{segundos} s"
+    elif segundos < 86400:
+        escala = f"{segundos / 60:.1f} min"
+    else:
+        escala = f"{segundos / 86400:.1f} dias"
+    print(f"{onde:5}: {ns:>9} ns  ->  {escala}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="Registros de tamanho fixo e variável">
+  <h2>Registros de tamanho fixo e variável</h2>
+  <div class="cols">
+    <div>
+      <p>Um arquivo de dados é uma sequência de <strong>registros</strong> (por exemplo, um aluno: matrícula, nome, curso), cada um com <strong>campos</strong>.</p>
+      <table class="tbl">
+        <tr><th>Tamanho fixo</th><th>Tamanho variável</th></tr>
+        <tr><td>todo registro ocupa <code>TAM</code> bytes</td><td>cada registro ocupa o que precisa</td></tr>
+        <tr><td>o i-ésimo começa em <code>i × TAM</code>: acesso direto, como um vetor</td><td>separadores (<code>;</code>, <code>\n</code>) ou um prefixo com o tamanho</td></tr>
+        <tr><td>desperdiça espaço com campos curtos</td><td>para achar o i-ésimo, lê desde o início</td></tr>
+      </table>
+      <p>Em Python, <code>arquivo.seek(i * TAM)</code> seguido de <code>arquivo.read(TAM)</code> lê o i-ésimo registro de um arquivo de verdade. Aqui no navegador, simulamos o arquivo com uma string.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="registros.py">
+TAM = 20                         # cada registro ocupa 20 caracteres
+
+def registro(mat, nome):
+    return f"{mat:05d}{nome:<15}"[:TAM]   # 5 dígitos + nome em 15 posições
+
+arquivo = ""
+for mat, nome in [(101, "Ana"), (205, "Bruno Costa"), (317, "Carla"), (420, "Davi Souza")]:
+    arquivo += registro(mat, nome)
+print(repr(arquivo))
+print("tamanho:", len(arquivo), "caracteres")
+
+i = 2                                    # o terceiro registro
+r = arquivo[i * TAM:(i + 1) * TAM]       # "seek" direto: sem percorrer
+print("registro", i, "->", r[:5], r[5:].strip())
+
+# tamanho variável: para achar o 3º é preciso passar pelos anteriores
+var = "101;Ana\n205;Bruno Costa\n317;Carla\n420;Davi Souza\n"
+print(var.split("\n")[2])
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="Arquivo sequencial × ordenado">
+  <h2>Arquivo sequencial × arquivo ordenado</h2>
+  <div class="cols">
+    <div>
+      <p>A classe <code>Disco</code> simula um arquivo dividido em blocos e <strong>conta</strong> quantos blocos são lidos.</p>
+      <ul>
+        <li><strong>Arquivo sequencial</strong> (registros na ordem de chegada): buscar exige ler bloco por bloco: O(b), com b = número de blocos.</li>
+        <li><strong>Arquivo ordenado</strong> pela chave: busca binária <strong>sobre os blocos</strong>. Lê o bloco do meio; se a chave é menor que a primeira do bloco, vai para a esquerda; se maior que a última, para a direita: O(log b).</li>
+      </ul>
+      <div class="note warn">O preço do arquivo ordenado: inserir no meio obriga a deslocar registros (reescrever blocos). Arquivos reais deixam espaço livre nos blocos ou usam áreas de overflow.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="disco.py">
+class Disco:
+    """Simula um arquivo dividido em blocos; conta os blocos lidos."""
+    def __init__(self, registros, por_bloco):
+        self.blocos = [registros[i:i + por_bloco] for i in range(0, len(registros), por_bloco)]
+        self.lidos = 0
+
+    def ler(self, b):
+        self.lidos += 1
+        return self.blocos[b]
+
+def busca_sequencial(d, chave):
+    for b in range(len(d.blocos)):
+        if chave in d.ler(b):
+            return b
+    return -1
+
+def busca_binaria(d, chave):
+    ini, fim = 0, len(d.blocos) - 1
+    while ini <= fim:
+        meio = (ini + fim) // 2
+        bloco = d.ler(meio)
+        if chave < bloco[0]:
+            fim = meio - 1
+        elif chave > bloco[-1]:
+            ini = meio + 1
+        else:
+            return meio if chave in bloco else -1
+    return -1
+
+chaves = list(range(0, 200000, 2))      # 100 mil registros ordenados
+for alvo in [12, 99998, 150001]:
+    d1, d2 = Disco(chaves, 100), Disco(chaves, 100)
+    busca_sequencial(d1, alvo)
+    busca_binaria(d2, alvo)
+    print(f"alvo {alvo:6}: sequencial leu {d1.lidos:4} blocos | binária leu {d2.lidos:2}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arq" data-title="Índices e arquivos hash">
+  <h2>Índices e arquivos hash</h2>
+  <p class="lead">Um <strong>índice</strong> é um arquivo pequeno de pares (chave, endereço) que aponta para o arquivo de dados, como o índice remissivo de um livro.</p>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><strong>Índice denso:</strong> uma entrada por registro. Funciona mesmo com dados fora de ordem.</li>
+        <li><strong>Índice esparso:</strong> uma entrada por <strong>bloco</strong> (a primeira chave). Bem menor, mas exige dados ordenados.</li>
+        <li><strong>Arquivo hash:</strong> <code>h(chave)</code> escolhe um bloco (bucket). Ideal para busca exata: cerca de 1 acesso. Inútil para intervalos (“matrículas de 200 a 300”), porque o hash espalha chaves vizinhas.</li>
+      </ul>
+      <p>Se o índice cabe na memória, a busca nele é de graça e só 1 bloco de dados é lido. Se não cabe… precisamos de um índice para o índice. Essa é a ideia da árvore B.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="indice_esparso.py">
+import bisect
+
+registros = list(range(0, 200000, 2))           # 100 mil chaves ordenadas
+POR_BLOCO = 100
+blocos = [registros[i:i + POR_BLOCO] for i in range(0, len(registros), POR_BLOCO)]
+
+# índice esparso: a 1ª chave de cada bloco (cabe na memória)
+indice = [b[0] for b in blocos]
+print("entradas no índice:", len(indice), "| registros:", len(registros))
+
+def buscar(chave):
+    b = bisect.bisect_right(indice, chave) - 1   # busca binária NA MEMÓRIA
+    if b < 0:
+        return None, 0
+    bloco = blocos[b]                            # 1 único acesso ao disco
+    return (b if chave in bloco else None), 1
+
+print(buscar(123456))    # (bloco, blocos lidos)
+print(buscar(123457))
+</textarea>
+    </div>
+  </div>
+  <div class="edviz" data-viz="disco" data-n="1000000" data-b="100" data-ordem="200"></div>
+</section>
+
+<!-- ===================== ÁRVORES B ===================== -->
+<section class="slide" data-mod="btree" data-title="Por que árvores B?">
+  <h2>Por que árvores B?</h2>
+  <div class="cols">
+    <div>
+      <p>Uma árvore binária de busca balanceada com 1 milhão de chaves tem cerca de <strong>20 níveis</strong>. Na memória, ótimo. No disco, cada nó visitado pode ser um bloco lido: 20 × 10 ms = 0,2 s por busca.</p>
+      <p>A <strong>árvore B</strong> (Bayer e McCreight, 1972) troca nós com 1 chave e 2 filhos por nós <strong>do tamanho de um bloco</strong>, com centenas de chaves e filhos. A árvore fica <strong>larga e baixa</strong>: 3 ou 4 níveis para milhões de chaves.</p>
+      <p>Dentro de cada nó, a busca é na memória (sequencial ou binária); o que importa é que ela lê <strong>um bloco por nível</strong>.</p>
+      <div class="note">Praticamente todo banco de dados relacional (PostgreSQL, MySQL, SQLite, Oracle) e muitos sistemas de arquivos (NTFS, ext4, Btrfs, APFS) usam árvores B ou B+.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="niveis.py">
+def niveis(filhos, n):
+    """Menor número de níveis de uma árvore com até 'filhos' filhos por nó para n chaves."""
+    h, capacidade = 0, 0
+    while capacidade < n:
+        h += 1
+        capacidade = filhos ** h - 1     # chaves de uma árvore cheia com h níveis
+    return h
+
+for n in [1000, 10 ** 6, 10 ** 9]:
+    print(f"n = {n:>10}: binária {niveis(2, n):2} níveis | B(100) {niveis(100, n)} | B(500) {niveis(500, n)}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="btree" data-title="Propriedades da árvore B">
+  <h2>Propriedades da árvore B</h2>
+  <p class="lead">Uma árvore B de <strong>ordem m</strong> (no máximo m filhos por nó) obedece a quatro regras:</p>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>cada nó tem no máximo <strong>m − 1 chaves</strong>, em ordem crescente, e até <strong>m filhos</strong>;</li>
+        <li>todo nó, exceto a raiz, tem no mínimo <strong>⌈m/2⌉ − 1 chaves</strong> (pelo menos meio cheio);</li>
+        <li>um nó interno com k chaves tem exatamente <strong>k + 1 filhos</strong>; as chaves separam os intervalos dos filhos;</li>
+        <li>todas as folhas estão no <strong>mesmo nível</strong>: a árvore é sempre perfeitamente balanceada em altura.</li>
+      </ol>
+    </div>
+    <div>
+      <div class="kv"><span class="k">[ 20 | 40 ]</span><span class="a">→</span><span class="v">filho 0: &lt; 20 · filho 1: entre 20 e 40 · filho 2: &gt; 40</span></div>
+      <p>A busca generaliza a da árvore binária: em cada nó, encontra entre quais chaves o alvo está e desce pelo ponteiro correspondente.</p>
+    </div>
+  </div>
+  <div class="edviz" data-viz="arvore-b" data-tipo="b" data-max="3" data-keys="10 20 5 6 12 30 7 17 3 25" data-chave="17"></div>
+  <div class="note">Use <strong>Buscar</strong> com 17, 8 e 30 e conte os nós lidos. Mude o máximo de chaves por nó: a árvore é reconstruída com as mesmas chaves.</div>
+</section>
+
+<section class="slide" data-mod="btree" data-title="Inserção com divisão">
+  <h2>Inserção: divide e sobe</h2>
+  <p class="lead">A árvore B nunca cresce para baixo. A chave nova sempre entra em uma <strong>folha</strong>; se a folha estourar, ela se <strong>divide</strong> e a chave do meio sobe para o pai.</p>
+  <div class="edviz" data-viz="arvore-b" data-tipo="b" data-max="2" data-keys="10 20 30 40 50" data-chave="60"></div>
+  <div class="cols even">
+    <div>
+      <ol>
+        <li>Desça da raiz até a folha onde a chave deveria estar.</li>
+        <li>Insira em ordem na folha.</li>
+        <li>Se ficou com mais de <code>m − 1</code> chaves: divida em duas metades e <strong>suba a mediana</strong> para o pai.</li>
+        <li>Se o pai estourar, repita. Se a <strong>raiz</strong> estourar, cria-se uma nova raiz com a mediana: a altura aumenta em 1, para todas as folhas ao mesmo tempo.</li>
+      </ol>
+    </div>
+    <div>
+      <p>Insira 60, 70 e 80 (máximo de 2 chaves por nó) e acompanhe as divisões em cascata até a raiz.</p>
+      <div class="note">Por crescer pela raiz, a árvore B mantém todas as folhas no mesmo nível sem nenhuma rotação. Inserir e buscar custam O(log n) acessos a disco, com base de log enorme.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="btree" data-title="Árvore B em Python">
+  <h2>Árvore B em Python: busca e inserção</h2>
+  <div class="cols">
+    <div>
+      <p><code>inserir_rec</code> desce até a folha e, na volta da recursão, cada nó verifica se estourou. Se sim, divide-se e <strong>devolve</strong> ao pai a mediana e o novo nó da direita; o pai os encaixa em suas listas.</p>
+      <p>Se a raiz dividir, <code>inserir</code> cria uma raiz nova com dois filhos.</p>
+      <p><code>buscar</code> devolve também quantos nós (blocos) foram lidos.</p>
+      <div class="note">A sequência de chaves é a mesma da visualização do slide <em>Propriedades da árvore B</em>, com no máximo 3 chaves por nó. Compare o resultado de <code>mostrar</code> com o desenho.</div>
+      <h3>E a remoção?</h3>
+      <p>Remover pode deixar um nó com menos chaves que o mínimo. Aí ele <strong>pega emprestada</strong> uma chave de um irmão com sobra (passando pelo pai) ou se <strong>funde</strong> com um irmão, puxando uma chave do pai. A fusão pode se propagar até a raiz, e a árvore diminui de altura por cima.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="arvore_b.py">
+class NoB:
+    def __init__(self, folha=True):
+        self.chaves = []
+        self.filhos = []
+        self.folha = folha
+
+MAX = 3      # no máximo 3 chaves por nó (ordem 4)
+
+def buscar(no, k, lidos=0):
+    lidos += 1                        # cada nó = um bloco lido
+    i = 0
+    while i < len(no.chaves) and k > no.chaves[i]:
+        i += 1
+    if i < len(no.chaves) and no.chaves[i] == k:
+        return True, lidos
+    if no.folha:
+        return False, lidos
+    return buscar(no.filhos[i], k, lidos)
+
+def inserir_rec(no, k):
+    """Insere k; se o nó estourar, devolve (mediana, novo nó da direita)."""
+    i = 0
+    while i < len(no.chaves) and k > no.chaves[i]:
+        i += 1
+    if no.folha:
+        no.chaves.insert(i, k)
+    else:
+        subiu = inserir_rec(no.filhos[i], k)
+        if subiu:
+            med, direito = subiu
+            no.chaves.insert(i, med)
+            no.filhos.insert(i + 1, direito)
+    if len(no.chaves) > MAX:          # estourou: divide
+        meio = len(no.chaves) // 2
+        direito = NoB(no.folha)
+        med = no.chaves[meio]
+        direito.chaves = no.chaves[meio + 1:]
+        no.chaves = no.chaves[:meio]
+        if not no.folha:
+            direito.filhos = no.filhos[meio + 1:]
+            no.filhos = no.filhos[:meio + 1]
+        return med, direito
+    return None
+
+def inserir(raiz, k):
+    subiu = inserir_rec(raiz, k)
+    if subiu:                         # a raiz dividiu: cresce para cima
+        med, direito = subiu
+        nova = NoB(folha=False)
+        nova.chaves = [med]
+        nova.filhos = [raiz, direito]
+        return nova
+    return raiz
+
+def mostrar(no, nivel=0):
+    print("    " * nivel + str(no.chaves))
+    for f in no.filhos:
+        mostrar(f, nivel + 1)
+
+raiz = NoB()
+for k in [10, 20, 5, 6, 12, 30, 7, 17, 3, 25]:
+    raiz = inserir(raiz, k)
+mostrar(raiz)
+print(buscar(raiz, 17))
+print(buscar(raiz, 8))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="btree" data-title="Árvore B+">
+  <h2>Árvore B+</h2>
+  <p class="lead">A variação mais usada na prática. Os nós internos guardam só <strong>separadores</strong>; todos os registros ficam nas <strong>folhas</strong>, que são ligadas em uma lista da esquerda para a direita.</p>
+  <div class="edviz" data-viz="arvore-b" data-tipo="bplus" data-max="3" data-keys="5 12 18 23 27 31 36 40 44 50 8 15 21" data-chave="27" data-de="14" data-ate="32"></div>
+  <div class="cols even">
+    <div>
+      <table class="tbl">
+        <tr><th></th><th>Árvore B</th><th>Árvore B+</th></tr>
+        <tr><td>dados</td><td>em todos os nós</td><td>só nas folhas</td></tr>
+        <tr><td>busca exata</td><td>pode parar no meio</td><td>sempre vai até a folha</td></tr>
+        <tr><td>intervalo</td><td>percurso em ordem pela árvore</td><td>desce 1 vez e segue as folhas</td></tr>
+        <tr><td>nós internos</td><td>chaves + dados</td><td>só chaves: cabem mais por bloco</td></tr>
+      </table>
+    </div>
+    <div>
+      <p>Clique em <strong>Consultar intervalo</strong>: a árvore desce até a folha de 14 e depois só anda pelas folhas, como em <code>SELECT * FROM alunos WHERE nota BETWEEN 14 AND 32</code>.</p>
+      <div class="note">Na divisão de uma folha da B+, a chave do meio sobe como <strong>cópia</strong> e continua na folha da direita. Nos nós internos, a divisão é igual à da árvore B. Insira 33, 34 e 35 para ver.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="btree" data-title="Quiz: arquivos e árvores B">
+  <h2>Quiz: arquivos e árvores B</h2>
+  <p class="lead">Leia, decida e só então clique. Use as visualizações para conferir.</p>
+  <div class="quiz" data-quiz="arvores" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: dicionários">
+  <h2>Prática 1: dicionários</h2>
+  <p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Os dois problemas têm solução O(n) graças ao <code>dict</code>.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. Palavra mais frequente <span class="lvl l1">básico</span></h3>
+      <p>Leia um texto em uma linha. Sem diferenciar maiúsculas de minúsculas, mostre a palavra mais frequente e quantas vezes ela aparece. Em caso de empate, vence a que aparece <strong>primeiro</strong> no texto. Conte com um <code>dict</code>, sem usar <code>count()</code> dentro de um laço (isso seria O(n²)).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>a b c b c c</pre></td><td><pre>Mais frequente: c
+Ocorrências: 3</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_mais_frequente.py" data-stdin="a b c b c c" data-tests='[{"in": "a b c b c c", "out": ["Mais frequente: c", "Ocorrências: 3"]}, {"in": "o rato roeu a roupa do rei de roma o rato", "out": ["Mais frequente: o\n", "Ocorrências: 2"], "nao": ["Mais frequente: rato"]}, {"in": "Python python PYTHON java", "out": ["Mais frequente: python", "Ocorrências: 3"]}, {"in": "um", "out": ["Mais frequente: um", "Ocorrências: 1"]}, {"in": "banana maçã banana maçã", "out": ["Mais frequente: banana", "Ocorrências: 2"], "nao": ["Mais frequente: maçã"]}]'>
+palavras = input("Texto: ").lower().split()
+
+# conte as palavras com um dict e encontre a mais frequente
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="a b c b c c">
+palavras = input("Texto: ").lower().split()
+cont = {}
+for p in palavras:
+    cont[p] = cont.get(p, 0) + 1
+melhor = palavras[0]
+for p in palavras:              # na ordem do texto: no empate fica a primeira
+    if cont[p] > cont[melhor]:
+        melhor = p
+print("Mais frequente:", melhor)
+print("Ocorrências:", cont[melhor])
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. Primeiro caractere único <span class="lvl l1">básico</span></h3>
+      <p>Leia um texto e mostre o primeiro caractere que aparece <strong>uma única vez</strong>, ignorando os espaços: <code>Primeiro único: x</code>. Se todos se repetem, mostre <code>Nenhum</code>. Faça em duas passadas: uma para contar (com <code>dict</code>) e outra para achar o primeiro com contagem 1.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>abacabad</pre></td><td><pre>Primeiro único: c</pre></td></tr><tr><td><pre>aabbcc</pre></td><td><pre>Nenhum</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_primeiro_unico.py" data-stdin="abacabad" data-tests='[{"in": "abacabad", "out": ["Primeiro único: c"], "nao": ["Primeiro único: d"]}, {"in": "aabbcc", "out": ["Nenhum"], "nao": ["Primeiro único"]}, {"in": "estruturas", "out": ["Primeiro único: e"]}, {"in": "x", "out": ["Primeiro único: x"]}, {"in": "a b a", "out": ["Primeiro único: b"], "nao": ["Primeiro único: a"]}, {"in": "abcabcd", "out": ["Primeiro único: d"]}]'>
+texto = input("Texto: ").replace(" ", "")
+
+# 1ª passada: conte cada caractere; 2ª passada: ache o primeiro com contagem 1
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="abacabad">
+texto = input("Texto: ").replace(" ", "")
+cont = {}
+for c in texto:
+    cont[c] = cont.get(c, 0) + 1
+resp = None
+for c in texto:
+    if cont[c] == 1:
+        resp = c
+        break
+if resp is None:
+    print("Nenhum")
+else:
+    print("Primeiro único:", resp)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: tabelas hash">
+  <h2>Prática 2: tabelas hash</h2>
+  <p class="lead">Agora é você quem implementa a tabela. Use a visualização de sondagem linear para conferir seus resultados à mão.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Simulando a sondagem linear <span class="lvl l2">médio</span></h3>
+      <p>Leia <code>m</code> e, na linha seguinte, chaves inteiras distintas. Insira cada uma com <code>h(k) = k % m</code> e sondagem linear, mostrando <code>k -&gt; posição p</code>. Se não houver posição livre, mostre <code>Tabela cheia: k</code>. No fim, mostre a tabela (<code>-</code> nas vazias, separadas por espaço) e o total de colisões, contando <strong>cada posição ocupada visitada</strong>, inclusive nas tentativas que falharam.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>7
+10 20 15 3 17</pre></td><td><pre>10 -&gt; posição 3
+20 -&gt; posição 6
+15 -&gt; posição 1
+3 -&gt; posição 4
+17 -&gt; posição 5
+Tabela: - 15 - 10 3 17 20
+Colisões: 3</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_sondagem_linear.py" data-stdin="7
+10 20 15 3 17" data-tests='[{"in": "7\n10 20 15 3 17", "out": ["3 -> posição 4", "17 -> posição 5", "Tabela: - 15 - 10 3 17 20", "Colisões: 3"], "nao": ["Tabela cheia"]}, {"in": "5\n4 9 14", "out": ["9 -> posição 0", "14 -> posição 1", "Tabela: 9 14 - - 4", "Colisões: 3"]}, {"in": "3\n1 2 3 4", "out": ["Tabela cheia: 4", "Tabela: 3 1 2", "Colisões: 3"], "nao": ["4 -> posição"]}, {"in": "10\n1 2 3", "out": ["Tabela: - 1 2 3 - - - - - -", "Colisões: 0"], "nao": ["Tabela cheia"]}, {"in": "4\n8", "out": ["8 -> posição 0", "Tabela: 8 - - -", "Colisões: 0"]}]'>
+m = int(input("m: "))
+chaves = [int(x) for x in input("Chaves: ").split()]
+tab = [None] * m
+
+# insira cada chave com sondagem linear e conte as colisões
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="7
+10 20 15 3 17">
+m = int(input("m: "))
+chaves = [int(x) for x in input("Chaves: ").split()]
+tab = [None] * m
+colisoes = 0
+for k in chaves:
+    p = k % m
+    tentativas = 0
+    while tab[p] is not None and tentativas < m:
+        colisoes += 1
+        tentativas += 1
+        p = (p + 1) % m
+    if tentativas == m:
+        print("Tabela cheia:", k)
+    else:
+        tab[p] = k
+        print(k, "-> posição", p)
+print("Tabela:", " ".join("-" if x is None else str(x) for x in tab))
+print("Colisões:", colisoes)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. Encadeamento com hash de texto <span class="lvl l2">médio</span></h3>
+      <p>Leia <code>m</code> e uma linha de palavras. Insira cada palavra (sem repetir) em uma tabela com encadeamento, usando o hash polinomial: começando com <code>h = 0</code>, para cada caractere faça <code>h = (h * 31 + ord(c)) % m</code>. Mostre as posições <strong>não vazias</strong> como <code>i: palavras na ordem de inserção</code>, depois o tamanho da maior lista e o fator de carga com 2 casas.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>7
+maçã uva pera kiwi uva limão</pre></td><td><pre>0: limão
+4: maçã pera
+5: kiwi
+6: uva
+Maior lista: 2
+Fator de carga: 0.71</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_encadeamento.py" data-stdin="7
+maçã uva pera kiwi uva limão" data-tests='[{"in": "7\nmaçã uva pera kiwi uva limão", "out": ["0: limão", "4: maçã pera", "5: kiwi", "6: uva", "Maior lista: 2", "Fator de carga: 0.71"], "nao": ["uva uva"]}, {"in": "5\na b c d e f g", "out": ["0: d", "1: e", "2: a f", "3: b g", "4: c", "Maior lista: 2", "Fator de carga: 1.40"]}, {"in": "11\npython", "out": ["5: python", "Maior lista: 1", "Fator de carga: 0.09"], "nao": ["0:", "1:"]}, {"in": "3\nana bia ana caio duda eva", "out": ["0: bia duda", "1: ana caio eva", "Maior lista: 3", "Fator de carga: 1.67"], "nao": ["2:"]}]'>
+m = int(input("m: "))
+palavras = input("Palavras: ").split()
+tabela = [[] for _ in range(m)]
+
+# calcule o hash polinomial de cada palavra e insira sem repetir
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="7
+maçã uva pera kiwi uva limão">
+m = int(input("m: "))
+palavras = input("Palavras: ").split()
+tabela = [[] for _ in range(m)]
+n = 0
+for p in palavras:
+    h = 0
+    for c in p:
+        h = (h * 31 + ord(c)) % m
+    if p not in tabela[h]:
+        tabela[h].append(p)
+        n += 1
+for i in range(m):
+    if tabela[i]:
+        print(f"{i}: " + " ".join(tabela[i]))
+print("Maior lista:", max(len(b) for b in tabela))
+print(f"Fator de carga: {n / m:.2f}")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: arquivos e árvores B">
+  <h2>Prática 3: arquivos e árvores B</h2>
+  <p class="lead">Contar blocos lidos e níveis de árvore é o que importa quando os dados estão no disco.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Busca binária em blocos <span class="lvl l2">médio</span></h3>
+      <p>Leia quantos registros cabem por bloco, as chaves do arquivo (em ordem crescente) e o alvo. Divida as chaves em blocos consecutivos. Faça busca binária <strong>sobre os blocos</strong>: leia o bloco do meio; se o alvo é menor que a primeira chave, vá para a esquerda; se maior que a última, para a direita; senão, o alvo está nesse bloco ou não existe. Mostre <code>Encontrado no bloco b</code> ou <code>Não encontrado</code>, <code>Blocos lidos: k</code> e quantos blocos a busca sequencial leria (até o bloco do alvo, ou todos, se ausente).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3
+2 5 8 11 14 17 20 23 26 31
+20</pre></td><td><pre>Encontrado no bloco 2
+Blocos lidos: 2
+Busca sequencial leria: 3</pre></td></tr></table></div>
+<textarea class="py" data-label="ex5_blocos.py" data-stdin="3
+2 5 8 11 14 17 20 23 26 31
+20" data-tests='[{"in": "3\n2 5 8 11 14 17 20 23 26 31\n20", "out": ["Encontrado no bloco 2", "Blocos lidos: 2", "Busca sequencial leria: 3"], "nao": ["Não encontrado"]}, {"in": "3\n2 5 8 11 14 17 20 23 26 31\n2", "out": ["Encontrado no bloco 0", "Blocos lidos: 2", "Busca sequencial leria: 1"]}, {"in": "3\n2 5 8 11 14 17 20 23 26 31\n12", "out": ["Não encontrado", "Blocos lidos: 1", "Busca sequencial leria: 4"], "nao": ["Encontrado no"]}, {"in": "3\n2 5 8 11 14 17 20 23 26 31\n40", "out": ["Não encontrado", "Blocos lidos: 3", "Busca sequencial leria: 4"]}, {"in": "4\n10 20 30\n20", "out": ["Encontrado no bloco 0", "Blocos lidos: 1", "Busca sequencial leria: 1"]}, {"in": "2\n1 3 5 7 9 11 13 15\n1", "out": ["Encontrado no bloco 0", "Blocos lidos: 2", "Busca sequencial leria: 1"]}]'>
+b = int(input("Registros por bloco: "))
+chaves = [int(x) for x in input("Chaves: ").split()]
+alvo = int(input("Alvo: "))
+blocos = [chaves[i:i + b] for i in range(0, len(chaves), b)]
+
+# busca binária sobre os blocos, contando os blocos lidos
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3
+2 5 8 11 14 17 20 23 26 31
+20">
+b = int(input("Registros por bloco: "))
+chaves = [int(x) for x in input("Chaves: ").split()]
+alvo = int(input("Alvo: "))
+blocos = [chaves[i:i + b] for i in range(0, len(chaves), b)]
+ini, fim = 0, len(blocos) - 1
+lidos = 0
+achou = -1
+while ini <= fim:
+    meio = (ini + fim) // 2
+    bloco = blocos[meio]
+    lidos += 1
+    if alvo < bloco[0]:
+        fim = meio - 1
+    elif alvo > bloco[-1]:
+        ini = meio + 1
+    else:
+        if alvo in bloco:
+            achou = meio
+        break
+if achou >= 0:
+    print("Encontrado no bloco", achou)
+else:
+    print("Não encontrado")
+print("Blocos lidos:", lidos)
+seq = achou + 1 if achou >= 0 else len(blocos)
+print("Busca sequencial leria:", seq)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. Altura de uma árvore B <span class="lvl l3">desafio</span></h3>
+      <p>Leia a ordem <code>m</code> (máximo de filhos por nó, <code>m ≥ 3</code>) e o número de chaves <code>n ≥ 1</code>. Mostre o menor e o maior número de <strong>níveis</strong> que uma árvore B com essas características pode ter.</p>
+      <p>Dicas: com <code>h</code> níveis, a árvore cabe no máximo <code>m<sup>h</sup> − 1</code> chaves (todos os nós cheios) e precisa de pelo menos <code>2·t<sup>h−1</sup> − 1</code> chaves, com <code>t = ⌈m/2⌉</code> (raiz com 1 chave, demais nós com o mínimo). Use laços com inteiros, sem logaritmos.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3
+7</pre></td><td><pre>Altura mínima: 2
+Altura máxima: 3</pre></td></tr></table></div>
+<textarea class="py" data-label="ex6_altura_b.py" data-stdin="3
+7" data-tests='[{"in": "3\n7", "out": ["Altura mínima: 2", "Altura máxima: 3"]}, {"in": "3\n1", "out": ["Altura mínima: 1", "Altura máxima: 1"]}, {"in": "5\n100", "out": ["Altura mínima: 3", "Altura máxima: 4"]}, {"in": "100\n1000000", "out": ["Altura mínima: 4", "Altura máxima: 4"], "nao": ["Altura mínima: 3"]}, {"in": "4\n15", "out": ["Altura mínima: 2", "Altura máxima: 4"]}, {"in": "3\n2", "out": ["Altura mínima: 1", "Altura máxima: 1"]}]'>
+m = int(input("Ordem (máximo de filhos): "))
+n = int(input("Chaves: "))
+
+# menor h com m ** h - 1 >= n
+# maior h com 2 * t ** (h - 1) - 1 <= n, onde t = (m + 1) // 2
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3
+7">
+m = int(input("Ordem (máximo de filhos): "))
+n = int(input("Chaves: "))
+t = (m + 1) // 2                 # mínimo de filhos: teto de m / 2
+h = 1
+while m ** h - 1 < n:            # cheia com h níveis ainda não cabe n
+    h += 1
+print("Altura mínima:", h)
+h = 1
+while 2 * t ** h - 1 <= n:       # dá para ter h + 1 níveis?
+    h += 1
+print("Altura máxima:", h)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: compare a distribuição de 1000 nomes com a função polinomial e com a soma dos códigos dos caracteres; implemente sondagem quadrática na <code>TabelaHash</code>; insira 1 a 100 em ordem na árvore B do slide de Python e veja a altura com <code>MAX = 3</code> e <code>MAX = 9</code>.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-hashing-arvores-b",
+ "mods": {
+  "intro": { "name": "Introdução", "color": "#1f5297" },
+  "hash": { "name": "Tabelas hash", "color": "#8e3a8f" },
+  "arq": { "name": "Organização de arquivos", "color": "#a8670c" },
+  "btree": { "name": "Árvores B e B+", "color": "#0f7a62" },
+  "pratica": { "name": "Prática", "color": "#be3455" }
+ },
+ "quizzes": {
+  "hashing": [
+   { "q": "Com h(k) = k mod 10, em que posição fica a chave 47?", "opts": ["4", "7", "47", "0"], "ans": 1, "why": "47 mod 10 = 7: o resto da divisão por 10." },
+   { "q": "Sondagem linear, m = 7, posições 3 e 4 ocupadas. Onde entra a chave 10?", "opts": ["3", "4", "5", "0"], "ans": 2, "why": "h(10) = 10 mod 7 = 3 (ocupada), tenta 4 (ocupada), entra na 5." },
+   { "q": "Uma tabela com m = 8 posições guarda 6 chaves. Qual é o fator de carga?", "opts": ["0,75", "1,33", "6", "0,6"], "ans": 0, "why": "α = n / m = 6 / 8 = 0,75." },
+   { "q": "Encadeamento com n = 300 chaves e m = 100 posições. Quantas chaves cada lista tem, em média?", "opts": ["1", "3", "100", "300"], "ans": 1, "why": "Em média α = n / m = 3 chaves por lista, se a função hash espalha bem." },
+   { "q": "Qual destes pode ser chave de um dict?", "opts": ["[1, 2]", "{1: 2}", "(1, 2)", "{1, 2}"], "ans": 2, "why": "Só a tupla é imutável (hashável). Lista, dict e set podem mudar, e o hash deixaria de corresponder à posição." },
+   { "q": "No endereçamento aberto, por que a remoção usa um marcador “apagado” em vez de None?", "opts": ["para economizar memória", "para a busca não parar antes da hora", "porque None não cabe na tabela", "para ordenar a tabela"], "ans": 1, "why": "A busca para no primeiro vazio. Um None no meio do caminho esconderia as chaves que colidiram ali e foram mais adiante." },
+   { "q": "Qual é o custo de buscar em uma tabela hash no pior caso?", "opts": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "ans": 2, "why": "Se todas as chaves colidirem, a busca percorre todas. Em média, com boa função hash e α limitado, é O(1)." },
+   { "code": "def h(s, m):\n    total = 0\n    for c in s:\n        total += ord(c)\n    return total % m\n\nprint(h(\"roma\", 7) == h(\"amor\", 7))", "opts": ["True", "False", "Erro", "Depende"], "ans": 0, "why": "Somar os códigos ignora a ordem das letras: anagramas sempre colidem. O hash polinomial (h × 31 + c) evita isso." }
+  ],
+  "arvores": [
+   { "q": "Em uma árvore B de ordem 5 (até 5 filhos por nó), quantas chaves cabem no máximo em um nó?", "opts": ["2", "4", "5", "10"], "ans": 1, "why": "Um nó com m filhos tem m − 1 chaves separando-os: 5 − 1 = 4." },
+   { "q": "Na mesma árvore de ordem 5, quantos filhos tem, no mínimo, um nó interno que não é a raiz?", "opts": ["1", "2", "3", "5"], "ans": 2, "why": "⌈5/2⌉ = 3 filhos (ou seja, pelo menos 2 chaves): cada nó fica pelo menos meio cheio." },
+   { "q": "O que acontece ao inserir em uma folha que já está cheia?", "opts": ["a chave vira filha da folha", "a folha se divide e a chave do meio sobe", "a árvore é reconstruída", "a chave é descartada"], "ans": 1, "why": "A folha estoura, divide-se em duas e a mediana sobe para o pai, podendo estourá-lo também." },
+   { "q": "Por onde a árvore B aumenta de altura?", "opts": ["pelas folhas", "pela raiz", "pelo nó mais à esquerda", "pelo nó mais cheio"], "ans": 1, "why": "Só quando a raiz se divide nasce uma nova raiz. Por isso todas as folhas continuam no mesmo nível." },
+   { "q": "Em uma árvore B+, onde ficam os registros (os dados)?", "opts": ["na raiz", "nos nós internos", "só nas folhas", "em todos os nós"], "ans": 2, "why": "Os nós internos guardam só separadores; os dados ficam nas folhas, ligadas em lista." },
+   { "q": "Qual estrutura atende melhor “todas as vendas entre 01/03 e 15/03”?", "opts": ["arquivo hash", "árvore B+", "tabela hash na memória", "arquivo sequencial sem ordem"], "ans": 1, "why": "A B+ desce uma vez até a primeira data e percorre as folhas encadeadas. O hash espalha chaves vizinhas e não ajuda em intervalos." },
+   { "q": "Arquivo com 1 milhão de registros, 100 por bloco, sem ordem. Quantos blocos uma busca lê no pior caso?", "opts": ["20", "100", "10.000", "1.000.000"], "ans": 2, "why": "São 1.000.000 / 100 = 10.000 blocos, e a busca sequencial pode precisar ler todos." },
+   { "q": "Uma árvore B com até 100 filhos por nó guarda 999.999 chaves. Quantos níveis bastam?", "opts": ["2", "3", "6", "20"], "ans": 1, "why": "Com 3 níveis cheios cabem 100³ − 1 = 999.999 chaves. Uma árvore binária precisaria de 20." }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/hashing-arvores-b.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

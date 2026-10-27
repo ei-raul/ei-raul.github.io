@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heap, fila de prioridade e ordenação — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: fila de prioridade e heap binário, heapsort, ordenações simples (bubble, selection, insertion), merge sort, quick sort e ordenação em tempo linear (counting e radix sort). Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+  <link href="../../assets/css/ed-viz/heap-ordenacao.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Heap, fila de prioridade e ordenação</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Heap, fila de prioridade e ordenação</h1>
+  <p class="sub">Ordenar é uma das tarefas mais comuns da computação, e existem dezenas de jeitos de fazê-la. Hoje vamos ver os clássicos, entender por que alguns são O(n²) e outros O(n log n), conhecer o heap e descobrir como ordenar sem comparar.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="heap" style="color:var(--c-heap)"><span class="sym">h[0]</span><span class="nm">Heap</span><span class="ds">fila de prioridade e heapsort</span></a>
+    <a href="#" data-goto="simples" style="color:var(--c-simples)"><span class="sym">O(n²)</span><span class="nm">Ordenações simples</span><span class="ds">bubble, selection e insertion</span></a>
+    <a href="#" data-goto="dc" style="color:var(--c-dc)"><span class="sym">n log n</span><span class="nm">Dividir e conquistar</span><span class="ds">merge sort e quick sort</span></a>
+    <a href="#" data-goto="linear" style="color:var(--c-linear)"><span class="sym">O(n + k)</span><span class="nm">Tempo linear</span><span class="ds">counting e radix sort</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram os algoritmos passo a passo: altere os dados, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Ordenar e priorizar">
+  <h2>Ordenar e priorizar</h2>
+  <div class="cols">
+    <div>
+      <p>Dados ordenados tornam muitas tarefas fáceis: busca binária, encontrar repetidos (ficam vizinhos), mediana, ranking, intercalar relatórios…</p>
+      <p>Às vezes não precisamos de tudo ordenado, só de saber <strong>quem é o próximo</strong>: o paciente mais grave, o processo mais urgente, o evento mais cedo. Para isso existe a <strong>fila de prioridade</strong>.</p>
+      <p>Ao longo da aula, conte as <strong>comparações</strong>: é a medida que usamos para comparar algoritmos de ordenação.</p>
+      <div class="note">Pergunte à turma: para achar só o maior elemento, precisamos ordenar o vetor inteiro?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="motivacao.py">
+notas = [7.5, 9.0, 4.0, 8.5, 6.0, 9.5, 5.5]
+
+ordenadas = sorted(notas)
+print("ordenadas:", ordenadas)
+print("mediana:", ordenadas[len(ordenadas) // 2])
+print("3 maiores:", ordenadas[-3:])
+
+# repetidos ficam vizinhos depois de ordenar
+nomes = sorted(["Ana", "Davi", "Bia", "Ana", "Caio", "Bia"])
+for i in range(1, len(nomes)):
+    if nomes[i] == nomes[i - 1]:
+        print("repetido:", nomes[i])
+
+# só o maior: basta percorrer uma vez, O(n)
+print("maior:", max(notas))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HEAP ===================== -->
+<section class="slide" data-mod="heap" data-title="Fila de prioridade">
+  <h2>Fila de prioridade</h2>
+  <div class="cols">
+    <div>
+      <p>Uma <strong>fila de prioridade</strong> guarda elementos com uma prioridade e oferece três operações: <strong>inserir</strong>, <strong>ver o topo</strong> (o de maior prioridade) e <strong>remover o topo</strong>.</p>
+      <p>Aplicações: triagem de pronto-socorro, escalonador de processos do sistema operacional, simulação de eventos, o algoritmo de Dijkstra (aula de grafos), compressão de Huffman.</p>
+      <table class="tbl">
+        <tr><th>Implementação</th><th>inserir</th><th>remover topo</th></tr>
+        <tr><td>lista sem ordem</td><td>O(1)</td><td>O(n): procura o maior</td></tr>
+        <tr><td>lista ordenada</td><td>O(n): desloca</td><td>O(1): <code>pop()</code></td></tr>
+        <tr><td><strong>heap</strong></td><td><strong>O(log n)</strong></td><td><strong>O(log n)</strong></td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="fila_lista.py">
+# Fila de prioridade com lista sem ordem: inserir é fácil, remover é caro
+fila = []
+
+def inserir(prioridade, nome):
+    fila.append((prioridade, nome))          # O(1)
+
+def remover_topo():
+    m = 0
+    for i in range(1, len(fila)):            # O(n): procura o maior
+        if fila[i][0] > fila[m][0]:
+            m = i
+    return fila.pop(m)
+
+inserir(2, "torção no pé")
+inserir(5, "parada cardíaca")
+inserir(3, "febre alta")
+inserir(1, "receita")
+while fila:
+    print(remover_topo())
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="heap" data-title="Heap binário: árvore guardada em vetor">
+  <h2>Heap binário: uma árvore guardada em vetor</h2>
+  <p class="lead">Um <strong>heap máximo</strong> é uma árvore binária <strong>quase completa</strong> (níveis cheios, o último preenchido da esquerda para a direita) em que todo pai é <strong>maior ou igual</strong> aos filhos. O maior fica na raiz.</p>
+  <div class="edviz" data-viz="heap" data-list="4 10 3 5 1 8 7 2 9" data-tipo="max"></div>
+  <div class="cols even">
+    <div>
+      <p>Como a árvore é quase completa, ela cabe num vetor <strong>sem buracos</strong>, nível por nível. Não precisamos de ponteiros: as posições se calculam.</p>
+      <div class="minis"><span class="mini">pai(i) <b>=</b> (i − 1) // 2</span><span class="mini">esq(i) <b>=</b> 2i + 1</span><span class="mini">dir(i) <b>=</b> 2i + 2</span></div>
+      <p>Altura de um heap com n elementos: ⌊log₂ n⌋. É isso que garante O(log n) nas operações.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="indices_heap.py">
+h = [10, 9, 8, 5, 1, 3, 7, 2, 4]
+
+for i in range(len(h)):
+    esq, dir = 2 * i + 1, 2 * i + 2
+    filhos = [h[f] for f in (esq, dir) if f < len(h)]
+    print(f"h[{i}] = {h[i]:2}   filhos: {filhos}")
+
+# propriedade de heap máximo: todo pai >= filhos
+ok = all(h[(i - 1) // 2] >= h[i] for i in range(1, len(h)))
+print("é heap máximo?", ok)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="heap" data-title="Inserir: o novo elemento sobe">
+  <h2>Inserir: o novo elemento sobe</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Coloque o elemento no <strong>fim do vetor</strong> (próxima folha livre).</li>
+        <li>Enquanto ele for maior que o pai, <strong>troque com o pai</strong> (<em>sift up</em>).</li>
+      </ol>
+      <p>Ele sobe no máximo a altura da árvore: <strong>O(log n)</strong>.</p>
+      <div class="note">Na visualização do slide anterior, insira o valor 12 e depois o 6. Quantas trocas cada um precisou?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="heap_inserir.py">
+def subir(h, i):
+    while i > 0:
+        pai = (i - 1) // 2
+        if h[i] <= h[pai]:
+            break                     # já está no lugar certo
+        h[i], h[pai] = h[pai], h[i]
+        i = pai
+
+def inserir(h, x):
+    h.append(x)
+    subir(h, len(h) - 1)
+
+h = []
+for x in [5, 3, 8, 1, 9, 2]:
+    inserir(h, x)
+    print(f"inseriu {x}: {h}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="heap" data-title="Remover o topo: a raiz desce">
+  <h2>Remover o topo: a raiz desce</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Guarde o topo <code>h[0]</code>.</li>
+        <li>Coloque o <strong>último</strong> elemento na raiz e remova a última posição.</li>
+        <li>Enquanto a raiz for menor que algum filho, <strong>troque com o maior filho</strong> (<em>sift down</em>).</li>
+      </ol>
+      <p>Por que o <strong>maior</strong> filho? Ele vai virar pai do outro, então precisa ser maior que ele.</p>
+      <p>Custo: <strong>O(log n)</strong>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="heap_remover.py">
+def descer(h, i, n):
+    while True:
+        maior = i
+        esq, dir = 2 * i + 1, 2 * i + 2
+        if esq < n and h[esq] > h[maior]:
+            maior = esq
+        if dir < n and h[dir] > h[maior]:
+            maior = dir
+        if maior == i:
+            return                    # maior que os filhos: parou
+        h[i], h[maior] = h[maior], h[i]
+        i = maior
+
+def remover_topo(h):
+    topo = h[0]
+    ultimo = h.pop()
+    if h:
+        h[0] = ultimo
+        descer(h, 0, len(h))
+    return topo
+
+h = [9, 5, 8, 1, 3, 2]
+while h:
+    print(remover_topo(h), "| resta:", h)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="heap" data-title="Construir um heap em O(n)">
+  <h2>Construir um heap em O(n)</h2>
+  <div class="cols">
+    <div>
+      <p>Inserir n elementos um a um custa O(n log n). Dá para fazer melhor: as folhas (metade do vetor) já são heaps; basta <strong>descer cada nó interno, do último para a raiz</strong>.</p>
+      <p>Metade dos nós são folhas e não descem; um quarto desce no máximo 1 nível; um oitavo, 2 níveis… A soma n/4·1 + n/8·2 + n/16·3 + … é menor que n: <strong>O(n)</strong>.</p>
+      <div class="note">Volte à visualização do heap, digite um vetor e clique em <strong>Construir heap</strong>. Compare o número de trocas com o tamanho do vetor.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="construir_heap.py">
+trocas = 0
+
+def descer(h, i, n):
+    global trocas
+    while True:
+        maior = i
+        for f in (2 * i + 1, 2 * i + 2):
+            if f < n and h[f] > h[maior]:
+                maior = f
+        if maior == i:
+            return
+        h[i], h[maior] = h[maior], h[i]
+        trocas += 1
+        i = maior
+
+def construir(h):
+    for i in range(len(h) // 2 - 1, -1, -1):   # nós internos, de trás para frente
+        descer(h, i, len(h))
+
+v = [4, 10, 3, 5, 1, 8, 7, 2, 9]
+construir(v)
+print(v, "| trocas:", trocas)
+
+for n in [100, 1000, 10000]:
+    trocas = 0
+    v = list(range(n))           # crescente: todo pai começa menor que os filhos
+    construir(v)
+    print(f"n = {n:5}: {trocas:5} trocas  ({trocas / n:.2f} por elemento)")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="heap" data-title="O módulo heapq">
+  <h2>O módulo <code>heapq</code></h2>
+  <div class="cols">
+    <div>
+      <p>O Python já traz um heap pronto, que trabalha sobre uma <code>list</code> comum. Atenção: é um heap <strong>mínimo</strong> (o menor fica em <code>h[0]</code>).</p>
+      <table class="tbl">
+        <tr><th>Função</th><th>O que faz</th><th>Custo</th></tr>
+        <tr><td><code>heappush(h, x)</code></td><td>insere</td><td>O(log n)</td></tr>
+        <tr><td><code>heappop(h)</code></td><td>remove e devolve o menor</td><td>O(log n)</td></tr>
+        <tr><td><code>h[0]</code></td><td>espia o menor</td><td>O(1)</td></tr>
+        <tr><td><code>heapify(v)</code></td><td>transforma a lista em heap</td><td>O(n)</td></tr>
+        <tr><td><code>nlargest(k, v)</code></td><td>os k maiores</td><td>O(n log k)</td></tr>
+      </table>
+      <p>Para um heap <strong>máximo</strong>, guarde os valores <strong>negativos</strong>. Para prioridades com dados, use <strong>tuplas</strong> <code>(prioridade, item)</code>: tuplas se comparam pelo primeiro elemento.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="heapq_demo.py">
+import heapq
+
+h = [7, 2, 9, 4, 1]
+heapq.heapify(h)
+print("heap:", h, "| menor:", h[0])
+heapq.heappush(h, 0)
+print([heapq.heappop(h) for _ in range(3)])
+
+# heap máximo com o truque do negativo
+mx = []
+for x in [7, 2, 9, 4]:
+    heapq.heappush(mx, -x)
+print("maior:", -heapq.heappop(mx))
+
+# pronto-socorro: menor número = mais urgente
+fila = []
+heapq.heappush(fila, (3, "febre alta"))
+heapq.heappush(fila, (1, "parada cardíaca"))
+heapq.heappush(fila, (5, "receita"))
+heapq.heappush(fila, (2, "fratura"))
+while fila:
+    prioridade, caso = heapq.heappop(fila)
+    print(prioridade, caso)
+
+print(heapq.nlargest(3, [5, 1, 8, 3, 9, 2]))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="heap" data-title="Heapsort">
+  <h2>Heapsort</h2>
+  <p class="lead">Construa um heap máximo com o vetor e repita: troque o topo (o maior) com o último elemento do heap, encolha o heap e desça a nova raiz. O vetor fica ordenado <strong>no próprio lugar</strong>.</p>
+  <div class="edviz" data-viz="ordenacao" data-algo="heap" data-fixo data-n="10"></div>
+  <div class="cols">
+    <div>
+      <p>Custo: construir O(n) + n remoções de O(log n) = <strong>O(n log n) sempre</strong>, mesmo no pior caso. Memória extra: O(1).</p>
+      <p>Desvantagens: não é estável e, na prática, costuma ser mais lento que o quick sort, porque salta pela memória.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="heapsort.py">
+def descer(v, i, n):
+    while True:
+        maior = i
+        for f in (2 * i + 1, 2 * i + 2):
+            if f < n and v[f] > v[maior]:
+                maior = f
+        if maior == i:
+            return
+        v[i], v[maior] = v[maior], v[i]
+        i = maior
+
+def heapsort(v):
+    n = len(v)
+    for i in range(n // 2 - 1, -1, -1):   # 1) constrói o heap máximo
+        descer(v, i, n)
+    for fim in range(n - 1, 0, -1):        # 2) tira o maior e põe no fim
+        v[0], v[fim] = v[fim], v[0]
+        descer(v, 0, fim)
+
+v = [6, 1, 9, 3, 7, 2, 8]
+heapsort(v)
+print(v)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ORDENAÇÕES SIMPLES ===================== -->
+<section class="slide" data-mod="simples" data-title="Bubble sort">
+  <h2>Bubble sort</h2>
+  <p class="lead">Percorra o vetor comparando vizinhos e trocando os que estão fora de ordem. A cada passada, o maior dos restantes “borbulha” até o fim.</p>
+  <div class="edviz" data-viz="ordenacao" data-algo="bubble" data-fixo data-n="10"></div>
+  <div class="cols">
+    <div>
+      <p>Pior caso (vetor invertido): n(n−1)/2 comparações e trocas: <strong>O(n²)</strong>.</p>
+      <p>Com a parada antecipada (“nenhuma troca na passada”), o melhor caso (já ordenado) é O(n).</p>
+      <div class="note">Na visualização, escolha a entrada <em>invertida</em> e depois <em>ordenada</em>. Compare os contadores.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="bubble.py">
+def bubble_sort(v):
+    comparacoes = trocas = 0
+    n = len(v)
+    for fim in range(n - 1, 0, -1):
+        trocou = False
+        for j in range(fim):
+            comparacoes += 1
+            if v[j] > v[j + 1]:
+                v[j], v[j + 1] = v[j + 1], v[j]
+                trocas += 1
+                trocou = True
+        if not trocou:
+            break                     # passada sem trocas: já ordenado
+    return comparacoes, trocas
+
+for v in ([5, 1, 4, 2, 8], [1, 2, 3, 4, 5], [5, 4, 3, 2, 1]):
+    original = v[:]
+    c, t = bubble_sort(v)
+    print(original, "->", v, f"| {c} comparações, {t} trocas")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="simples" data-title="Selection sort">
+  <h2>Selection sort</h2>
+  <p class="lead">Para cada posição <code>i</code>, procure o <strong>menor</strong> elemento do trecho restante e troque-o com <code>v[i]</code>.</p>
+  <div class="edviz" data-viz="ordenacao" data-algo="selection" data-fixo data-n="10"></div>
+  <div class="cols">
+    <div>
+      <p>Sempre n(n−1)/2 comparações, qualquer que seja a entrada: <strong>O(n²)</strong> no melhor e no pior caso.</p>
+      <p>Em compensação, faz no máximo <strong>n − 1 trocas</strong>. Útil quando escrever na memória é muito caro.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="selection.py">
+def selection_sort(v):
+    comparacoes = trocas = 0
+    n = len(v)
+    for i in range(n - 1):
+        menor = i
+        for j in range(i + 1, n):
+            comparacoes += 1
+            if v[j] < v[menor]:
+                menor = j
+        if menor != i:
+            v[i], v[menor] = v[menor], v[i]
+            trocas += 1
+    return comparacoes, trocas
+
+for v in ([5, 1, 4, 2, 8], [1, 2, 3, 4, 5], [5, 4, 3, 2, 1]):
+    original = v[:]
+    c, t = selection_sort(v)
+    print(original, "->", v, f"| {c} comparações, {t} trocas")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="simples" data-title="Insertion sort">
+  <h2>Insertion sort</h2>
+  <p class="lead">Como organizar cartas na mão: pegue o próximo elemento e <strong>insira-o</strong> no lugar certo do trecho já ordenado à esquerda, deslocando os maiores.</p>
+  <div class="edviz" data-viz="ordenacao" data-algo="insertion" data-fixo data-n="10" data-entrada="quase"></div>
+  <div class="cols">
+    <div>
+      <p>Pior caso (invertido): O(n²). Melhor caso (ordenado): só n − 1 comparações, <strong>O(n)</strong>.</p>
+      <p>Em vetores <strong>quase ordenados</strong> ou pequenos, é excelente. Por isso aparece dentro de algoritmos “de verdade”, como o Timsort do Python.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="insertion.py">
+def insertion_sort(v):
+    comparacoes = 0
+    for i in range(1, len(v)):
+        x = v[i]
+        j = i - 1
+        while j >= 0:
+            comparacoes += 1
+            if v[j] <= x:
+                break
+            v[j + 1] = v[j]           # desloca o maior para a direita
+            j -= 1
+        v[j + 1] = x
+    return comparacoes
+
+for v in ([5, 1, 4, 2, 8], [1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [1, 2, 4, 3, 5]):
+    original = v[:]
+    c = insertion_sort(v)
+    print(original, "->", v, f"| {c} comparações")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="simples" data-title="Teste de mesa do insertion sort">
+  <h2>Teste de mesa do insertion sort</h2>
+  <p class="lead">Acompanhe como <code>x</code> guarda o elemento enquanto os maiores andam para a direita. Antes de avançar, preveja o próximo valor de <code>v</code>.</p>
+  <div class="trace" data-code="v = [5, 2, 4, 1]
+for i in range(1, len(v)):
+    x = v[i]
+    j = i - 1
+    while j &gt;= 0 and v[j] &gt; x:
+        v[j + 1] = v[j]
+        j -= 1
+    v[j + 1] = x
+print(v)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 2, 4, 1]&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 2, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 2, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;x guarda o valor a inserir (2)&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 2, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 2, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;j = 0 é válido e v[0] = 5 &gt; 2: entra no while&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 5, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;5 anda uma casa para a direita (o 2 está salvo em x)&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 5, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;j = -1: chegou ao início&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[5, 5, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;j &lt; 0: sai do while&quot;}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 4, 1]&quot;, &quot;i&quot;: &quot;1&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;x entra em v[j + 1] = v[0]&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 4, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;2&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 4, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;agora insere o 4&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 4, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 4, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v[1] = 5 &gt; 4: desloca&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 5, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 5, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 5, 5, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v[0] = 2 não é maior que 4: para&quot;}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 1]&quot;, &quot;i&quot;: &quot;2&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;o 4 entra na posição 1&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 1]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;4&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 1]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;insere o 1: ele é menor que todos&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 1]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 1]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 5, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 4, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 2, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;0&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 2, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;v&quot;: &quot;[2, 2, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;v&quot;: &quot;[1, 2, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;o 1 entra no início, depois de 3 deslocamentos&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;v&quot;: &quot;[1, 2, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;v&quot;: &quot;[1, 2, 4, 5]&quot;, &quot;i&quot;: &quot;3&quot;, &quot;x&quot;: &quot;1&quot;, &quot;j&quot;: &quot;-1&quot;}, &quot;out&quot;: &quot;[1, 2, 4, 5]\n&quot;, &quot;note&quot;: &quot;ordenado!&quot;}]" data-vars="[&quot;v&quot;, &quot;i&quot;, &quot;x&quot;, &quot;j&quot;]"></div>
+</section>
+
+<section class="slide" data-mod="simples" data-title="Comparando as ordenações simples">
+  <h2>Comparando as ordenações simples</h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Algoritmo</th><th>Melhor</th><th>Pior</th><th>Trocas</th><th>Estável?</th></tr>
+        <tr><td>bubble</td><td>O(n)</td><td>O(n²)</td><td>até n²/2</td><td>sim</td></tr>
+        <tr><td>selection</td><td>O(n²)</td><td>O(n²)</td><td>até n − 1</td><td>não</td></tr>
+        <tr><td>insertion</td><td>O(n)</td><td>O(n²)</td><td>até n²/2</td><td>sim</td></tr>
+      </table>
+      <p>Um algoritmo é <strong>estável</strong> quando elementos com a mesma chave mantêm a ordem original. Importa ao ordenar por um critério e depois por outro (ex.: por nome, depois por turma).</p>
+      <p>No exemplo, o selection sort inverte a ordem original de dois alunos com nota 7.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="estabilidade.py">
+def selection_por_nota(v):
+    for i in range(len(v) - 1):
+        m = i
+        for j in range(i + 1, len(v)):
+            if v[j][1] < v[m][1]:
+                m = j
+        v[i], v[m] = v[m], v[i]
+
+def insertion_por_nota(v):
+    for i in range(1, len(v)):
+        x = v[i]
+        j = i - 1
+        while j >= 0 and v[j][1] > x[1]:
+            v[j + 1] = v[j]
+            j -= 1
+        v[j + 1] = x
+
+alunos = [("Ana", 7), ("Bia", 7), ("Caio", 5)]
+a, b = alunos[:], alunos[:]
+selection_por_nota(a)
+insertion_por_nota(b)
+print("selection:", a)     # Bia passou na frente de Ana
+print("insertion:", b)     # Ana continua antes de Bia
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DIVIDIR E CONQUISTAR ===================== -->
+<section class="slide" data-mod="dc" data-title="Intercalar duas listas ordenadas">
+  <h2>Intercalar duas listas ordenadas</h2>
+  <p class="lead">A peça central do merge sort: juntar duas listas <strong>já ordenadas</strong> em uma só, comparando apenas os primeiros elementos ainda não usados de cada uma.</p>
+  <div class="edviz" data-viz="intercalacao" data-a="2 5 8 11" data-b="1 3 9 10 14"></div>
+  <div class="cols">
+    <div>
+      <p>Cada comparação coloca um elemento no resultado; quando uma lista acaba, o resto da outra é copiado. Custo <strong>O(n + m)</strong>.</p>
+      <p>Usar <code>&lt;=</code> (e não <code>&lt;</code>) no empate pega primeiro da lista da esquerda: é isso que torna o merge sort <strong>estável</strong>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="intercalar.py">
+def intercalar(a, b):
+    c = []
+    i = j = 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            c.append(a[i])
+            i += 1
+        else:
+            c.append(b[j])
+            j += 1
+    c.extend(a[i:])        # sobrou de a (se sobrou)
+    c.extend(b[j:])        # sobrou de b (se sobrou)
+    return c
+
+print(intercalar([2, 5, 8, 11], [1, 3, 9, 10, 14]))
+print(intercalar([], [4, 6]))
+print(intercalar([1, 1, 2], [1, 3]))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dc" data-title="Merge sort">
+  <h2>Merge sort</h2>
+  <p class="lead"><strong>Dividir e conquistar:</strong> divida o vetor ao meio, ordene cada metade (recursivamente) e intercale as duas. Um vetor de 0 ou 1 elemento já está ordenado.</p>
+  <div class="edviz" data-viz="ordenacao" data-algo="merge" data-fixo data-n="12"></div>
+  <div class="cols">
+    <div>
+      <p>As divisões formam log₂ n níveis. Em cada nível, as intercalações juntas processam os n elementos. Total: <strong>O(n log n)</strong>, em <strong>qualquer</strong> caso.</p>
+      <p>Custo extra: precisa de O(n) de memória auxiliar para intercalar. É estável.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="merge_sort.py">
+def intercalar(a, b):
+    c = []
+    i = j = 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            c.append(a[i]); i += 1
+        else:
+            c.append(b[j]); j += 1
+    return c + a[i:] + b[j:]
+
+def merge_sort(v, nivel=0):
+    print("  " * nivel + str(v))
+    if len(v) <= 1:
+        return v                    # caso base
+    meio = len(v) // 2
+    esq = merge_sort(v[:meio], nivel + 1)
+    dir = merge_sort(v[meio:], nivel + 1)
+    return intercalar(esq, dir)
+
+print(merge_sort([38, 27, 43, 3, 9, 82, 10]))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dc" data-title="Partição: a ideia do quick sort">
+  <h2>Partição: a ideia do quick sort</h2>
+  <p class="lead">Escolha um <strong>pivô</strong> e reorganize o vetor para que os menores fiquem à esquerda dele e os maiores à direita. O pivô termina na sua <strong>posição definitiva</strong>.</p>
+  <div class="edviz" data-viz="particao" data-list="7 2 9 4 1 8 3 6 5"></div>
+  <div class="cols">
+    <div>
+      <p>Partição de <strong>Lomuto</strong> (pivô = último): o índice <code>j</code> examina cada elemento; <code>i</code> marca onde termina a parte dos menores. Uma passada: <strong>O(n)</strong>, sem memória extra.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="particao.py">
+def particao(v, ini, fim):
+    pivo = v[fim]
+    i = ini                          # fronteira da parte dos menores
+    for j in range(ini, fim):
+        if v[j] < pivo:
+            v[i], v[j] = v[j], v[i]
+            i += 1
+    v[i], v[fim] = v[fim], v[i]      # pivô vai para o lugar final
+    return i
+
+v = [7, 2, 9, 4, 1, 8, 3, 6, 5]
+p = particao(v, 0, len(v) - 1)
+print(v, "| pivô na posição", p)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dc" data-title="Quick sort e a escolha do pivô">
+  <h2>Quick sort e a escolha do pivô</h2>
+  <div class="edviz" data-viz="ordenacao" data-algo="quick" data-fixo data-n="12"></div>
+  <div class="cols">
+    <div>
+      <p>Particione e ordene recursivamente os dois lados. Se o pivô divide o vetor em partes parecidas, são log n níveis de O(n): <strong>O(n log n)</strong> em média, e muito rápido na prática.</p>
+      <p>Mas com o pivô no último elemento e o vetor <strong>já ordenado</strong>, cada partição só tira um elemento: n níveis, <strong>O(n²)</strong> e recursão profunda.</p>
+      <p>Solução comum: escolher o pivô <strong>aleatoriamente</strong> (ou a mediana de três). O pior caso continua existindo, mas fica improvável.</p>
+      <div class="note">Na visualização, escolha a entrada <em>ordenada</em> e veja o pior caso acontecer.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="quick_sort.py">
+import math, random
+
+comparacoes = 0
+
+def particao(v, ini, fim):
+    global comparacoes
+    pivo = v[fim]
+    i = ini
+    for j in range(ini, fim):
+        comparacoes += 1
+        if v[j] < pivo:
+            v[i], v[j] = v[j], v[i]
+            i += 1
+    v[i], v[fim] = v[fim], v[i]
+    return i
+
+def quick_sort(v, ini, fim, aleatorio=False):
+    if ini < fim:
+        if aleatorio:                      # sorteia o pivô e o põe no fim
+            k = random.randint(ini, fim)
+            v[k], v[fim] = v[fim], v[k]
+        p = particao(v, ini, fim)
+        quick_sort(v, ini, p - 1, aleatorio)
+        quick_sort(v, p + 1, fim, aleatorio)
+
+n = 150                                    # recursão de até n níveis no pior caso
+for nome, v, aleat in [("aleatório", random.sample(range(n), n), False),
+                       ("ordenado", list(range(n)), False),
+                       ("ordenado + pivô aleatório", list(range(n)), True)]:
+    comparacoes = 0
+    quick_sort(v, 0, n - 1, aleat)
+    print(f"{nome:26}: {comparacoes:6} comparações")
+print("n log2 n ≈", round(n * math.log2(n)), "| n²/2 =", n * n // 2)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dc" data-title="Comparando os tempos">
+  <h2>Comparando os tempos</h2>
+  <div class="cols">
+    <div>
+      <p>Medindo de verdade, dobrando n: os quadráticos quadruplicam; os O(n log n) pouco mais que dobram.</p>
+      <table class="tbl">
+        <tr><th>Algoritmo</th><th>Médio</th><th>Pior</th><th>Memória</th><th>Estável</th></tr>
+        <tr><td>insertion</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>sim</td></tr>
+        <tr><td>merge sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>sim</td></tr>
+        <tr><td>quick sort</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>não</td></tr>
+        <tr><td>heapsort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>não</td></tr>
+      </table>
+      <div class="note warn">Aqui o Python roda dentro do navegador, bem mais devagar que no computador. Por isso os n são pequenos.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="tempos.py">
+import random, time
+
+def insertion_sort(v):
+    for i in range(1, len(v)):
+        x = v[i]
+        j = i - 1
+        while j >= 0 and v[j] > x:
+            v[j + 1] = v[j]
+            j -= 1
+        v[j + 1] = x
+
+def merge_sort(v):
+    if len(v) <= 1:
+        return v
+    m = len(v) // 2
+    a, b = merge_sort(v[:m]), merge_sort(v[m:])
+    c, i, j = [], 0, 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            c.append(a[i]); i += 1
+        else:
+            c.append(b[j]); j += 1
+    return c + a[i:] + b[j:]
+
+for n in [250, 500, 1000]:
+    v = [random.random() for _ in range(n)]
+    t0 = time.perf_counter(); insertion_sort(v[:])
+    t1 = time.perf_counter(); merge_sort(v[:])
+    t2 = time.perf_counter(); sorted(v)
+    t3 = time.perf_counter()
+    print(f"n = {n:4}: insertion {1000*(t1-t0):7.1f} ms | merge {1000*(t2-t1):6.1f} ms | sorted {1000*(t3-t2):5.2f} ms")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="dc" data-title="Desafio: o k-ésimo menor (quickselect)">
+  <h2>Desafio: o k-ésimo menor (quickselect)</h2>
+  <div class="cols">
+    <div>
+      <p>Para achar a <strong>mediana</strong> não é preciso ordenar tudo. Depois de uma partição, o pivô está na posição definitiva <code>p</code>:</p>
+      <ul>
+        <li>se <code>p == k</code>, achou;</li>
+        <li>se <code>k &lt; p</code>, continue só no lado esquerdo;</li>
+        <li>senão, só no direito.</li>
+      </ul>
+      <p>Só um lado é visitado a cada vez: em média n + n/2 + n/4 + … = <strong>O(n)</strong>.</p>
+      <p>Complete <code>k_esimo(v, k)</code> (k começa em 0) e teste com a mediana.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_quickselect.py">
+def particao(v, ini, fim):
+    pivo = v[fim]
+    i = ini
+    for j in range(ini, fim):
+        if v[j] < pivo:
+            v[i], v[j] = v[j], v[i]
+            i += 1
+    v[i], v[fim] = v[fim], v[i]
+    return i
+
+def k_esimo(v, k):
+    # use particao repetidamente, sempre no lado que contém k
+    pass
+
+v = [9, 1, 8, 2, 7, 3, 6]
+print(k_esimo(v[:], 0))                # deve mostrar 1
+print(k_esimo(v[:], len(v) // 2))      # mediana: 6
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+def particao(v, ini, fim):
+    pivo = v[fim]
+    i = ini
+    for j in range(ini, fim):
+        if v[j] < pivo:
+            v[i], v[j] = v[j], v[i]
+            i += 1
+    v[i], v[fim] = v[fim], v[i]
+    return i
+
+def k_esimo(v, k):
+    ini, fim = 0, len(v) - 1
+    while True:
+        p = particao(v, ini, fim)
+        if p == k:
+            return v[p]
+        elif k < p:
+            fim = p - 1
+        else:
+            ini = p + 1
+
+v = [9, 1, 8, 2, 7, 3, 6]
+print(k_esimo(v[:], 0))
+print(k_esimo(v[:], len(v) // 2))
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TEMPO LINEAR ===================== -->
+<section class="slide" data-mod="linear" data-title="O limite das comparações">
+  <h2>O limite das comparações: Ω(n log n)</h2>
+  <div class="cols">
+    <div>
+      <p>Todo algoritmo que ordena <strong>só comparando</strong> elementos precisa, no pior caso, de pelo menos <strong>log₂(n!)</strong> comparações.</p>
+      <p>Por quê? Existem n! ordens possíveis da entrada, e cada comparação tem só duas respostas (sim/não). Com k comparações distinguimos no máximo 2ᵏ casos; precisamos de 2ᵏ ≥ n!.</p>
+      <p>E log₂(n!) cresce como n log₂ n. Portanto merge sort e heapsort são <strong>ótimos</strong> entre os algoritmos por comparação.</p>
+      <p>Para ir além, é preciso <strong>não comparar</strong>: usar os próprios valores como índices.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="limite.py">
+import math
+
+print(f"{'n':>8} {'log2(n!)':>12} {'n log2 n':>12}")
+for n in [4, 10, 100, 1000, 100000]:
+    minimo = math.lgamma(n + 1) / math.log(2)    # log2(n!)
+    print(f"{n:8} {minimo:12.0f} {n * math.log2(n):12.0f}")
+
+# n = 4: são 24 ordens possíveis, então pelo menos 5 comparações
+print(math.factorial(4), "ordens ->", math.ceil(math.log2(24)), "comparações")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="linear" data-title="Counting sort">
+  <h2>Counting sort: contar em vez de comparar</h2>
+  <p class="lead">Se os valores são inteiros entre 0 e k, conte quantas vezes cada um aparece e escreva-os em ordem.</p>
+  <div class="edviz" data-viz="contagem" data-list="3 1 4 1 0 3 2 4 3"></div>
+  <div class="cols">
+    <div>
+      <p>Custo <strong>O(n + k)</strong>: uma passada nos dados e uma no vetor de contagem. Com k pequeno (notas de 0 a 10, idades, dias do mês), é linear.</p>
+      <p>Com k enorme (ex.: CPFs), o vetor de contagem fica gigante: não serve.</p>
+      <p>A versão com <strong>somas acumuladas</strong> (ao lado) calcula a posição final de cada valor e é <strong>estável</strong>, o que permite ordenar registros por uma chave.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="counting_sort.py">
+def counting_sort(v, k):
+    cont = [0] * (k + 1)
+    for x in v:
+        cont[x] += 1
+    saida = []
+    for x in range(k + 1):
+        saida.extend([x] * cont[x])
+    return saida
+
+print(counting_sort([3, 1, 4, 1, 0, 3, 2, 4, 3], 4))
+
+# versão estável: ordena registros (nome, nota) pela nota
+def counting_sort_estavel(registros, k):
+    cont = [0] * (k + 1)
+    for _, nota in registros:
+        cont[nota] += 1
+    for x in range(1, k + 1):
+        cont[x] += cont[x - 1]          # cont[x] = quantos são <= x
+    saida = [None] * len(registros)
+    for r in reversed(registros):      # de trás para frente: estável
+        cont[r[1]] -= 1
+        saida[cont[r[1]]] = r
+    return saida
+
+alunos = [("Ana", 8), ("Bia", 5), ("Caio", 8), ("Davi", 5), ("Eva", 10)]
+print(counting_sort_estavel(alunos, 10))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="linear" data-title="Radix sort">
+  <h2>Radix sort: um dígito por vez</h2>
+  <p class="lead">Ordene pelo dígito das <strong>unidades</strong>, depois das dezenas, depois das centenas… usando, em cada passada, uma distribuição <strong>estável</strong> em 10 baldes.</p>
+  <div class="edviz" data-viz="radix" data-list="170 45 75 90 802 24 2 66"></div>
+  <div class="cols">
+    <div>
+      <p>Com d dígitos, são d passadas de O(n + 10): <strong>O(d · n)</strong>. Funciona para números grandes sem um vetor de contagem gigante, e para textos de tamanho fixo (CEPs, placas, datas AAAAMMDD).</p>
+      <p>A estabilidade é essencial: ao ordenar pelas dezenas, os empates mantêm a ordem já obtida pelas unidades.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="radix_sort.py">
+def radix_sort(v):
+    if not v:
+        return v
+    base = 1
+    while base <= max(v):
+        baldes = [[] for _ in range(10)]
+        for x in v:
+            baldes[(x // base) % 10].append(x)
+        v = [x for balde in baldes for x in balde]
+        print(f"pelo dígito {base:>4}: {v}")
+        base *= 10
+    return v
+
+print(radix_sort([170, 45, 75, 90, 802, 24, 2, 66]))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="linear" data-title="Na prática: sorted() e sort()">
+  <h2>Na prática: <code>sorted()</code> e <code>list.sort()</code></h2>
+  <div class="cols">
+    <div>
+      <p>No dia a dia, use o que o Python oferece: o <strong>Timsort</strong>, um híbrido de merge sort e insertion sort que aproveita trechos já ordenados. É O(n log n), O(n) em dados quase ordenados, e <strong>estável</strong>.</p>
+      <ul>
+        <li><code>sorted(v)</code> devolve uma lista nova; <code>v.sort()</code> ordena a própria lista e devolve <code>None</code>.</li>
+        <li><code>key=</code> diz <strong>por qual valor</strong> comparar; <code>reverse=True</code> inverte.</li>
+        <li>Para vários critérios, a chave pode ser uma tupla, ou ordene em etapas aproveitando a estabilidade.</li>
+      </ul>
+    </div>
+    <div>
+<textarea class="py" data-label="sorted_key.py">
+alunos = [("Caio", "B", 7.5), ("Ana", "A", 9.0),
+          ("Bia", "B", 9.0), ("Davi", "A", 7.5)]
+
+print(sorted(alunos, key=lambda a: a[2], reverse=True))   # por nota
+
+# turma crescente e, dentro da turma, nota decrescente
+print(sorted(alunos, key=lambda a: (a[1], -a[2])))
+
+# em etapas: primeiro o critério secundário, depois o principal
+v = sorted(alunos, key=lambda a: a[0])     # por nome
+v.sort(key=lambda a: a[2], reverse=True)   # por nota (estável!)
+for nome, turma, nota in v:
+    print(nota, nome)
+
+print(sorted(["banana", "Kiwi", "uva"], key=str.lower))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual algoritmo?">
+  <h2>Qual algoritmo?</h2>
+  <p class="lead">Leia a situação, discuta com a turma e só então clique.</p>
+  <div class="quiz" data-quiz="algoritmo" data-label="Situação"></div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: heap e insertion sort">
+  <h2>Prática 1: heap e insertion sort</h2>
+  <p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Tente antes de abrir a solução!</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. É um heap máximo? <span class="lvl l1">básico</span></h3>
+      <p>Leia números inteiros na mesma linha (um vetor) e mostre <code>É heap máximo</code> se todo elemento for menor ou igual ao seu pai, ou <code>Não é heap</code> caso contrário.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>9 7 8 3 5 6</pre></td><td><pre>É heap máximo</pre></td></tr><tr><td><pre>9 7 8 3 10</pre></td><td><pre>Não é heap</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_eh_heap.py" data-stdin="9 7 8 3 5 6" data-tests='[{"in": "9 7 8 3 5 6", "out": ["É heap máximo"], "nao": ["Não é heap"]}, {"in": "9 7 8 3 10", "out": ["Não é heap"], "nao": ["É heap máximo"]}, {"in": "5", "out": ["É heap máximo"], "nao": ["Não é heap"]}, {"in": "10 10 10", "out": ["É heap máximo"], "nao": ["Não é heap"]}, {"in": "1 2", "out": ["Não é heap"], "nao": ["É heap máximo"]}, {"in": "20 15 18 4 16 17 1", "out": ["Não é heap"], "nao": ["É heap máximo"]}]'>
+h = [int(x) for x in input("Vetor: ").split()]
+
+# compare cada elemento (a partir do índice 1) com o seu pai
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="9 7 8 3 5 6">
+h = [int(x) for x in input("Vetor: ").split()]
+ok = True
+for i in range(1, len(h)):
+    if h[i] > h[(i - 1) // 2]:      # filho maior que o pai
+        ok = False
+        break
+if ok:
+    print("É heap máximo")
+else:
+    print("Não é heap")
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. Insertion sort passada a passada <span class="lvl l1">básico</span></h3>
+      <p>Leia números inteiros na mesma linha e ordene-os com <strong>insertion sort</strong>. Depois de inserir cada elemento <code>i</code> (de 1 até n − 1), mostre <code>Passada i: [lista]</code>. No fim, mostre <code>Ordenado: [lista]</code>. Não use <code>sort()</code> nem <code>sorted()</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>5 2 4 1</pre></td><td><pre>Passada 1: [2, 5, 4, 1]
+Passada 2: [2, 4, 5, 1]
+Passada 3: [1, 2, 4, 5]
+Ordenado: [1, 2, 4, 5]</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_insertion_passadas.py" data-stdin="5 2 4 1" data-tests='[{"in": "5 2 4 1", "out": ["Passada 1: [2, 5, 4, 1]", "Passada 2: [2, 4, 5, 1]", "Passada 3: [1, 2, 4, 5]", "Ordenado: [1, 2, 4, 5]"]}, {"in": "5 2 4 6 1 3", "out": ["Passada 1: [2, 5, 4, 6, 1, 3]", "Passada 3: [2, 4, 5, 6, 1, 3]", "Passada 4: [1, 2, 4, 5, 6, 3]", "Passada 5: [1, 2, 3, 4, 5, 6]", "Ordenado: [1, 2, 3, 4, 5, 6]"]}, {"in": "7", "out": ["Ordenado: [7]"], "nao": ["Passada"]}, {"in": "1 2 3", "out": ["Passada 1: [1, 2, 3]", "Passada 2: [1, 2, 3]", "Ordenado: [1, 2, 3]"]}, {"in": "3 -1 3", "out": ["Passada 1: [-1, 3, 3]", "Passada 2: [-1, 3, 3]", "Ordenado: [-1, 3, 3]"]}]'>
+v = [int(x) for x in input("Números: ").split()]
+
+# insertion sort mostrando a lista depois de cada inserção
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="5 2 4 1">
+v = [int(x) for x in input("Números: ").split()]
+for i in range(1, len(v)):
+    x = v[i]
+    j = i - 1
+    while j >= 0 and v[j] > x:
+        v[j + 1] = v[j]
+        j -= 1
+    v[j + 1] = x
+    print(f"Passada {i}: {v}")
+print("Ordenado:", v)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: heapq e intercalação">
+  <h2>Prática 2: <code>heapq</code> e intercalação</h2>
+  <p class="lead">Dois problemas clássicos em que não é preciso ordenar tudo de novo.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Os k maiores <span class="lvl l2">médio</span></h3>
+      <p>Leia números inteiros na primeira linha e um inteiro <code>k</code> na segunda. Mostre os <code>k</code> maiores em ordem <strong>decrescente</strong>, separados por espaço: <code>Maiores: a b c</code>. Se <code>k</code> for maior que a quantidade de números, mostre todos.</p>
+      <p>Use <code>heapq</code> mantendo um heap mínimo com no máximo <code>k</code> elementos: O(n log k), sem ordenar a lista toda.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>5 1 9 3 7 2
+3</pre></td><td><pre>Maiores: 9 7 5</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_k_maiores.py" data-stdin="5 1 9 3 7 2
+3" data-tests='[{"in": "5 1 9 3 7 2\n3", "out": ["Maiores: 9 7 5"], "nao": ["Maiores: 9 7 5 3"]}, {"in": "4 4 1\n2", "out": ["Maiores: 4 4"], "nao": ["Maiores: 4 4 1"]}, {"in": "3 8\n5", "out": ["Maiores: 8 3"]}, {"in": "-2 -9 -1\n1", "out": ["Maiores: -1"], "nao": ["Maiores: -1 -2"]}, {"in": "10 20 30 40 50 60\n6", "out": ["Maiores: 60 50 40 30 20 10"]}]'>
+import heapq
+
+v = [int(x) for x in input("Números: ").split()]
+k = int(input("k: "))
+
+# mantenha um heap mínimo com os k maiores vistos até agora
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="5 1 9 3 7 2
+3">
+import heapq
+
+v = [int(x) for x in input("Números: ").split()]
+k = int(input("k: "))
+h = []
+for x in v:
+    if len(h) < k:
+        heapq.heappush(h, x)
+    elif x > h[0]:                  # maior que o menor dos k maiores
+        heapq.heapreplace(h, x)     # tira o menor e coloca x
+maiores = []
+while h:
+    maiores.append(heapq.heappop(h))
+maiores.reverse()                   # saíram do menor para o maior
+print("Maiores:", " ".join(str(x) for x in maiores))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. Intercalar e contar <span class="lvl l2">médio</span></h3>
+      <p>Leia duas listas de inteiros em ordem crescente (uma por linha; uma linha pode estar vazia). Intercale-as <strong>sem usar</strong> <code>sort()</code> ou <code>sorted()</code> e mostre <code>Intercalada: [lista]</code> e <code>Comparações: c</code>, contando só as comparações feitas enquanto as duas listas ainda têm elementos. No empate, pegue da <strong>primeira</strong> lista.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1 4 7
+2 3 8 9</pre></td><td><pre>Intercalada: [1, 2, 3, 4, 7, 8, 9]
+Comparações: 5</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_intercalar.py" data-stdin="1 4 7
+2 3 8 9" data-tests='[{"in": "1 4 7\n2 3 8 9", "out": ["Intercalada: [1, 2, 3, 4, 7, 8, 9]", "Comparações: 5"]}, {"in": "1 2 3\n4 5 6", "out": ["Intercalada: [1, 2, 3, 4, 5, 6]", "Comparações: 3"]}, {"in": "\n5 6", "out": ["Intercalada: [5, 6]", "Comparações: 0"]}, {"in": "1 1\n1", "out": ["Intercalada: [1, 1, 1]", "Comparações: 2"]}, {"in": "10\n1 2 3", "out": ["Intercalada: [1, 2, 3, 10]", "Comparações: 3"]}]'>
+a = [int(x) for x in input("Lista A: ").split()]
+b = [int(x) for x in input("Lista B: ").split()]
+
+# intercale com dois índices, contando as comparações
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1 4 7
+2 3 8 9">
+a = [int(x) for x in input("Lista A: ").split()]
+b = [int(x) for x in input("Lista B: ").split()]
+c = []
+i = j = 0
+comparacoes = 0
+while i < len(a) and j < len(b):
+    comparacoes += 1
+    if a[i] <= b[j]:
+        c.append(a[i])
+        i += 1
+    else:
+        c.append(b[j])
+        j += 1
+c += a[i:] + b[j:]
+print("Intercalada:", c)
+print("Comparações:", comparacoes)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: merge sort e contagem">
+  <h2>Prática 3: merge sort e contagem</h2>
+  <p class="lead">O primeiro reaproveita o merge sort para responder outra pergunta; o segundo dispensa comparações.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Contar inversões <span class="lvl l3">desafio</span></h3>
+      <p>Uma <strong>inversão</strong> é um par de posições <code>i &lt; j</code> com <code>v[i] &gt; v[j]</code>; mede o quão desordenado está o vetor. Leia inteiros na mesma linha e mostre <code>Inversões: k</code>.</p>
+      <p>Testar todos os pares é O(n²). Adapte o <strong>merge sort</strong>: ao intercalar, quando um elemento da metade direita sai antes, ele forma inversão com <strong>todos</strong> os que ainda restam na metade esquerda. Assim fica O(n log n).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>2 4 1 3 5</pre></td><td><pre>Inversões: 3</pre></td></tr></table></div>
+<textarea class="py" data-label="ex5_inversoes.py" data-stdin="2 4 1 3 5" data-tests='[{"in": "2 4 1 3 5", "out": ["Inversões: 3"]}, {"in": "1 2 3 4", "out": ["Inversões: 0"]}, {"in": "4 3 2 1", "out": ["Inversões: 6"]}, {"in": "5", "out": ["Inversões: 0"]}, {"in": "3 3 1", "out": ["Inversões: 2"]}, {"in": "8 4 2 1 9 6", "out": ["Inversões: 8"]}]'>
+v = [int(x) for x in input("Números: ").split()]
+
+# merge sort que devolve (lista_ordenada, inversões)
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="2 4 1 3 5">
+v = [int(x) for x in input("Números: ").split()]
+
+def ordena_conta(v):
+    if len(v) <= 1:
+        return v, 0
+    m = len(v) // 2
+    a, inv_a = ordena_conta(v[:m])
+    b, inv_b = ordena_conta(v[m:])
+    c, i, j = [], 0, 0
+    inv = inv_a + inv_b
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            c.append(a[i]); i += 1
+        else:
+            c.append(b[j]); j += 1
+            inv += len(a) - i       # b[j] é menor que todos os que restam em a
+    return c + a[i:] + b[j:], inv
+
+print("Inversões:", ordena_conta(v)[1])
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. Notas por contagem <span class="lvl l2">médio</span></h3>
+      <p>Leia notas inteiras de 0 a 10 na mesma linha. Usando <strong>counting sort</strong> (um vetor de 11 contadores, sem <code>sort()</code>), mostre <code>Ordenadas: …</code> (separadas por espaço) e <code>Moda: x</code>, a nota mais frequente. No empate, a <strong>menor</strong> nota.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>7 3 10 7 0 3 7</pre></td><td><pre>Ordenadas: 0 3 3 7 7 7 10
+Moda: 7</pre></td></tr></table></div>
+<textarea class="py" data-label="ex6_counting_notas.py" data-stdin="7 3 10 7 0 3 7" data-tests='[{"in": "7 3 10 7 0 3 7", "out": ["Ordenadas: 0 3 3 7 7 7 10", "Moda: 7"]}, {"in": "5", "out": ["Ordenadas: 5", "Moda: 5"]}, {"in": "8 2 8 2", "out": ["Ordenadas: 2 2 8 8", "Moda: 2"], "nao": ["Moda: 8"]}, {"in": "10 10 0", "out": ["Ordenadas: 0 10 10", "Moda: 10"]}, {"in": "0 0 0", "out": ["Ordenadas: 0 0 0", "Moda: 0"]}]'>
+notas = [int(x) for x in input("Notas: ").split()]
+cont = [0] * 11
+
+# conte cada nota, depois percorra cont de 0 a 10
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="7 3 10 7 0 3 7">
+notas = [int(x) for x in input("Notas: ").split()]
+cont = [0] * 11
+for n in notas:
+    cont[n] += 1
+ordenadas = []
+moda = 0
+for n in range(11):
+    ordenadas += [str(n)] * cont[n]
+    if cont[n] > cont[moda]:        # > mantém a menor no empate
+        moda = n
+print("Ordenadas:", " ".join(ordenadas))
+print("Moda:", moda)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: implemente um heap <strong>mínimo</strong> trocando as comparações do heap máximo; conte as comparações do merge sort e compare com n log₂ n; ordene uma lista de palavras pelo tamanho e, no empate, em ordem alfabética.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-heap-ordenacao",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "heap": {
+   "name": "Heap e fila de prioridade",
+   "color": "#a8670c"
+  },
+  "simples": {
+   "name": "Ordenações simples",
+   "color": "#0b78b0"
+  },
+  "dc": {
+   "name": "Dividir e conquistar",
+   "color": "#0f7a62"
+  },
+  "linear": {
+   "name": "Tempo linear",
+   "color": "#8e3a8f"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "quizzes": {
+  "algoritmo": [
+   {
+    "q": "O vetor está quase ordenado: só uns poucos elementos estão fora do lugar. Qual ordenação simples é a melhor escolha?",
+    "opts": [
+     "bubble sort",
+     "selection sort",
+     "insertion sort",
+     "quick sort com pivô no último"
+    ],
+    "ans": 2,
+    "why": "Quase todo elemento já está no lugar: o insertion sort faz perto de n comparações, O(n). O bubble sort só anda um elemento uma posição para a esquerda por passada: um elemento pequeno perdido no fim custa n passadas. O selection sort faz n(n−1)/2 comparações sempre."
+   },
+   {
+    "q": "Com o pivô sempre no último elemento, quando acontece o pior caso do quick sort?",
+    "opts": [
+     "vetor aleatório",
+     "vetor já ordenado",
+     "vetor com valores distintos",
+     "vetor pequeno"
+    ],
+    "ans": 1,
+    "why": "O pivô é sempre o maior: cada partição separa só ele, gerando n níveis de recursão e O(n²) comparações."
+   },
+   {
+    "q": "Qual destes, na versão clássica, NÃO é estável?",
+    "opts": [
+     "merge sort",
+     "insertion sort",
+     "bubble sort",
+     "selection sort"
+    ],
+    "ans": 3,
+    "why": "A troca de longa distância do selection sort pode passar um elemento por cima de outro com a mesma chave."
+   },
+   {
+    "q": "Qual precisa de O(n) de memória auxiliar?",
+    "opts": [
+     "merge sort",
+     "heapsort",
+     "insertion sort",
+     "selection sort"
+    ],
+    "ans": 0,
+    "why": "A intercalação escreve em uma lista auxiliar. Os outros ordenam no próprio vetor."
+   },
+   {
+    "q": "Qual garante O(n log n) no pior caso usando só O(1) de memória extra?",
+    "opts": [
+     "quick sort",
+     "merge sort",
+     "heapsort",
+     "bubble sort"
+    ],
+    "ans": 2,
+    "why": "Heapsort: construir O(n) + n remoções O(log n), tudo dentro do próprio vetor."
+   },
+   {
+    "q": "Ordenar as idades (0 a 120) de 1 milhão de pessoas. Qual é o mais rápido?",
+    "opts": [
+     "counting sort",
+     "merge sort",
+     "insertion sort",
+     "quick sort"
+    ],
+    "ans": 0,
+    "why": "k = 120 é pequeno: O(n + k), sem comparações. Os outros precisam de pelo menos n log n."
+   },
+   {
+    "q": "Em um heap guardado em vetor, quais são as posições dos filhos do elemento na posição 3?",
+    "opts": [
+     "4 e 5",
+     "6 e 7",
+     "7 e 8",
+     "1 e 2"
+    ],
+    "ans": 2,
+    "why": "2·3 + 1 = 7 e 2·3 + 2 = 8."
+   },
+   {
+    "q": "Qual o custo de construir um heap a partir de n elementos, descendo os nós internos de baixo para cima?",
+    "opts": [
+     "O(log n)",
+     "O(n)",
+     "O(n log n)",
+     "O(n²)"
+    ],
+    "ans": 1,
+    "why": "A maioria dos nós está perto das folhas e desce pouco; a soma total é menor que n."
+   },
+   {
+    "q": "Qual o custo de remover o topo de um heap com n elementos?",
+    "opts": [
+     "O(1)",
+     "O(log n)",
+     "O(n)",
+     "O(n log n)"
+    ],
+    "ans": 1,
+    "why": "O último vai para a raiz e desce no máximo a altura da árvore, ⌊log₂ n⌋."
+   },
+   {
+    "q": "No máximo, quantas trocas o selection sort faz em um vetor de n elementos?",
+    "opts": [
+     "n − 1",
+     "n log n",
+     "n²/2",
+     "n²"
+    ],
+    "ans": 0,
+    "why": "Uma troca por passada, e são n − 1 passadas."
+   }
+  ],
+  "saida": [
+   {
+    "code": "import heapq\nh = [5, 1, 8, 3]\nheapq.heapify(h)\nprint(h[0])",
+    "opts": [
+     "5",
+     "1",
+     "8",
+     "3"
+    ],
+    "ans": 1,
+    "why": "heapq é um heap mínimo: depois de heapify, o menor fica em h[0]."
+   },
+   {
+    "code": "import heapq\nh = []\nfor x in [4, 9, 2]:\n    heapq.heappush(h, -x)\nprint(-heapq.heappop(h))",
+    "opts": [
+     "2",
+     "4",
+     "9",
+     "-9"
+    ],
+    "ans": 2,
+    "why": "Guardando negativos, o menor é -9; trocando o sinal de volta, sai o maior: 9."
+   },
+   {
+    "code": "v = [5, 2, 9, 1]\nfor j in range(len(v) - 1):\n    if v[j] > v[j + 1]:\n        v[j], v[j + 1] = v[j + 1], v[j]\nprint(v)",
+    "opts": [
+     "[1, 2, 5, 9]",
+     "[2, 5, 1, 9]",
+     "[2, 1, 5, 9]",
+     "[5, 2, 1, 9]"
+    ],
+    "ans": 1,
+    "why": "Uma passada do bubble sort: troca 5 e 2, mantém 5 e 9, troca 9 e 1. O maior chegou ao fim; o resto ainda não está ordenado."
+   },
+   {
+    "code": "h = [9, 7, 8, 3, 5]\ni = 4\nprint(h[(i - 1) // 2])",
+    "opts": [
+     "7",
+     "8",
+     "3",
+     "9"
+    ],
+    "ans": 0,
+    "why": "O pai da posição 4 é (4 − 1) // 2 = 1, e h[1] é 7."
+   },
+   {
+    "code": "print(sorted([\"banana\", \"kiwi\", \"uva\"], key=len))",
+    "opts": [
+     "['banana', 'kiwi', 'uva']",
+     "['uva', 'kiwi', 'banana']",
+     "['kiwi', 'uva', 'banana']",
+     "[3, 4, 6]"
+    ],
+    "ans": 1,
+    "why": "key=len compara pelos tamanhos 6, 4 e 3, mas devolve as próprias palavras."
+   },
+   {
+    "code": "nomes = [\"Bia\", \"ana\", \"Caio\"]\nprint(sorted(nomes))",
+    "opts": [
+     "['ana', 'Bia', 'Caio']",
+     "['Bia', 'Caio', 'ana']",
+     "['Caio', 'Bia', 'ana']",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "Strings se comparam pelos códigos dos caracteres: maiúsculas vêm antes das minúsculas. Use key=str.lower para ignorar isso."
+   },
+   {
+    "code": "v = [3, 1, 2]\nr = v.sort()\nprint(r, v)",
+    "opts": [
+     "[1, 2, 3] [1, 2, 3]",
+     "None [1, 2, 3]",
+     "None [3, 1, 2]",
+     "[1, 2, 3] [3, 1, 2]"
+    ],
+    "ans": 1,
+    "why": "sort() ordena a própria lista e devolve None. sorted(v) é que devolveria uma lista nova."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/heap-ordenacao.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

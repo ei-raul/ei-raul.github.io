@@ -1,0 +1,24 @@
+/* Visualizações da aula "Hashing, árvores B/B+ e organização de arquivos" — complementa estruturas-viz.css */
+
+/* Tabela hash com encadeamento: uma linha por posição */
+.hb-tab { display: flex; flex-direction: column; gap: .3rem; }
+.hb-row { display: flex; align-items: center; gap: .2rem; padding: .15rem .3rem; border-radius: 7px; }
+.hb-row .ev-link { padding-bottom: 0; }
+.hb-row .ev-nv { height: 2.1rem; min-width: 2.3rem; font-size: .95rem; }
+.hb-idx { font-family: var(--mono); font-size: .8rem; font-weight: 700; width: 2.2rem; height: 2.1rem; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); border-radius: 6px; background: #fff; color: var(--text-muted); }
+.hb-row.on { background: color-mix(in srgb, var(--mod) 10%, transparent); }
+.hb-row.on .hb-idx { background: var(--mod); border-color: var(--mod); color: #fff; }
+
+/* Árvores B e B+: nós com várias chaves */
+.hb-node > rect:first-child { fill: #fff; stroke: #9fb7cf; stroke-width: 2.5; transition: fill .15s, stroke .15s; }
+.hb-node text { font-family: var(--mono); font-size: 13px; font-weight: 600; fill: var(--text); }
+.hb-sep { stroke: #c9d9e8; stroke-width: 1.5; }
+.hb-khl { fill: color-mix(in srgb, var(--ev-done) 25%, #fff); }
+.hb-node text.hb-kon { fill: #145c39; }
+.hb-node.on > rect:first-child    { fill: color-mix(in srgb, var(--mod) 14%, #fff); stroke: var(--mod); }
+.hb-node.cmp > rect:first-child   { fill: #fff3d6; stroke: var(--ev-cmp); }
+.hb-node.swap > rect:first-child  { fill: #fde6e6; stroke: var(--ev-swap); }
+.hb-node.found > rect:first-child { fill: #e3f5ec; stroke: var(--ev-done); }
+.hb-leaflink { stroke: #9fb7cf; stroke-width: 2; stroke-dasharray: 5 3; }
+.hb-leaflink.on { stroke: var(--ev-done); stroke-width: 3; }
+.hb-arrow { fill: #9fb7cf; }

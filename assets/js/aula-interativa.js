@@ -59,7 +59,8 @@ const HINTS = {
   SyntaxError: 'Erro de escrita. Confira parênteses, aspas, vírgulas e os dois-pontos após for, if e while.',
   IndentationError: 'Recuo incorreto. As linhas dentro de um bloco precisam ter o mesmo recuo (4 espaços).',
   AttributeError: 'Esse tipo não possui esse método. Ex.: tuplas e strings não têm append().',
-  ZeroDivisionError: 'Divisão por zero. Verifique se a lista não está vazia antes de dividir por len().'
+  ZeroDivisionError: 'Divisão por zero. Verifique se a lista não está vazia antes de dividir por len().',
+  RecursionError: 'Recursão profunda demais. Confira se existe um caso base e se cada chamada se aproxima dele.'
 };
 function autosize(t){ t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
 function autosizeVisible(){ $$(document.body.classList.contains('view-all') ? 'textarea.src' : '.slide.active textarea.src').forEach(autosize); }

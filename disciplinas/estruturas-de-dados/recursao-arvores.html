@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursão e árvores binárias de busca — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: recursão, pilha de chamadas, memorização, árvores binárias, percursos e árvore binária de busca (busca, inserção e remoção). Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+  <link href="../../assets/css/ed-viz/recursao-arvores.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Recursão e árvores binárias de busca</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Recursão e árvores binárias de busca</h1>
+  <p class="sub">Uma função que chama a si mesma resolve um problema grande a partir de versões menores dele. Hoje usamos essa ideia para percorrer estruturas hierárquicas e montar a árvore binária de busca, que encontra um valor entre milhões em poucas comparações.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="rec" style="color:var(--c-rec)"><span class="sym">f(n−1)</span><span class="nm">Recursão</span><span class="ds">caso base, pilha de chamadas</span></a>
+    <a href="#" data-goto="arv" style="color:var(--c-arv)"><span class="sym">raiz</span><span class="nm">Árvores binárias</span><span class="ds">nós, folhas, altura e percursos</span></a>
+    <a href="#" data-goto="abb" style="color:var(--c-abb)"><span class="sym">esq &lt; raiz &lt; dir</span><span class="nm">Árvore binária de busca</span><span class="ds">buscar, inserir, remover</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram os algoritmos passo a passo: altere os dados, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<!-- ===================== RECURSÃO ===================== -->
+<section class="slide" data-mod="rec" data-title="Uma função que chama a si mesma">
+  <h2>Uma função que chama a si mesma</h2>
+  <div class="cols">
+    <div>
+      <p>Uma função é <strong>recursiva</strong> quando resolve um problema chamando a si mesma para uma versão <strong>menor</strong> do mesmo problema.</p>
+      <p>Toda recursão correta tem duas partes:</p>
+      <ol>
+        <li><strong>Caso base:</strong> uma entrada tão pequena que a resposta é direta, sem nova chamada.</li>
+        <li><strong>Passo recursivo:</strong> reduz o problema e confia que a chamada menor devolve a resposta certa.</li>
+      </ol>
+      <p>O fatorial tem uma definição recursiva natural: <code>0! = 1! = 1</code> e <code>n! = n × (n − 1)!</code>.</p>
+      <div class="minis"><span class="mini">4! <b>=</b> 4 × 3!</span><span class="mini">3! <b>=</b> 3 × 2!</span><span class="mini">2! <b>=</b> 2 × 1!</span><span class="mini">1! <b>=</b> 1</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="fatorial.py">
+def fatorial(n):
+    if n <= 1:                    # caso base: resposta direta
+        return 1
+    return n * fatorial(n - 1)    # passo: um problema menor
+
+for n in range(6):
+    print(f"{n}! = {fatorial(n)}")
+
+def contagem(n):
+    if n == 0:                    # caso base
+        print("Fogo!")
+        return
+    print(n)
+    contagem(n - 1)               # cada chamada chega mais perto do 0
+
+contagem(3)
+</textarea>
+      <div class="note">Pense na recursão como uma <strong>delegação</strong>: “eu sei resolver o 4 se alguém me der a resposta do 3”.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="A pilha de chamadas">
+  <h2>A pilha de chamadas</h2>
+  <p class="lead">Cada chamada ganha um <strong>quadro</strong> próprio na memória, com suas variáveis. Uma chamada que espera outra fica parada embaixo dela: é uma <strong>pilha</strong>. A última a entrar é a primeira a terminar.</p>
+  <div class="edviz" data-viz="pilha" data-func="fatorial" data-n="4"></div>
+  <div class="cols">
+    <div>
+      <p>A pilha <strong>cresce</strong> até o caso base e depois <strong>desmonta</strong>: cada quadro recebe o resultado do de cima, faz a sua conta e sai.</p>
+      <p>Troque a função para <code>soma(lista)</code> na visualização e acompanhe <code>soma([3, 1, 4, 2]) = 3 + soma([1, 4, 2])</code>.</p>
+      <div class="note warn">Cada quadro ocupa memória. Com a recursão profunda demais (milhares de chamadas esperando), a pilha estoura: o Python lança <code>RecursionError</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="pilha_chamadas.py">
+def fatorial(n, nivel=0):
+    recuo = "    " * nivel
+    print(f"{recuo}fatorial({n}) começou")
+    if n <= 1:
+        print(f"{recuo}fatorial({n}) devolve 1")
+        return 1
+    r = n * fatorial(n - 1, nivel + 1)
+    print(f"{recuo}fatorial({n}) devolve {r}")
+    return r
+
+print("Resultado:", fatorial(4))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Recursão sobre listas e strings">
+  <h2>Recursão sobre listas e strings</h2>
+  <div class="cols">
+    <div>
+      <p>Uma lista é “o primeiro elemento + o resto da lista”. O resto é uma lista menor: perfeito para o passo recursivo. O caso base costuma ser a lista vazia (ou com um elemento).</p>
+      <table class="tbl">
+        <tr><th>Problema</th><th>Caso base</th><th>Passo</th></tr>
+        <tr><td>soma</td><td><code>[]</code> → 0</td><td><code>v[0] + soma(v[1:])</code></td></tr>
+        <tr><td>máximo</td><td>1 elemento → ele</td><td>maior entre <code>v[0]</code> e <code>maximo(v[1:])</code></td></tr>
+        <tr><td>inverter</td><td>até 1 letra → ela</td><td><code>inverte(s[1:]) + s[0]</code></td></tr>
+        <tr><td>palíndromo</td><td>até 1 letra → True</td><td>pontas iguais e o miolo é palíndromo</td></tr>
+      </table>
+      <div class="note warn"><code>v[1:]</code> cria uma <strong>cópia</strong> da lista a cada chamada, o que deixa a soma O(n²). Para listas grandes, passe um índice (<code>soma(v, i + 1)</code>) em vez de fatiar.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="listas_recursivas.py">
+def soma(v):
+    if not v:                     # lista vazia
+        return 0
+    return v[0] + soma(v[1:])
+
+def maximo(v):
+    if len(v) == 1:
+        return v[0]
+    resto = maximo(v[1:])
+    return v[0] if v[0] > resto else resto
+
+def inverte(s):
+    if len(s) <= 1:
+        return s
+    return inverte(s[1:]) + s[0]
+
+def eh_palindromo(s):
+    if len(s) <= 1:
+        return True
+    return s[0] == s[-1] and eh_palindromo(s[1:-1])
+
+print(soma([3, 1, 4, 1, 5]))
+print(maximo([3, 9, 4, 1, 5]))
+print(inverte("recursão"))
+print(eh_palindromo("arara"), eh_palindromo("arroz"))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Fibonacci: a árvore de chamadas">
+  <h2>Fibonacci: a árvore de chamadas</h2>
+  <p class="lead">Quando a função chama a si mesma <strong>duas vezes</strong>, as chamadas formam uma árvore. Em <code>fib(n) = fib(n − 1) + fib(n − 2)</code>, os mesmos valores são calculados de novo e de novo.</p>
+  <div class="edviz" data-viz="fib" data-n="5" data-memo="nao"></div>
+  <div class="cols">
+    <div>
+      <p>Na visualização, o número ao lado de cada nó é o valor devolvido. Conte quantas vezes aparece <code>f(2)</code>.</p>
+      <p>O número de chamadas cresce quase como 1,6ⁿ: a versão ingênua é <strong>exponencial</strong>. Para n = 40, são mais de 300 milhões de chamadas.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="fib_ingenuo.py">
+chamadas = 0
+
+def fib(n):
+    global chamadas
+    chamadas += 1
+    if n < 2:                     # fib(0) = 0, fib(1) = 1
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+for n in [5, 10, 15, 20]:
+    chamadas = 0
+    r = fib(n)
+    print(f"fib({n:2}) = {r:5}   chamadas: {chamadas}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Memorização: não recalcule">
+  <h2>Memorização: não recalcule</h2>
+  <p class="lead">Guardamos cada resultado em um dicionário na primeira vez que ele é calculado. Nas próximas, a resposta sai na hora.</p>
+  <div class="edviz" data-viz="fib" data-n="6" data-memo="sim"></div>
+  <div class="cols">
+    <div>
+      <p>Com o dicionário <code>memo</code>, cada <code>fib(k)</code> é calculado <strong>uma única vez</strong>: a árvore vira quase uma linha e o custo cai para <strong>O(n)</strong>.</p>
+      <p>Essa técnica (guardar respostas de subproblemas) é a base da <strong>programação dinâmica</strong>.</p>
+      <div class="note">Compare na visualização: mude entre “sem” e “com memorização” mantendo o mesmo n e observe o contador de chamadas.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="fib_memo.py">
+import time
+
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+memo = {}
+def fib_memo(n):
+    if n in memo:                 # já calculado: devolve na hora
+        return memo[n]
+    if n < 2:
+        r = n
+    else:
+        r = fib_memo(n - 1) + fib_memo(n - 2)
+    memo[n] = r                   # guarda para as próximas vezes
+    return r
+
+t0 = time.perf_counter()
+print("ingênuo:", fib(22))
+t1 = time.perf_counter()
+print("memo:   ", fib_memo(22))
+t2 = time.perf_counter()
+print(f"tempos: {(t1 - t0) * 1000:.1f} ms  x  {(t2 - t1) * 1000:.3f} ms")
+print("fib(150) =", fib_memo(150))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Busca binária recursiva">
+  <h2>Busca binária recursiva</h2>
+  <div class="cols">
+    <div>
+      <p>A busca binária da aula de complexidade e busca é naturalmente recursiva: procurar no vetor é olhar o meio e <strong>procurar em uma das metades</strong>.</p>
+      <ul>
+        <li>Caso base 1: o trecho ficou vazio (<code>ini &gt; fim</code>) → <code>-1</code>.</li>
+        <li>Caso base 2: o meio é o alvo → devolve <code>meio</code>.</li>
+        <li>Passo: chama a si mesma em <strong>uma</strong> metade.</li>
+      </ul>
+      <p>Cada chamada reduz o trecho pela metade: a pilha tem cerca de <strong>log₂ n</strong> quadros (no máximo ⌊log₂ n⌋ + 2, contando a chamada do trecho vazio). Uma única chamada recursiva por nível → O(log n).</p>
+    </div>
+    <div>
+<textarea class="py" data-label="busca_recursiva.py">
+def busca(v, alvo, ini, fim):
+    if ini > fim:                 # trecho vazio: não está
+        return -1
+    meio = (ini + fim) // 2
+    print(f"  procurando em v[{ini}..{fim}], meio = {meio}")
+    if v[meio] == alvo:
+        return meio
+    if v[meio] < alvo:
+        return busca(v, alvo, meio + 1, fim)
+    return busca(v, alvo, ini, meio - 1)
+
+v = [3, 8, 12, 17, 23, 31, 42, 50, 64, 77, 81, 95]
+print("posição:", busca(v, 64, 0, len(v) - 1))
+print("posição:", busca(v, 10, 0, len(v) - 1))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Erros comuns: recursão sem fim">
+  <h2>Erros comuns: recursão sem fim</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><strong>Esquecer o caso base:</strong> a função nunca para de se chamar.</li>
+        <li><strong>Passo que não se aproxima do caso base:</strong> <code>fatorial(n + 1)</code>, ou <code>soma(v)</code> em vez de <code>soma(v[1:])</code>.</li>
+        <li><strong>Caso base que nunca é alcançado:</strong> <code>if n == 0</code> com <code>n</code> negativo ou diminuindo de 2 em 2 a partir de um ímpar.</li>
+        <li><strong>Esquecer o <code>return</code></strong> no passo: a chamada calcula o resultado e ele se perde (a função devolve <code>None</code>).</li>
+      </ul>
+      <p>O Python limita a profundidade da pilha (cerca de 1000 quadros) e lança <code>RecursionError</code> antes de a memória acabar.</p>
+      <div class="note">Peça para a turma prever a saída antes de executar. Depois, corrija adicionando o caso base.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="sem_caso_base.py" data-erro="RecursionError">
+def contagem(n):
+    print(n)
+    contagem(n - 1)     # falta o caso base: quando parar?
+
+contagem(3)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Recursão × iteração">
+  <h2>Recursão × iteração</h2>
+  <div class="cols">
+    <div>
+      <p>Todo algoritmo recursivo pode ser reescrito com laços (às vezes com uma pilha explícita), e vice-versa. Qual usar?</p>
+      <table class="tbl">
+        <tr><th></th><th>Recursão</th><th>Iteração</th></tr>
+        <tr><td>Clareza</td><td>natural para estruturas hierárquicas (árvores, pastas) e “dividir para conquistar”</td><td>natural para percorrer sequências</td></tr>
+        <tr><td>Memória</td><td>um quadro por chamada pendente</td><td>constante</td></tr>
+        <tr><td>Limite</td><td>profundidade máxima (~1000 em Python)</td><td>nenhum</td></tr>
+      </table>
+      <p>Regra prática: se a profundidade pode chegar a milhares (percorrer uma lista longa), prefira o laço. Se é proporcional a log n ou à altura de uma árvore equilibrada, a recursão é ótima.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="rec_x_iter.py">
+def soma_rec(n):
+    if n == 0:
+        return 0
+    return n + soma_rec(n - 1)    # n quadros na pilha
+
+def soma_it(n):
+    total = 0
+    for i in range(1, n + 1):     # memória constante
+        total += i
+    return total
+
+print(soma_rec(500), soma_it(500))
+print(soma_it(100000))
+# print(soma_rec(100000))        # descomente: estoura a pilha
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Estruturas hierárquicas">
+  <h2>Recursão em estruturas hierárquicas</h2>
+  <div class="cols">
+    <div>
+      <p>Pastas contêm arquivos e <strong>outras pastas</strong>, que contêm arquivos e outras pastas… A estrutura é definida em termos dela mesma, então a função que a percorre também é.</p>
+      <p>No exemplo, uma pasta é um dicionário <code>nome → conteúdo</code>, e um arquivo é só o seu tamanho (um <code>int</code>):</p>
+      <ul>
+        <li>caso base: um arquivo → devolve o tamanho;</li>
+        <li>passo: uma pasta → soma o tamanho de cada item dentro dela.</li>
+      </ul>
+      <p>Organogramas, menus, comentários com respostas, o DOM de uma página HTML e expressões matemáticas têm a mesma forma: são <strong>árvores</strong>.</p>
+      <div class="note"><strong>Experimente:</strong> escreva <code>contar_arquivos(pasta)</code> e <code>maior_arquivo(pasta)</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="pastas.py">
+pastas = {
+    "documentos": {
+        "tcc.docx": 120,
+        "fotos": {"praia.jpg": 300, "festa.jpg": 250},
+    },
+    "musicas": {"rock": {"a.mp3": 400}, "b.mp3": 380},
+    "notas.txt": 2,
+}
+
+def tamanho(item):
+    if isinstance(item, int):     # caso base: um arquivo
+        return item
+    total = 0
+    for nome in item:             # pasta: soma o que está dentro
+        total += tamanho(item[nome])
+    return total
+
+def listar(pasta, recuo=0):
+    for nome, item in pasta.items():
+        if isinstance(item, dict):
+            print("  " * recuo + f"[{nome}] {tamanho(item)} KB")
+            listar(item, recuo + 1)
+        else:
+            print("  " * recuo + f"{nome} {item} KB")
+
+listar(pastas)
+print("Total:", tamanho(pastas), "KB")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="rec" data-title="Desafio: Torre de Hanói">
+  <h2>Desafio: Torre de Hanói</h2>
+  <div class="cols">
+    <div>
+      <p>Três hastes (A, B, C) e <code>n</code> discos de tamanhos diferentes, todos em A. Leve todos para C, movendo <strong>um disco por vez</strong> e nunca pondo um disco maior sobre um menor.</p>
+      <p>Pense recursivamente: para mover <code>n</code> discos de A para C,</p>
+      <ol>
+        <li>mova os <code>n − 1</code> de cima de A para B (usando C);</li>
+        <li>mova o maior disco de A para C;</li>
+        <li>mova os <code>n − 1</code> de B para C (usando A).</li>
+      </ol>
+      <p>Mostre cada movimento e o total. Para n discos, são 2ⁿ − 1 movimentos.</p>
+      <div class="minis"><span class="mini">n = 1 <b>→</b> 1</span><span class="mini">n = 3 <b>→</b> 7</span><span class="mini">n = 10 <b>→</b> 1023</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_hanoi.py">
+def hanoi(n, origem, destino, auxiliar):
+    # mova n discos de origem para destino, usando auxiliar
+    # caso base: n == 0 (nada a fazer)
+    pass
+
+hanoi(3, "A", "C", "B")
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+movimentos = 0
+
+def hanoi(n, origem, destino, auxiliar):
+    global movimentos
+    if n == 0:
+        return
+    hanoi(n - 1, origem, auxiliar, destino)   # tira os de cima do caminho
+    movimentos += 1
+    print(f"disco {n}: {origem} -> {destino}")
+    hanoi(n - 1, auxiliar, destino, origem)   # coloca-os de volta por cima
+
+hanoi(3, "A", "C", "B")
+print("Total:", movimentos, "movimentos")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ÁRVORES BINÁRIAS ===================== -->
+<section class="slide" data-mod="arv" data-title="Árvores: vocabulário">
+  <h2>Árvores: vocabulário</h2>
+  <p class="lead">Uma <strong>árvore</strong> é formada por nós ligados de forma hierárquica: um nó especial no topo (a raiz) e, abaixo de cada nó, seus filhos. Em uma <strong>árvore binária</strong>, cada nó tem no máximo dois filhos: o da esquerda e o da direita.</p>
+  <div class="edviz" data-viz="arvore" data-tree='["A", ["B", ["D"], ["E", ["G"]]], ["C", null, ["F"]]]'></div>
+  <div class="cols even">
+    <div>
+      <table class="tbl">
+        <tr><th>Termo</th><th>Significado</th></tr>
+        <tr><td>raiz</td><td>o nó sem pai, no topo</td></tr>
+        <tr><td>folha</td><td>nó sem filhos</td></tr>
+        <tr><td>nó interno</td><td>nó com pelo menos um filho</td></tr>
+        <tr><td>subárvore</td><td>um nó e todos os seus descendentes</td></tr>
+      </table>
+    </div>
+    <div>
+      <table class="tbl">
+        <tr><th>Termo</th><th>Significado</th></tr>
+        <tr><td>nível (profundidade)</td><td>nº de arestas da raiz até o nó (raiz: 0)</td></tr>
+        <tr><td>altura do nó</td><td>nº de arestas do nó até a folha mais distante (folha: 0)</td></tr>
+        <tr><td>altura da árvore</td><td>altura da raiz (árvore vazia: −1)</td></tr>
+      </table>
+      <div class="note">A definição é recursiva: uma árvore binária é <strong>vazia</strong> ou é um nó com uma subárvore esquerda e uma direita, que também são árvores binárias.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arv" data-title="Nós em Python">
+  <h2>Nós em Python</h2>
+  <div class="cols">
+    <div>
+      <p>Cada nó é um objeto com a chave e duas referências: <code>esq</code> e <code>dir</code>. <code>None</code> representa a subárvore vazia.</p>
+      <p>Como a árvore é recursiva, as funções sobre ela seguem sempre o mesmo molde:</p>
+      <ol>
+        <li>caso base: <code>no is None</code> (árvore vazia);</li>
+        <li>passo: combine o nó atual com o resultado das chamadas em <code>no.esq</code> e <code>no.dir</code>.</li>
+      </ol>
+      <div class="minis"><span class="mini">tamanho = 1 + tam(esq) + tam(dir)</span><span class="mini">altura = 1 + max(alt(esq), alt(dir))</span></div>
+      <p>Cada nó é visitado uma vez: essas funções são <strong>O(n)</strong>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="no.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+# a árvore da etapa anterior, montada à mão
+raiz = No("A")
+raiz.esq = No("B")
+raiz.dir = No("C")
+raiz.esq.esq = No("D")
+raiz.esq.dir = No("E")
+raiz.esq.dir.esq = No("G")
+raiz.dir.dir = No("F")
+
+def tamanho(no):
+    if no is None:
+        return 0
+    return 1 + tamanho(no.esq) + tamanho(no.dir)
+
+def altura(no):
+    if no is None:
+        return -1                 # árvore vazia
+    return 1 + max(altura(no.esq), altura(no.dir))
+
+def folhas(no):
+    if no is None:
+        return 0
+    if no.esq is None and no.dir is None:
+        return 1
+    return folhas(no.esq) + folhas(no.dir)
+
+print("nós:", tamanho(raiz))
+print("altura:", altura(raiz))
+print("folhas:", folhas(raiz))
+print("altura da subárvore de C:", altura(raiz.dir))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arv" data-title="Percursos em profundidade">
+  <h2>Percursos: pré-ordem, em ordem e pós-ordem</h2>
+  <p class="lead">Percorrer é visitar todos os nós. Nos três percursos em profundidade, a recursão desce pela esquerda e depois pela direita; muda apenas <strong>quando</strong> o nó atual é visitado.</p>
+  <div class="edviz" data-viz="percursos" data-keys="50 30 70 20 40 60 80" data-ordem="pre"></div>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Percurso</th><th>Ordem</th><th>Uso típico</th></tr>
+        <tr><td>pré-ordem</td><td>raiz, esq, dir</td><td>copiar a árvore, imprimir hierarquias</td></tr>
+        <tr><td>em ordem</td><td>esq, raiz, dir</td><td>listar uma ABB em ordem crescente</td></tr>
+        <tr><td>pós-ordem</td><td>esq, dir, raiz</td><td>apagar a árvore, somar tamanhos de pastas</td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="percursos.py">
+class No:
+    def __init__(self, chave, esq=None, dir=None):
+        self.chave = chave
+        self.esq = esq
+        self.dir = dir
+
+raiz = No(50, No(30, No(20), No(40)), No(70, No(60), No(80)))
+
+def pre_ordem(no):
+    if no is not None:
+        print(no.chave, end=" ")   # visita ANTES
+        pre_ordem(no.esq)
+        pre_ordem(no.dir)
+
+def em_ordem(no):
+    if no is not None:
+        em_ordem(no.esq)
+        print(no.chave, end=" ")   # visita ENTRE
+        em_ordem(no.dir)
+
+def pos_ordem(no):
+    if no is not None:
+        pos_ordem(no.esq)
+        pos_ordem(no.dir)
+        print(no.chave, end=" ")   # visita DEPOIS
+
+pre_ordem(raiz); print("<- pré-ordem")
+em_ordem(raiz);  print("<- em ordem")
+pos_ordem(raiz); print("<- pós-ordem")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arv" data-title="Percurso em nível">
+  <h2>Percurso em nível (em largura)</h2>
+  <p class="lead">Visita os nós nível por nível, da esquerda para a direita. Não é recursivo: usa uma <strong>fila</strong> para lembrar quem ainda falta visitar.</p>
+  <div class="edviz" data-viz="percursos" data-keys="50 30 70 20 40 60 80 35" data-ordem="nivel"></div>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Coloque a raiz na fila.</li>
+        <li>Enquanto a fila não estiver vazia: tire o nó da frente, visite-o e coloque seus filhos no fim.</li>
+      </ol>
+      <p>Como a fila é FIFO (o primeiro que entra é o primeiro que sai), os nós de um nível saem antes dos do nível seguinte.</p>
+      <p><code>collections.deque</code> tira da frente em O(1); <code>list.pop(0)</code> seria O(n).</p>
+      <div class="note">Na aula de grafos, esse mesmo algoritmo vira a <strong>busca em largura</strong> (BFS).</div>
+    </div>
+    <div>
+<textarea class="py" data-label="em_nivel.py">
+from collections import deque
+
+class No:
+    def __init__(self, chave, esq=None, dir=None):
+        self.chave = chave
+        self.esq = esq
+        self.dir = dir
+
+raiz = No(50, No(30, No(20), No(40, No(35))), No(70, No(60), No(80)))
+
+def em_nivel(raiz):
+    fila = deque([raiz])
+    while fila:
+        no = fila.popleft()               # tira da frente
+        print(no.chave, end=" ")
+        if no.esq is not None:
+            fila.append(no.esq)           # filhos vão para o fim
+        if no.dir is not None:
+            fila.append(no.dir)
+    print()
+
+def por_nivel(raiz):                      # um nível por linha
+    nivel = [raiz]
+    d = 0
+    while nivel:
+        print(f"nível {d}:", [no.chave for no in nivel])
+        proximo = []
+        for no in nivel:
+            proximo += [f for f in (no.esq, no.dir) if f is not None]
+        nivel = proximo
+        d += 1
+
+em_nivel(raiz)
+por_nivel(raiz)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABB ===================== -->
+<section class="slide" data-mod="abb" data-title="Árvore binária de busca">
+  <h2>Árvore binária de busca (ABB)</h2>
+  <p class="lead">Em uma ABB, para <strong>todo</strong> nó: as chaves da subárvore esquerda são <strong>menores</strong> que a dele, e as da direita são <strong>maiores</strong>. É a busca binária transformada em estrutura.</p>
+  <div class="edviz" data-viz="abb" data-keys="50 30 70 20 40 60 80" data-valor="45"></div>
+  <div class="cols even">
+    <div>
+      <p>Para buscar, compare com a raiz e desça para um lado só: cada comparação descarta uma subárvore inteira.</p>
+      <p>Para inserir, faça a mesma descida até encontrar um filho vazio (<code>None</code>): o novo nó entra ali, sempre como <strong>folha</strong>.</p>
+    </div>
+    <div>
+      <div class="note"><strong>Experimente:</strong> clique em <em>1 a 7 em ordem</em> e depois em <em>7 aleatórios</em>. Compare a altura. Busque o maior valor nos dois casos e conte as comparações.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="abb" data-title="Busca e inserção">
+  <h2>Busca e inserção</h2>
+  <div class="cols">
+    <div>
+      <p>A inserção recursiva devolve a raiz da subárvore (possivelmente nova). Assim, <code>no.esq = inserir(no.esq, chave)</code> liga o novo nó no lugar certo.</p>
+      <p>A busca pode ser recursiva ou, como aqui, um laço que desce a árvore. Em ambos os casos, o caminho vai da raiz até, no máximo, uma folha: <strong>O(h)</strong>, sendo <code>h</code> a altura.</p>
+      <div class="note warn">Nesta aula a ABB não guarda chaves repetidas. Outra opção comum é mandar os iguais sempre para a direita, ou guardar um contador no nó.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="abb_inserir_buscar.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:                     # lugar vazio: o novo nó entra aqui
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no                          # repetidos são ignorados
+
+def buscar(no, chave):
+    passos = 0
+    while no is not None and no.chave != chave:
+        passos += 1
+        no = no.esq if chave < no.chave else no.dir
+    return no, passos + (1 if no else 0)   # +1: a comparação que achou
+
+raiz = None
+for k in [50, 30, 70, 20, 40, 60, 80]:
+    raiz = inserir(raiz, k)
+
+for alvo in [60, 20, 65]:
+    no, passos = buscar(raiz, alvo)
+    print(alvo, "encontrado" if no else "não está", "em", passos, "comparações")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="abb" data-title="Mínimo, máximo e ordem crescente">
+  <h2>Mínimo, máximo e ordem crescente</h2>
+  <div class="cols">
+    <div>
+      <p>O <strong>menor</strong> valor está no nó mais à esquerda: desça por <code>esq</code> até não dar mais. O <strong>maior</strong>, no mais à direita.</p>
+      <p>O percurso <strong>em ordem</strong> visita a subárvore esquerda (menores), a raiz e a direita (maiores): sai tudo <strong>ordenado</strong>.</p>
+      <p>Inserir n valores em uma ABB e percorrê-la em ordem é um algoritmo de ordenação (<em>tree sort</em>).</p>
+    </div>
+    <div>
+<textarea class="py" data-label="abb_min_max.py">
+import random
+
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def minimo(no):
+    while no.esq is not None:
+        no = no.esq
+    return no.chave
+
+def maximo(no):
+    while no.dir is not None:
+        no = no.dir
+    return no.chave
+
+def em_ordem(no, saida):
+    if no is not None:
+        em_ordem(no.esq, saida)
+        saida.append(no.chave)
+        em_ordem(no.dir, saida)
+    return saida
+
+valores = random.sample(range(100), 10)
+raiz = None
+for v in valores:
+    raiz = inserir(raiz, v)
+print("inseridos:", valores)
+print("em ordem: ", em_ordem(raiz, []))
+print("mínimo:", minimo(raiz), "| máximo:", maximo(raiz))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="abb" data-title="Remoção: três casos">
+  <h2>Remoção: três casos</h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>O nó removido tem…</th><th>O que fazer</th></tr>
+        <tr><td>nenhum filho (folha)</td><td>simplesmente desligá-lo do pai</td></tr>
+        <tr><td>um filho</td><td>o filho sobe e ocupa o lugar dele</td></tr>
+        <tr><td>dois filhos</td><td>copiar para ele o <strong>sucessor</strong> (menor chave da subárvore direita) e remover o sucessor, que tem no máximo um filho</td></tr>
+      </table>
+      <p>Por que o sucessor serve? Ele é maior que tudo à esquerda e menor que todo o resto da direita: a propriedade da ABB continua valendo. (O <em>antecessor</em>, maior da esquerda, também funcionaria.)</p>
+      <div class="edviz" data-viz="abb" data-keys="50 30 70 20 40 60 80 65 75" data-valor="70"></div>
+    </div>
+    <div>
+<textarea class="py" data-label="abb_remover.py">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+def remover(no, chave):
+    if no is None:                    # não estava na árvore
+        return None
+    if chave < no.chave:
+        no.esq = remover(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = remover(no.dir, chave)
+    else:
+        if no.esq is None:            # 0 ou 1 filho
+            return no.dir
+        if no.dir is None:
+            return no.esq
+        s = no.dir                    # 2 filhos: acha o sucessor
+        while s.esq is not None:
+            s = s.esq
+        no.chave = s.chave
+        no.dir = remover(no.dir, s.chave)
+    return no
+
+def em_ordem(no):
+    return em_ordem(no.esq) + [no.chave] + em_ordem(no.dir) if no else []
+
+raiz = None
+for k in [50, 30, 70, 20, 40, 60, 80, 65, 75]:
+    raiz = inserir(raiz, k)
+for k in [20, 60, 70, 50]:
+    raiz = remover(raiz, k)
+    print("sem", k, "->", em_ordem(raiz), "| raiz:", raiz.chave)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="abb" data-title="O custo depende da altura">
+  <h2>O custo depende da altura</h2>
+  <div class="cols">
+    <div>
+      <p>Buscar, inserir e remover descem um caminho da raiz: custam <strong>O(h)</strong>. Tudo depende da forma da árvore.</p>
+      <table class="tbl">
+        <tr><th>Forma</th><th>Altura com n nós</th><th>Busca</th></tr>
+        <tr><td>equilibrada (cheia)</td><td>≈ log₂ n</td><td>O(log n)</td></tr>
+        <tr><td>inserções aleatórias</td><td>proporcional a log n (em média, abaixo de 3 · log₂ n)</td><td>O(log n) em média</td></tr>
+        <tr><td>degenerada (inserção em ordem)</td><td>n − 1</td><td>O(n), como uma lista</td></tr>
+      </table>
+      <div class="note warn">Dados que chegam ordenados (datas, matrículas, IDs crescentes) são comuns na vida real e geram justamente o pior caso. As árvores <strong>AVL</strong> e <strong>rubro-negras</strong>, da próxima aula, se reequilibram sozinhas e garantem altura O(log n).</div>
+    </div>
+    <div>
+<textarea class="py" data-label="altura_abb.py">
+import random, math
+
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(raiz, chave):             # versão com laço (sem limite de recursão)
+    novo = No(chave)
+    if raiz is None:
+        return novo
+    no = raiz
+    while True:
+        if chave < no.chave:
+            if no.esq is None:
+                no.esq = novo
+                return raiz
+            no = no.esq
+        else:
+            if no.dir is None:
+                no.dir = novo
+                return raiz
+            no = no.dir
+
+def altura(raiz):                     # conta os níveis, sem recursão
+    nivel, h = [raiz], -1
+    while nivel:
+        h += 1
+        nivel = [f for no in nivel for f in (no.esq, no.dir) if f]
+    return h
+
+n = 500
+aleatoria = None
+for k in random.sample(range(n), n):
+    aleatoria = inserir(aleatoria, k)
+ordenada = None
+for k in range(n):
+    ordenada = inserir(ordenada, k)
+
+print("n =", n)
+print("altura com inserção aleatória:", altura(aleatoria))
+print("altura com inserção em ordem: ", altura(ordenada))
+print("menor altura possível:        ", math.ceil(math.log2(n + 1)) - 1)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="abb" data-title="Perguntas sobre árvores">
+  <h2>Perguntas sobre árvores</h2>
+  <p class="lead">Desenhe a árvore no caderno quando precisar. Responda e só então clique.</p>
+  <div class="quiz" data-quiz="arvores" data-label="Pergunta"></div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: recursão">
+  <h2>Prática 1: recursão</h2>
+  <p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Resolva com funções <strong>recursivas</strong>, sem laços.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. Soma dos dígitos <span class="lvl l1">básico</span></h3>
+      <p>Leia um inteiro <code>n ≥ 0</code> e mostre a soma dos seus dígitos usando uma função recursiva. Dica: o último dígito é <code>n % 10</code> e o resto do número é <code>n // 10</code>; um número de um dígito é o caso base.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1234</pre></td><td><pre>Soma dos dígitos: 10</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_soma_digitos.py" data-stdin="1234" data-tests='[{"in": "1234", "out": ["Soma dos dígitos: 10"]}, {"in": "0", "out": ["Soma dos dígitos: 0"]}, {"in": "9", "out": ["Soma dos dígitos: 9"]}, {"in": "99999", "out": ["Soma dos dígitos: 45"]}, {"in": "1000000", "out": ["Soma dos dígitos: 1"], "nao": ["Soma dos dígitos: 10"]}, {"in": "507", "out": ["Soma dos dígitos: 12"]}]'>
+def soma_digitos(n):
+    # caso base: n tem um único dígito
+    # passo: último dígito + soma dos dígitos do resto
+    pass
+
+n = int(input("Número: "))
+print("Soma dos dígitos:", soma_digitos(n))
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1234">
+def soma_digitos(n):
+    if n < 10:                          # um dígito só
+        return n
+    return n % 10 + soma_digitos(n // 10)
+
+n = int(input("Número: "))
+print("Soma dos dígitos:", soma_digitos(n))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. Potência rápida <span class="lvl l2">médio</span></h3>
+      <p>Leia <code>b e</code> (inteiros, <code>e ≥ 0</code>) e calcule <code>bᵉ</code> sem <code>**</code> nem <code>pow</code>. A versão ingênua (<code>b * pot(b, e − 1)</code>) faz e + 1 chamadas. Faça em <strong>O(log e)</strong>: calcule <code>m = pot(b, e // 2)</code> uma única vez; o resultado é <code>m * m</code>, vezes <code>b</code> se <code>e</code> for ímpar. Mostre também quantas vezes a função foi chamada (contando a primeira).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>2 10</pre></td><td><pre>Resultado: 1024
+Chamadas: 5</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_potencia.py" data-stdin="2 10" data-tests='[{"in": "2 10", "out": ["Resultado: 1024", "Chamadas: 5"], "nao": ["Chamadas: 11"]}, {"in": "3 0", "out": ["Resultado: 1", "Chamadas: 1"]}, {"in": "5 1", "out": ["Resultado: 5", "Chamadas: 2"]}, {"in": "2 62", "out": ["Resultado: 4611686018427387904", "Chamadas: 7"]}, {"in": "-2 3", "out": ["Resultado: -8", "Chamadas: 3"]}, {"in": "7 100", "out": ["Chamadas: 8"], "nao": ["Chamadas: 101"]}]'>
+chamadas = 0
+
+def pot(b, e):
+    global chamadas
+    chamadas += 1
+    # caso base: e == 0
+    # passo: m = pot(b, e // 2) ...
+    pass
+
+b, e = [int(x) for x in input("Base e expoente: ").split()]
+print("Resultado:", pot(b, e))
+print("Chamadas:", chamadas)
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="2 10">
+chamadas = 0
+
+def pot(b, e):
+    global chamadas
+    chamadas += 1
+    if e == 0:
+        return 1
+    m = pot(b, e // 2)                  # uma única chamada recursiva
+    if e % 2 == 0:
+        return m * m
+    return m * m * b
+
+b, e = [int(x) for x in input("Base e expoente: ").split()]
+print("Resultado:", pot(b, e))
+print("Chamadas:", chamadas)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: árvores">
+  <h2>Prática 2: árvores</h2>
+  <p class="lead">Nos dois exercícios, a primeira linha traz chaves inteiras, que são inseridas <strong>nessa ordem</strong> em uma ABB (repetidas são ignoradas). O código inicial já monta a árvore.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Nós, altura e folhas <span class="lvl l1">básico</span></h3>
+      <p>Escreva as funções recursivas <code>tamanho</code>, <code>altura</code> e <code>folhas</code> e mostre os três valores. A altura de uma folha é 0.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>50 30 70 20 40 60 80</pre></td><td><pre>Nós: 7
+Altura: 2
+Folhas: 4</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_altura_folhas.py" data-stdin="50 30 70 20 40 60 80" data-tests='[{"in": "50 30 70 20 40 60 80", "out": ["Nós: 7", "Altura: 2", "Folhas: 4"]}, {"in": "1 2 3 4 5", "out": ["Nós: 5", "Altura: 4", "Folhas: 1"]}, {"in": "10", "out": ["Nós: 1", "Altura: 0", "Folhas: 1"]}, {"in": "8 3 10 1 6 14 4 7 13", "out": ["Nós: 9", "Altura: 3", "Folhas: 4"]}, {"in": "5 5 5", "out": ["Nós: 1", "Altura: 0", "Folhas: 1"], "nao": ["Nós: 3"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+
+# escreva tamanho(no), altura(no) e folhas(no) e mostre os resultados
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="50 30 70 20 40 60 80">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+
+def tamanho(no):
+    if no is None:
+        return 0
+    return 1 + tamanho(no.esq) + tamanho(no.dir)
+
+def altura(no):
+    if no is None:
+        return -1
+    return 1 + max(altura(no.esq), altura(no.dir))
+
+def folhas(no):
+    if no is None:
+        return 0
+    if no.esq is None and no.dir is None:
+        return 1
+    return folhas(no.esq) + folhas(no.dir)
+
+print("Nós:", tamanho(raiz))
+print("Altura:", altura(raiz))
+print("Folhas:", folhas(raiz))
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. O k-ésimo menor <span class="lvl l2">médio</span></h3>
+      <p>A segunda linha traz um inteiro <code>k</code>. Mostre a <code>k</code>-ésima menor chave da árvore (<code>k = 1</code> é a menor) ou <code>k inválido</code> se não existir. Use o percurso em ordem; não use <code>sort()</code> nem <code>sorted()</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>50 30 70 20 40 60 80
+3</pre></td><td><pre>3º menor: 40</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_kesimo.py" data-stdin="50 30 70 20 40 60 80
+3" data-tests='[{"in": "50 30 70 20 40 60 80\n3", "out": ["3º menor: 40"]}, {"in": "50 30 70 20 40 60 80\n1", "out": ["1º menor: 20"]}, {"in": "50 30 70 20 40 60 80\n7", "out": ["7º menor: 80"]}, {"in": "50 30 70 20 40 60 80\n8", "out": ["k inválido"], "nao": ["menor:"]}, {"in": "50 30 70\n0", "out": ["k inválido"], "nao": ["menor:"]}, {"in": "5 1 9 5\n2", "out": ["2º menor: 5"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+k = int(input("k: "))
+
+# percorra em ordem e encontre a k-ésima chave
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="50 30 70 20 40 60 80
+3">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+k = int(input("k: "))
+
+def em_ordem(no, saida):
+    if no is not None:
+        em_ordem(no.esq, saida)
+        saida.append(no.chave)
+        em_ordem(no.dir, saida)
+    return saida
+
+ordem = em_ordem(raiz, [])
+if 1 <= k <= len(ordem):
+    print(f"{k}º menor: {ordem[k - 1]}")
+else:
+    print("k inválido")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: propriedades da árvore">
+  <h2>Prática 3: propriedades da árvore</h2>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Nível de cada chave <span class="lvl l2">médio</span></h3>
+      <p>Leia as chaves de uma ABB (inseridas na ordem dada) e mostre, <strong>em ordem crescente</strong>, uma linha <code>chave: nível N</code> para cada nó. A raiz está no nível 0. Dica: passe o nível como parâmetro na recursão.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>50 30 70 20 40</pre></td><td><pre>20: nível 2
+30: nível 1
+40: nível 2
+50: nível 0
+70: nível 1</pre></td></tr></table></div>
+<textarea class="py" data-label="ex5_niveis.py" data-stdin="50 30 70 20 40" data-tests='[{"in": "50 30 70 20 40", "out": ["20: nível 2\n30: nível 1\n40: nível 2\n50: nível 0\n70: nível 1"]}, {"in": "3 1 2", "out": ["1: nível 1\n2: nível 2\n3: nível 0"]}, {"in": "9", "out": ["9: nível 0"], "nao": ["nível 1"]}, {"in": "1 2 3", "out": ["1: nível 0\n2: nível 1\n3: nível 2"], "nao": ["nível 3"]}, {"in": "8 3 10 1 6 14 4 7 13", "out": ["1: nível 2\n3: nível 1\n4: nível 3\n6: nível 2\n7: nível 3\n8: nível 0\n10: nível 1\n13: nível 3\n14: nível 2"]}]'>
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+
+# mostre "chave: nível N" para cada nó, em ordem crescente
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="50 30 70 20 40">
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def inserir(no, chave):
+    if no is None:
+        return No(chave)
+    if chave < no.chave:
+        no.esq = inserir(no.esq, chave)
+    elif chave > no.chave:
+        no.dir = inserir(no.dir, chave)
+    return no
+
+raiz = None
+for x in input("Chaves: ").split():
+    raiz = inserir(raiz, int(x))
+
+def niveis(no, nivel):
+    if no is not None:
+        niveis(no.esq, nivel + 1)
+        print(f"{no.chave}: nível {nivel}")
+        niveis(no.dir, nivel + 1)
+
+niveis(raiz, 0)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. É uma ABB? <span class="lvl l3">desafio</span></h3>
+      <p>A árvore vem em <strong>nível</strong>, com <code>-</code> para filho vazio (o código inicial já a monta). Verifique se é uma ABB com chaves distintas: <strong>todas</strong> as chaves à esquerda de um nó menores que ele e todas à direita maiores. Mostre <code>Resultado: ABB válida</code> ou <code>Resultado: não é ABB</code>.</p>
+      <p>Cuidado: comparar cada nó só com os filhos não basta. Em <code>50 30 70 20 60</code>, o 60 é filho direito do 30 (ok), mas está à esquerda do 50. Dica: passe para a recursão o intervalo <code>(mínimo, máximo)</code> permitido.</p>
+<textarea class="py" data-label="ex6_eh_abb.py" data-stdin="50 30 70 20 60 - 80" data-tests='[{"in": "50 30 70 20 40 60 80", "out": ["Resultado: ABB válida"], "nao": ["não é"]}, {"in": "50 30 70 20 60 - 80", "out": ["Resultado: não é ABB"], "nao": ["ABB válida"]}, {"in": "10 5 15 - - 12 20", "out": ["Resultado: ABB válida"], "nao": ["não é"]}, {"in": "10 5 15 - - 3 20", "out": ["Resultado: não é ABB"], "nao": ["ABB válida"]}, {"in": "7", "out": ["Resultado: ABB válida"]}, {"in": "10 10", "out": ["Resultado: não é ABB"], "nao": ["ABB válida"]}, {"in": "8 3 10 1 6 - 14 - - 4 9", "out": ["Resultado: não é ABB"], "nao": ["ABB válida"]}]'>
+from collections import deque
+
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def montar(tokens):            # monta a árvore a partir da ordem em nível
+    if not tokens or tokens[0] == "-":
+        return None
+    raiz = No(int(tokens[0]))
+    fila = deque([raiz])
+    i = 1
+    while fila and i < len(tokens):
+        no = fila.popleft()
+        for lado in ("esq", "dir"):
+            if i < len(tokens) and tokens[i] != "-":
+                filho = No(int(tokens[i]))
+                setattr(no, lado, filho)
+                fila.append(filho)
+            i += 1
+    return raiz
+
+raiz = montar(input("Árvore em nível: ").split())
+
+# verifique se raiz é uma ABB válida
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="50 30 70 20 60 - 80">
+from collections import deque
+
+class No:
+    def __init__(self, chave):
+        self.chave = chave
+        self.esq = None
+        self.dir = None
+
+def montar(tokens):
+    if not tokens or tokens[0] == "-":
+        return None
+    raiz = No(int(tokens[0]))
+    fila = deque([raiz])
+    i = 1
+    while fila and i < len(tokens):
+        no = fila.popleft()
+        for lado in ("esq", "dir"):
+            if i < len(tokens) and tokens[i] != "-":
+                filho = No(int(tokens[i]))
+                setattr(no, lado, filho)
+                fila.append(filho)
+            i += 1
+    return raiz
+
+raiz = montar(input("Árvore em nível: ").split())
+
+def eh_abb(no, minimo, maximo):
+    if no is None:
+        return True
+    if (minimo is not None and no.chave <= minimo) or (maximo is not None and no.chave >= maximo):
+        return False
+    # à esquerda, tudo menor que no.chave; à direita, tudo maior
+    return eh_abb(no.esq, minimo, no.chave) and eh_abb(no.dir, no.chave, maximo)
+
+if eh_abb(raiz, None, None):
+    print("Resultado: ABB válida")
+else:
+    print("Resultado: não é ABB")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: escreva <code>contar_arquivos(pasta)</code> para o exemplo das pastas; imprima uma ABB “deitada” (direita em cima, com recuo pelo nível); implemente a busca e a inserção da ABB sem recursão; conte quantas chamadas faz <code>fib(25)</code> com e sem memorização.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-recursao-arvores",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "rec": {
+   "name": "Recursão",
+   "color": "#c2410c"
+  },
+  "arv": {
+   "name": "Árvores binárias",
+   "color": "#0f7a62"
+  },
+  "abb": {
+   "name": "Árvore binária de busca",
+   "color": "#8e3a8f"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "quizzes": {
+  "arvores": [
+   {
+    "q": "As chaves 40, 20, 60, 10, 30 são inseridas nessa ordem em uma ABB vazia. Qual é o percurso em ordem?",
+    "opts": [
+     "40 20 60 10 30",
+     "10 20 30 40 60",
+     "10 30 20 60 40",
+     "40 20 10 30 60"
+    ],
+    "ans": 1,
+    "why": "Em uma ABB, o percurso em ordem sempre sai em ordem crescente, qualquer que seja a ordem de inserção."
+   },
+   {
+    "q": "Na mesma árvore (40, 20, 60, 10, 30), qual é o percurso em pré-ordem?",
+    "opts": [
+     "40 20 10 30 60",
+     "10 20 30 40 60",
+     "10 30 20 60 40",
+     "40 20 60 10 30"
+    ],
+    "ans": 0,
+    "why": "Raiz (40), depois toda a subárvore esquerda em pré-ordem (20 10 30) e então a direita (60)."
+   },
+   {
+    "q": "E o percurso em pós-ordem da árvore 40, 20, 60, 10, 30?",
+    "opts": [
+     "10 30 20 60 40",
+     "40 60 20 30 10",
+     "10 20 30 40 60",
+     "30 10 20 60 40"
+    ],
+    "ans": 0,
+    "why": "Esquerda (10 30 20), direita (60) e só no fim a raiz (40). A raiz é sempre a última na pós-ordem."
+   },
+   {
+    "q": "Qual percurso usa uma fila em vez de recursão?",
+    "opts": [
+     "pré-ordem",
+     "em ordem",
+     "pós-ordem",
+     "em nível"
+    ],
+    "ans": 3,
+    "why": "O percurso em nível visita por camadas; a fila guarda os nós do próximo nível na ordem certa."
+   },
+   {
+    "q": "Inserindo 1, 2, 3, …, n nessa ordem em uma ABB vazia, qual é a altura da árvore?",
+    "opts": [
+     "log₂ n",
+     "n − 1",
+     "n / 2",
+     "1"
+    ],
+    "ans": 1,
+    "why": "Cada valor é maior que todos os anteriores e vai sempre para a direita: a árvore vira uma lista com n níveis, altura n − 1."
+   },
+   {
+    "q": "Onde está a menor chave de uma ABB?",
+    "opts": [
+     "na raiz",
+     "no nó mais à esquerda",
+     "em qualquer folha",
+     "no último nível"
+    ],
+    "ans": 1,
+    "why": "Desça sempre por esq até não dar mais. Esse nó pode não ser folha: ele pode ter um filho direito."
+   },
+   {
+    "q": "Ao remover um nó com dois filhos, por qual chave ele é substituído na versão vista em aula?",
+    "opts": [
+     "pela do filho esquerdo",
+     "pela da raiz",
+     "pela menor chave da subárvore direita (sucessor)",
+     "pela maior chave da árvore"
+    ],
+    "ans": 2,
+    "why": "O sucessor é maior que tudo à esquerda e menor que o resto da direita, então a propriedade da ABB é mantida."
+   },
+   {
+    "q": "Qual é o custo de buscar em uma ABB de altura h?",
+    "opts": [
+     "O(1)",
+     "O(h)",
+     "O(n²)",
+     "O(2ʰ)"
+    ],
+    "ans": 1,
+    "why": "A busca desce um único caminho da raiz até, no máximo, uma folha: no máximo h + 1 comparações."
+   },
+   {
+    "q": "Uma folha está no nível 3 e não há nós mais fundos. Qual a altura da árvore?",
+    "opts": [
+     "2",
+     "3",
+     "4",
+     "depende do número de nós"
+    ],
+    "ans": 1,
+    "why": "A altura da árvore é o maior nível de um nó (número de arestas da raiz até a folha mais distante)."
+   }
+  ],
+  "saida": [
+   {
+    "code": "def f(n):\n    if n == 0:\n        return 0\n    return n + f(n - 1)\n\nprint(f(4))",
+    "opts": [
+     "4",
+     "10",
+     "24",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "4 + 3 + 2 + 1 + 0 = 10."
+   },
+   {
+    "code": "def g(s):\n    if s == \"\":\n        return \"\"\n    return g(s[1:]) + s[0]\n\nprint(g(\"abc\"))",
+    "opts": [
+     "abc",
+     "cba",
+     "a",
+     "bca"
+    ],
+    "ans": 1,
+    "why": "g(\"abc\") = g(\"bc\") + \"a\" = (g(\"c\") + \"b\") + \"a\" = \"cba\": a string invertida."
+   },
+   {
+    "code": "def p(n):\n    if n > 0:\n        p(n - 1)\n        print(n, end=\" \")\n\np(3)",
+    "opts": [
+     "3 2 1",
+     "1 2 3",
+     "3",
+     "0 1 2 3"
+    ],
+    "ans": 1,
+    "why": "O print vem DEPOIS da chamada: p(3) espera p(2), que espera p(1). O primeiro a imprimir é o 1, na volta da recursão."
+   },
+   {
+    "code": "def p(n):\n    if n > 0:\n        print(n, end=\" \")\n        p(n - 1)\n\np(3)",
+    "opts": [
+     "3 2 1",
+     "1 2 3",
+     "3",
+     "3 2 1 0"
+    ],
+    "ans": 0,
+    "why": "Agora o print vem ANTES da chamada: imprime na ida, 3, 2, 1. Com n = 0 a condição falha e nada é impresso."
+   },
+   {
+    "code": "chamadas = 0\ndef fib(n):\n    global chamadas\n    chamadas += 1\n    if n < 2:\n        return n\n    return fib(n - 1) + fib(n - 2)\n\nfib(4)\nprint(chamadas)",
+    "opts": [
+     "4",
+     "5",
+     "9",
+     "16"
+    ],
+    "ans": 2,
+    "why": "fib(4) chama fib(3) (5 chamadas no total) e fib(2) (3 chamadas): 1 + 5 + 3 = 9."
+   },
+   {
+    "code": "def r(n):\n    return r(n - 1)\n\nprint(r(5))",
+    "opts": [
+     "0",
+     "None",
+     "5",
+     "RecursionError"
+    ],
+    "ans": 3,
+    "why": "Não há caso base: as chamadas se acumulam até ultrapassar o limite da pilha."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/recursao-arvores.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complexidade, vetores e busca — Estruturas de Dados</title>
+  <meta name="description" content="Aula interativa de Estruturas de Dados: vetores e matrizes na memória, análise de complexidade (notação O) e busca sequencial e binária. Exemplos em Python que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+  <link href="../../assets/css/estruturas-viz.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../estruturas-de-dados.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Estruturas de Dados</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Complexidade, vetores e busca</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Complexidade, vetores e busca</h1>
+  <p class="sub">Dois programas podem dar a mesma resposta e um deles levar horas. Hoje vamos entender como os dados ficam na memória, como medir o custo de um algoritmo sem cronômetro e por que procurar em dados ordenados é tão mais rápido.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="vet" style="color:var(--c-vet)"><span class="sym">v[i]</span><span class="nm">Vetores e matrizes</span><span class="ds">elementos lado a lado na memória</span></a>
+    <a href="#" data-goto="cplx" style="color:var(--c-cplx)"><span class="sym">O(n²)</span><span class="nm">Complexidade</span><span class="ds">como o custo cresce com n</span></a>
+    <a href="#" data-goto="busca" style="color:var(--c-busca)"><span class="sym">log₂ n</span><span class="nm">Busca</span><span class="ds">sequencial e binária</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">As visualizações mostram os algoritmos passo a passo: altere os dados, use <strong>Próximo passo</strong> ou <strong>Animar</strong>. Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Por que estudar estruturas de dados?">
+  <h2>Por que estudar estruturas de dados?</h2>
+  <div class="cols">
+    <div>
+      <p>Uma <strong>estrutura de dados</strong> é uma forma de organizar dados na memória para que certas operações fiquem rápidas: buscar, inserir, remover, pegar o menor…</p>
+      <p>O exemplo ao lado faz as <strong>mesmas</strong> 100 consultas em uma lista e em um conjunto (<code>set</code>) com os mesmos 10 mil números. A resposta é igual; o tempo, não.</p>
+      <p>Não existe estrutura melhor em tudo. Cada uma acelera algumas operações e cobra em outras. Ao longo da disciplina, vamos aprender a <strong>medir esse custo</strong> e a escolher.</p>
+      <div class="note">Antes de executar, pergunte à turma: qual será mais rápido, e quantas vezes mais?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="motivacao.py">
+import time
+
+n = 10000
+lista = list(range(n))
+conjunto = set(lista)
+consultas = range(n - 100, n)    # 100 valores do fim
+
+t0 = time.perf_counter()
+for x in consultas:
+    x in lista          # olha um elemento por vez
+t1 = time.perf_counter()
+for x in consultas:
+    x in conjunto       # calcula onde o valor estaria
+t2 = time.perf_counter()
+
+print(f"lista:    {(t1 - t0) * 1000:8.2f} ms")
+print(f"conjunto: {(t2 - t1) * 1000:8.2f} ms")
+</textarea>
+      <div class="minis"><span class="mini">x in lista <b>→</b> percorre</span><span class="mini">x in conjunto <b>→</b> hashing (aula futura)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== VETORES ===================== -->
+<section class="slide" data-mod="vet" data-title="Vetor: elementos lado a lado">
+  <h2>Vetor: elementos lado a lado na memória</h2>
+  <p class="lead">Um <strong>vetor</strong> (array) guarda seus elementos em posições <strong>consecutivas</strong> da memória, todas do mesmo tamanho. Por isso o computador calcula o endereço de qualquer posição com uma única conta.</p>
+  <div class="edviz" data-viz="memoria" data-list="7 3 9 4 1 8" data-base="1000" data-size="4"></div>
+  <div class="cols even">
+    <div>
+      <p><code>endereço(v[i]) = início + i × tamanho_do_elemento</code></p>
+      <p>Não importa se o vetor tem 6 ou 6 milhões de elementos: acessar <code>v[i]</code> custa sempre o mesmo. Dizemos que o acesso é <strong>O(1)</strong>, tempo constante.</p>
+      <p>É também por isso que os índices começam em 0: o índice é o <strong>deslocamento</strong> a partir do início.</p>
+    </div>
+    <div>
+      <div class="note">Em Python, a <code>list</code> é um vetor de <strong>referências</strong>: as posições consecutivas guardam endereços dos objetos. Os elementos podem ter tipos diferentes, mas o acesso por índice continua O(1). Em C, um <code>int v[6]</code> guarda os próprios números lado a lado.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="vet" data-title="Inserir e remover no meio">
+  <h2>Inserir e remover no meio custa caro</h2>
+  <p class="lead">Como os elementos ficam colados, não há “espaço livre” entre eles. Para inserir no meio, é preciso <strong>deslocar</strong> todos os que vêm depois.</p>
+  <div class="edviz" data-viz="deslocamento" data-list="10 20 30 40 50 60" data-pos="1" data-valor="15"></div>
+  <div class="cols">
+    <div>
+      <p>Inserir na posição <code>p</code> de um vetor com <code>n</code> elementos desloca <code>n − p</code> elementos. No pior caso (início), desloca todos: <strong>O(n)</strong>.</p>
+      <p>No fim, não desloca nenhum: <strong>O(1)</strong>. Remover segue a mesma lógica.</p>
+      <table class="tbl">
+        <tr><th>Operação em <code>list</code></th><th>Custo</th></tr>
+        <tr><td><code>v[i]</code>, <code>v[i] = x</code></td><td>O(1)</td></tr>
+        <tr><td><code>v.append(x)</code>, <code>v.pop()</code></td><td>O(1) amortizado</td></tr>
+        <tr><td><code>v.insert(0, x)</code>, <code>v.pop(0)</code></td><td>O(n)</td></tr>
+        <tr><td><code>x in v</code>, <code>v.index(x)</code></td><td>O(n)</td></tr>
+      </table>
+    </div>
+    <div>
+<textarea class="py" data-label="inserir.py">
+def inserir(v, pos, x):
+    v.append(None)                 # abre uma posição no fim
+    movidos = 0
+    for i in range(len(v) - 1, pos, -1):
+        v[i] = v[i - 1]            # anda uma casa para a direita
+        movidos += 1
+    v[pos] = x
+    return movidos
+
+v = [10, 20, 30, 40, 50]
+print(inserir(v, 2, 25), v)
+print(inserir(v, 0, 5), v)         # no início: desloca todos
+print(inserir(v, len(v), 99), v)   # no fim: nenhum deslocamento
+</textarea>
+      <div class="note">Por que o laço anda <strong>de trás para frente</strong>? Troque para <code>range(pos + 1, len(v))</code> e veja o que acontece com os valores.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="vet" data-title="Vetor dinâmico: por que append é rápido">
+  <h2>Vetor dinâmico: por que <code>append</code> é rápido</h2>
+  <div class="cols">
+    <div>
+      <p>Um vetor de verdade tem tamanho fixo. A <code>list</code> do Python é um <strong>vetor dinâmico</strong>: reserva mais espaço (<em>capacidade</em>) do que usa (<em>tamanho</em>).</p>
+      <p>Quando enche, cria um vetor maior e copia tudo para lá. No código ao lado, o novo vetor tem o <strong>dobro</strong> da capacidade (o CPython cresce só cerca de 12,5% por vez; o que importa é crescer por um <em>fator</em>, não por uma quantidade fixa). Essa cópia é cara, O(n), mas acontece cada vez mais raramente.</p>
+      <p>Dobrando, a soma de todas as cópias fica abaixo de 2n: cada <code>append</code> custa em média menos de 2 cópias. Dizemos que é <strong>O(1) amortizado</strong>.</p>
+      <div class="note">Experimente trocar o crescimento para <code>self.capacidade + 1</code> (cresce de um em um) e compare o número de cópias.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="vetor_dinamico.py">
+class VetorDinamico:
+    def __init__(self):
+        self.capacidade = 1
+        self.tamanho = 0
+        self.dados = [None] * self.capacidade
+        self.copias = 0
+
+    def append(self, x):
+        if self.tamanho == self.capacidade:    # cheio: cresce
+            nova = 2 * self.capacidade
+            novo = [None] * nova
+            for i in range(self.tamanho):
+                novo[i] = self.dados[i]
+                self.copias += 1
+            self.dados = novo
+            self.capacidade = nova
+            print(f"  cheio com {self.tamanho}: capacidade agora {nova}")
+        self.dados[self.tamanho] = x
+        self.tamanho += 1
+
+v = VetorDinamico()
+for i in range(20):
+    v.append(i)
+print("tamanho:", v.tamanho, "| capacidade:", v.capacidade)
+print("cópias:", v.copias, "| média por append:", v.copias / v.tamanho)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="vet" data-title="Matrizes na memória">
+  <h2>Matrizes na memória</h2>
+  <p class="lead">A memória é uma fila única de posições. Uma matriz <code>L × C</code> é guardada <strong>linha após linha</strong>: o elemento <code>m[i][j]</code> fica na posição <code>i × C + j</code> desse vetor.</p>
+  <div class="matviz" data-label="m" data-rows="[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]"></div>
+  <div class="cols even">
+    <div>
+      <p>Na matriz 3 × 4 acima, <code>m[2][1]</code> está na posição <code>2 × 4 + 1 = 9</code> da memória: antes dele há 2 linhas inteiras (8 elementos) e mais 1 elemento.</p>
+      <p>Assim, acessar <code>m[i][j]</code> também é <strong>O(1)</strong>. Percorrer a matriz inteira visita <code>L × C</code> elementos: O(L·C), ou O(n²) se for quadrada.</p>
+      <div class="note">Em C, <code>int m[3][4]</code> é exatamente isso: 12 inteiros seguidos. Em Python, uma lista de listas é um vetor de referências para as linhas.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="matriz_memoria.py">
+m = [[1, 2, 3, 4],
+     [5, 6, 7, 8],
+     [9, 10, 11, 12]]
+linhas, colunas = len(m), len(m[0])
+
+# a matriz "achatada", como fica na memória
+plano = []
+for linha in m:
+    for x in linha:
+        plano.append(x)
+print(plano)
+
+i, j = 2, 1
+print("m[i][j]               =", m[i][j])
+print("plano[i * colunas + j] =", plano[i * colunas + j])
+
+# o caminho inverso: posição k -> (linha, coluna)
+k = 6
+print("posição", k, "-> linha", k // colunas, "coluna", k % colunas)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPLEXIDADE ===================== -->
+<section class="slide" data-mod="cplx" data-title="Quanto custa um algoritmo?">
+  <h2>Quanto custa um algoritmo?</h2>
+  <div class="cols">
+    <div>
+      <p>Medir em segundos depende do computador, da linguagem e do que mais está rodando. Para comparar <strong>algoritmos</strong>, contamos quantas <strong>operações básicas</strong> eles fazem em função do tamanho da entrada, <code>n</code>.</p>
+      <p>Operação básica: uma comparação, uma soma, uma atribuição, um acesso a <code>v[i]</code>. Cada uma custa um tempo constante.</p>
+      <p>No exemplo, <code>soma</code> faz uma operação por elemento: <strong>n</strong>. <code>pares</code> compara cada elemento com todos: <strong>n × n</strong>.</p>
+      <div class="note">Execute e observe a coluna <em>pares</em>: quando n aumenta 10 vezes, o trabalho aumenta quantas vezes?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="contando.py">
+def soma(v):
+    ops = 0
+    total = 0
+    for x in v:
+        total += x
+        ops += 1
+    return ops
+
+def pares(v):
+    ops = 0
+    for a in v:
+        for b in v:
+            ops += 1          # compara o par (a, b)
+    return ops
+
+for n in [10, 100, 1000]:
+    v = list(range(n))
+    print(f"n = {n:5}   soma: {soma(v):6}   pares: {pares(v):9}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cplx" data-title="Medindo o tempo de verdade">
+  <h2>Medindo o tempo de verdade</h2>
+  <div class="cols">
+    <div>
+      <p>O tempo medido varia a cada execução, mas a <strong>proporção</strong> revela o comportamento: dobre <code>n</code> e veja quanto o tempo cresce.</p>
+      <table class="tbl">
+        <tr><th>Se o algoritmo é…</th><th>dobrar n multiplica o tempo por</th></tr>
+        <tr><td>O(n)</td><td>≈ 2</td></tr>
+        <tr><td>O(n²)</td><td>≈ 4</td></tr>
+        <tr><td>O(n³)</td><td>≈ 8</td></tr>
+        <tr><td>O(log n)</td><td>quase nada (soma uma constante)</td></tr>
+      </table>
+      <p><code>time.perf_counter()</code> devolve um relógio de alta precisão, em segundos.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="cronometro.py">
+import time
+
+def pares_iguais(v):
+    c = 0
+    for i in range(len(v)):
+        for j in range(i + 1, len(v)):
+            if v[i] == v[j]:
+                c += 1
+    return c
+
+anterior = None
+for n in [200, 400, 800, 1600]:
+    v = list(range(n))
+    t0 = time.perf_counter()
+    pares_iguais(v)
+    t = time.perf_counter() - t0
+    razao = f"   ({t / anterior:.1f}x o anterior)" if anterior else ""
+    print(f"n = {n:5}: {t * 1000:8.1f} ms{razao}")
+    anterior = t
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cplx" data-title="Como as funções crescem">
+  <h2>Como as funções crescem</h2>
+  <p class="lead">Para n pequeno, quase tudo é rápido. A diferença aparece quando n cresce: a <strong>taxa de crescimento</strong> domina qualquer constante.</p>
+  <div class="edviz" data-viz="crescimento" data-n="1000"></div>
+  <div class="note">Com n = 100, um algoritmo exponencial levaria mais que a idade do universo. Com n = 1 milhão, um quadrático leva quase 3 horas e um O(n log n), menos de um segundo.</div>
+</section>
+
+<section class="slide" data-mod="cplx" data-title="Notação O grande">
+  <h2>Notação O grande</h2>
+  <div class="cols">
+    <div>
+      <p>Dizemos que um algoritmo é <strong>O(f(n))</strong> quando, para n grande, ele faz no máximo algo proporcional a <code>f(n)</code> operações. É um <strong>limite superior</strong> do crescimento.</p>
+      <h3>Como simplificar</h3>
+      <ol>
+        <li><strong>Ignore constantes multiplicativas:</strong> 3n + 5 → O(n).</li>
+        <li><strong>Fique só com o termo que cresce mais rápido:</strong> n² + 100n + 7 → O(n²).</li>
+        <li>A base do logaritmo não importa: log₂ n e log₁₀ n diferem por uma constante → O(log n).</li>
+      </ol>
+      <div class="minis"><span class="mini">5n + 20 <b>→</b> O(n)</span><span class="mini">n²/2 + n <b>→</b> O(n²)</span><span class="mini">7 <b>→</b> O(1)</span><span class="mini">n + log n <b>→</b> O(n)</span></div>
+    </div>
+    <div>
+      <table class="tbl">
+        <tr><th>Classe</th><th>Exemplo típico</th></tr>
+        <tr><td><code>O(1)</code></td><td>acessar <code>v[i]</code>, <code>append</code></td></tr>
+        <tr><td><code>O(log n)</code></td><td>busca binária</td></tr>
+        <tr><td><code>O(n)</code></td><td>percorrer uma lista, busca sequencial</td></tr>
+        <tr><td><code>O(n log n)</code></td><td>merge sort, <code>sorted()</code></td></tr>
+        <tr><td><code>O(n²)</code></td><td>dois laços aninhados sobre os dados</td></tr>
+        <tr><td><code>O(2ⁿ)</code></td><td>testar todos os subconjuntos</td></tr>
+      </table>
+      <div class="note">Também existem Ω (limite inferior) e Θ (limite justo). Na prática, quando alguém diz “é O(n)”, quase sempre quer dizer “cresce linearmente”.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cplx" data-title="Regras práticas para analisar código">
+  <h2>Regras práticas para analisar código</h2>
+  <div class="cols">
+    <div>
+      <table class="tbl">
+        <tr><th>Estrutura do código</th><th>Custo</th></tr>
+        <tr><td>comandos em sequência</td><td><strong>soma</strong> os custos (fica o maior)</td></tr>
+        <tr><td>laço que roda n vezes</td><td>n × custo do corpo</td></tr>
+        <tr><td>laços aninhados (n e n)</td><td>n × n = n²</td></tr>
+        <tr><td>laço que <strong>divide</strong> por 2 a cada volta</td><td>log n</td></tr>
+        <tr><td>chamada de função</td><td>custo da função (cuidado com <code>in</code>, <code>index</code>, <code>insert</code>, <code>sorted</code>…)</td></tr>
+      </table>
+      <p>Por que dividir pela metade dá log n? Começando em n, depois de k divisões sobra n / 2ᵏ. Chega a 1 quando 2ᵏ = n, ou seja, <strong>k = log₂ n</strong>.</p>
+      <div class="minis"><span class="mini">log₂ 1.000 <b>≈</b> 10</span><span class="mini">log₂ 1.000.000 <b>≈</b> 20</span><span class="mini">log₂ 10⁹ <b>≈</b> 30</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="regras.py">
+import math
+
+n = 1000
+
+# laço que divide por 2: log n voltas
+i = n
+voltas = 0
+while i > 1:
+    i = i // 2
+    voltas += 1
+print("metades até chegar a 1:", voltas)
+print("log2(1000) =", round(math.log2(n), 2))
+
+# laço interno que depende do externo: 0 + 1 + ... + (n-1)
+c = 0
+for a in range(n):
+    for b in range(a):
+        c += 1
+print("triângulo:", c, "= n(n-1)/2 -> ainda O(n²)")
+
+# armadilha: um laço só, mas com um O(n) escondido
+v = list(range(n))
+achados = 0
+for x in range(n):
+    if x in v:          # "in" em lista percorre a lista!
+        achados += 1
+print("achados:", achados, "-> n × n = O(n²)")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cplx" data-title="Melhor, pior e caso médio">
+  <h2>Melhor caso, pior caso e caso médio</h2>
+  <div class="cols">
+    <div>
+      <p>O mesmo algoritmo pode trabalhar mais ou menos dependendo dos dados. Na busca sequencial em n elementos:</p>
+      <table class="tbl">
+        <tr><th>Caso</th><th>Quando acontece</th><th>Comparações</th></tr>
+        <tr><td>melhor</td><td>alvo na primeira posição</td><td>1 → O(1)</td></tr>
+        <tr><td>pior</td><td>alvo no fim ou ausente</td><td>n → O(n)</td></tr>
+        <tr><td>médio</td><td>alvo em posição aleatória</td><td>≈ n/2 → O(n)</td></tr>
+      </table>
+      <p>Normalmente analisamos o <strong>pior caso</strong>: é uma garantia. Se o pior caso é aceitável, qualquer entrada será.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="casos.py">
+import random
+
+def comparacoes(v, alvo):
+    c = 0
+    for x in v:
+        c += 1
+        if x == alvo:
+            break
+    return c
+
+n = 1000
+v = list(range(n))
+print("melhor caso:", comparacoes(v, 0))
+print("pior caso:  ", comparacoes(v, -1))
+
+total = 0
+for _ in range(2000):
+    total += comparacoes(v, random.randrange(n))
+print("média de 2000 buscas aleatórias:", total / 2000)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="cplx" data-title="Qual é a complexidade?">
+  <h2>Qual é a complexidade?</h2>
+  <p class="lead">Leia o trecho, decida a ordem de crescimento em função de <code>n</code> (o tamanho de <code>v</code>) e só então clique.</p>
+  <div class="quiz" data-quiz="complexidade" data-label="Trecho"></div>
+</section>
+
+<!-- ===================== BUSCA ===================== -->
+<section class="slide" data-mod="busca" data-title="Busca sequencial">
+  <h2>Busca sequencial</h2>
+  <p class="lead">A estratégia mais simples: olhar um elemento de cada vez, do início ao fim, até achar o alvo ou acabar o vetor. Funciona com <strong>qualquer</strong> vetor, ordenado ou não.</p>
+  <div class="edviz" data-viz="busca" data-modo="seq" data-list="42 7 19 3 25 11 30 8" data-alvo="30"></div>
+  <div class="cols">
+    <div>
+      <p>Convenção usada em toda a disciplina: a função devolve a <strong>posição</strong> do alvo, ou <code>-1</code> se ele não estiver no vetor.</p>
+      <p>Custo: <strong>O(n)</strong> no pior caso. É o que o Python faz em <code>x in lista</code> e <code>lista.index(x)</code>.</p>
+      <div class="note">Mude o alvo na visualização para um valor que não está no vetor e conte as comparações.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="busca_sequencial.py">
+def busca_sequencial(v, alvo):
+    for i in range(len(v)):
+        if v[i] == alvo:
+            return i        # achou: devolve a posição
+    return -1               # percorreu tudo sem achar
+
+nomes = ["Ana", "Bruno", "Carla", "Davi", "Eva"]
+print(busca_sequencial(nomes, "Davi"))
+print(busca_sequencial(nomes, "Zeca"))
+print(nomes.index("Carla"))     # o Python já faz isso: O(n)
+print("Eva" in nomes)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="busca" data-title="Busca binária">
+  <h2>Busca binária</h2>
+  <p class="lead">Se o vetor está <strong>ordenado</strong>, dá para fazer como num dicionário de papel: abrir no meio e descartar a metade onde a palavra não pode estar.</p>
+  <div class="edviz" data-viz="busca" data-modo="bin" data-list="3 8 12 17 23 31 42 50 64 77 81 95" data-alvo="64"></div>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Mantenha o trecho ainda possível entre <code>ini</code> e <code>fim</code>.</li>
+        <li>Olhe o elemento do <code>meio</code>.</li>
+        <li>Se for o alvo, achou. Se for <strong>menor</strong>, o alvo está à direita: <code>ini = meio + 1</code>. Se for <strong>maior</strong>, está à esquerda: <code>fim = meio - 1</code>.</li>
+        <li>Se <code>ini</code> passar de <code>fim</code>, o trecho ficou vazio: não está no vetor.</li>
+      </ol>
+      <p>Cada comparação corta o trecho pela metade: no pior caso, <strong>O(log n)</strong> comparações.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="busca_binaria.py">
+def busca_binaria(v, alvo):
+    ini, fim = 0, len(v) - 1
+    while ini <= fim:
+        meio = (ini + fim) // 2
+        if v[meio] == alvo:
+            return meio
+        elif v[meio] < alvo:
+            ini = meio + 1      # descarta a metade esquerda
+        else:
+            fim = meio - 1      # descarta a metade direita
+    return -1
+
+v = [3, 8, 12, 17, 23, 31, 42, 50, 64, 77, 81, 95]
+print(busca_binaria(v, 64))
+print(busca_binaria(v, 3))
+print(busca_binaria(v, 40))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="busca" data-title="Teste de mesa da busca binária">
+  <h2>Teste de mesa da busca binária</h2>
+  <p class="lead">Acompanhe <code>ini</code>, <code>fim</code> e <code>meio</code> a cada linha. Antes de avançar, tente prever o próximo valor de <code>meio</code>.</p>
+  <div class="trace" data-code="v = [4, 9, 15, 21, 30, 38, 47]
+alvo = 30
+ini, fim = 0, len(v) - 1
+while ini &lt;= fim:
+    meio = (ini + fim) // 2
+    if v[meio] == alvo:
+        print(&quot;Achou na posição&quot;, meio)
+        break
+    elif v[meio] &lt; alvo:
+        ini = meio + 1
+    else:
+        fim = meio - 1" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 2, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;ini&quot;: &quot;0&quot;, &quot;fim&quot;: &quot;6&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;procura no vetor inteiro: ini = 0, fim = 6&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;ini&quot;: &quot;0&quot;, &quot;fim&quot;: &quot;6&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;ini &lt;= fim: ainda há trecho para olhar&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;ini&quot;: &quot;0&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;meio = (0 + 6) // 2 = 3&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;ini&quot;: &quot;0&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v[3] é 21: não é o alvo&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;ini&quot;: &quot;0&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;21 &lt; 30: o alvo só pode estar à direita&quot;}, {&quot;line&quot;: 10, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;ini = meio + 1: descarta v[0..3]&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;meio = (4 + 6) // 2 = 5&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v[5] é 38: não é o alvo&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;6&quot;, &quot;meio&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;38 &gt; 30: não é menor, vai para o else&quot;}, {&quot;line&quot;: 12, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;4&quot;, &quot;meio&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;fim = meio - 1: descarta v[5..6]&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;4&quot;, &quot;meio&quot;: &quot;5&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;4&quot;, &quot;meio&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;meio = (4 + 4) // 2 = 4&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;4&quot;, &quot;meio&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;v[4] é 30: encontrou!&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;4&quot;, &quot;meio&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;Achou na posição 4\n&quot;, &quot;note&quot;: null}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;ini&quot;: &quot;4&quot;, &quot;fim&quot;: &quot;4&quot;, &quot;meio&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;Achou na posição 4\n&quot;, &quot;note&quot;: &quot;break: sai do while. Foram 3 comparações para 7 elementos&quot;}]" data-vars="[&quot;ini&quot;, &quot;fim&quot;, &quot;meio&quot;]"></div>
+  <div class="minis"><span class="mini">v = [4, 9, 15, 21, 30, 38, 47]</span><span class="mini">índices 0 a 6</span><span class="mini">alvo = 30</span></div>
+</section>
+
+<section class="slide" data-mod="busca" data-title="Sequencial × binária">
+  <h2>Sequencial × binária: quantas comparações?</h2>
+  <div class="cols">
+    <div>
+      <p>O programa conta as comparações no <strong>pior caso</strong> da busca sequencial (alvo no fim) e da binária, para vetores cada vez maiores.</p>
+      <table class="tbl">
+        <tr><th>n</th><th>sequencial (pior)</th><th>binária (pior)</th></tr>
+        <tr><td>1.000</td><td>1.000</td><td>10</td></tr>
+        <tr><td>1.000.000</td><td>1.000.000</td><td>20</td></tr>
+        <tr><td>1.000.000.000</td><td>1.000.000.000</td><td>30</td></tr>
+      </table>
+      <div class="note warn">A busca binária exige o vetor <strong>ordenado</strong>. Ordenar custa O(n log n), então só compensa quando vamos buscar muitas vezes nos mesmos dados.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="comparando.py">
+def comp_sequencial(v, alvo):
+    c = 0
+    for x in v:
+        c += 1
+        if x == alvo:
+            break
+    return c
+
+def comp_binaria(v, alvo):
+    c = 0
+    ini, fim = 0, len(v) - 1
+    while ini <= fim:
+        meio = (ini + fim) // 2
+        c += 1
+        if v[meio] == alvo:
+            break
+        elif v[meio] < alvo:
+            ini = meio + 1
+        else:
+            fim = meio - 1
+    return c
+
+for n in [10, 100, 1000, 10000, 100000]:
+    v = list(range(n))
+    alvo = n - 1                    # pior caso da sequencial
+    print(f"n = {n:6}:  sequencial {comp_sequencial(v, alvo):6}  |  binária {comp_binaria(v, alvo):2}")
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="busca" data-title="Cuidados com a busca binária">
+  <h2>Cuidados com a busca binária</h2>
+  <div class="cols">
+    <div>
+      <h3>Erros comuns</h3>
+      <ul>
+        <li><strong>Vetor fora de ordem:</strong> o algoritmo não reclama, só devolve a resposta errada.</li>
+        <li><code>while ini &lt; fim</code> em vez de <code>&lt;=</code>: deixa de olhar o trecho de um elemento só.</li>
+        <li><code>ini = meio</code> em vez de <code>meio + 1</code>: pode ficar preso para sempre no mesmo trecho.</li>
+      </ul>
+      <h3>Pronto no Python: <code>bisect</code></h3>
+      <p><code>bisect_left(v, x)</code> devolve a posição onde <code>x</code> está ou deveria ser inserido para manter a ordem. <code>insort(v, x)</code> insere mantendo a ordem (a busca é O(log n), mas a inserção ainda desloca: O(n)).</p>
+    </div>
+    <div>
+<textarea class="py" data-label="cuidados.py">
+def busca_binaria(v, alvo):
+    ini, fim = 0, len(v) - 1
+    while ini <= fim:
+        meio = (ini + fim) // 2
+        if v[meio] == alvo:
+            return meio
+        elif v[meio] < alvo:
+            ini = meio + 1
+        else:
+            fim = meio - 1
+    return -1
+
+v = [42, 7, 19, 3, 25, 11]        # NÃO está ordenado
+print(busca_binaria(v, 42))       # 42 está na posição 0...
+print(busca_binaria(sorted(v), 42))
+
+import bisect
+w = [3, 8, 12, 17, 23, 31]
+pos = bisect.bisect_left(w, 17)
+print(pos, w[pos] == 17)
+print(bisect.bisect_left(w, 20))  # onde o 20 entraria
+bisect.insort(w, 20)
+print(w)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="busca" data-title="Desafio: raiz quadrada com busca binária">
+  <h2>Desafio: raiz quadrada com busca binária</h2>
+  <div class="cols">
+    <div>
+      <p>A busca binária não serve só para vetores. Ela funciona em qualquer intervalo onde a resposta “sim/não” muda <strong>uma única vez</strong>.</p>
+      <p>Encontre a <strong>raiz quadrada inteira</strong> de <code>n</code>: o maior <code>r</code> tal que <code>r * r &lt;= n</code>. Não use <code>math</code> nem <code>** 0.5</code>.</p>
+      <p>Para <code>n = 1000000</code>, a resposta é <code>1000</code>. Quantos passos seu programa precisou? Compare com testar <code>r = 0, 1, 2, …</code> um por um.</p>
+      <div class="minis"><span class="mini">raiz(10) <b>→</b> 3</span><span class="mini">raiz(16) <b>→</b> 4</span><span class="mini">raiz(1) <b>→</b> 1</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_raiz.py">
+n = 1000000
+
+# encontre o maior r tal que r * r <= n
+# dica: a resposta está entre 0 e n; aplique a busca binária nesse intervalo
+
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+n = 1000000
+ini, fim = 0, n
+resp = 0
+passos = 0
+while ini <= fim:
+    meio = (ini + fim) // 2
+    passos += 1
+    if meio * meio <= n:
+        resp = meio          # serve; tenta um maior
+        ini = meio + 1
+    else:
+        fim = meio - 1
+print("raiz inteira:", resp, "em", passos, "passos")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: vetores">
+  <h2>Prática 1: vetores</h2>
+  <p class="lead">Escreva sua solução no editor. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos e mostra o que falta. Tente antes de abrir a solução!</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>1. Segundo maior <span class="lvl l1">básico</span></h3>
+      <p>Leia números inteiros na mesma linha e mostre o <strong>segundo maior valor distinto</strong>. Se não existir (todos iguais), mostre <code>Não existe</code>. Percorra a lista <strong>uma única vez</strong>, sem ordenar: O(n).</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>5 9 2 7</pre></td><td><pre>Segundo maior: 7</pre></td></tr><tr><td><pre>4 4 4</pre></td><td><pre>Não existe</pre></td></tr></table></div>
+<textarea class="py" data-label="ex1_segundo_maior.py" data-stdin="5 9 2 7" data-tests='[{"in": "5 9 2 7", "out": ["Segundo maior: 7"]}, {"in": "3 3 1", "out": ["Segundo maior: 1"]}, {"in": "4 4 4", "out": ["Não existe"], "nao": ["Segundo maior"]}, {"in": "-1 -5 -3", "out": ["Segundo maior: -3"]}, {"in": "10 20", "out": ["Segundo maior: 10"], "nao": ["Segundo maior: 20"]}, {"in": "8 1 8 6 8", "out": ["Segundo maior: 6"]}]'>
+v = [int(x) for x in input("Números: ").split()]
+
+# encontre o segundo maior valor distinto em uma única passada
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="5 9 2 7">
+v = [int(x) for x in input("Números: ").split()]
+maior = None
+segundo = None
+for x in v:
+    if maior is None or x > maior:
+        segundo = maior          # o antigo maior vira o segundo
+        maior = x
+    elif x != maior and (segundo is None or x > segundo):
+        segundo = x
+if segundo is None:
+    print("Não existe")
+else:
+    print("Segundo maior:", segundo)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>2. Inserir mantendo a ordem <span class="lvl l1">básico</span></h3>
+      <p>Leia um vetor <strong>ordenado</strong> (primeira linha) e um valor <code>x</code> (segunda linha). Insira <code>x</code> mantendo a ordem, <strong>sem usar</strong> <code>sort()</code>, <code>sorted()</code> nem <code>insert()</code>: coloque-o no fim e desloque os maiores para a direita. Mostre o vetor e quantos elementos foram deslocados. Valores iguais a <code>x</code> não se movem.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1 3 5 7
+4</pre></td><td><pre>Resultado: [1, 3, 4, 5, 7]
+Deslocamentos: 2</pre></td></tr></table></div>
+<textarea class="py" data-label="ex2_inserir_ordenado.py" data-stdin="1 3 5 7
+4" data-tests='[{"in": "1 3 5 7\n4", "out": ["Resultado: [1, 3, 4, 5, 7]", "Deslocamentos: 2"]}, {"in": "2 4 6\n10", "out": ["Resultado: [2, 4, 6, 10]", "Deslocamentos: 0"]}, {"in": "2 4 6\n1", "out": ["Resultado: [1, 2, 4, 6]", "Deslocamentos: 3"]}, {"in": "1 2 2 3\n2", "out": ["Resultado: [1, 2, 2, 2, 3]", "Deslocamentos: 1"]}, {"in": "5\n5", "out": ["Resultado: [5, 5]", "Deslocamentos: 0"]}]'>
+v = [int(x) for x in input("Vetor ordenado: ").split()]
+x = int(input("Valor: "))
+
+# insira x mantendo a ordem, deslocando os maiores para a direita
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1 3 5 7
+4">
+v = [int(x) for x in input("Vetor ordenado: ").split()]
+x = int(input("Valor: "))
+v.append(x)                       # abre espaço no fim
+i = len(v) - 1
+desl = 0
+while i > 0 and v[i - 1] > x:     # só os MAIORES andam
+    v[i] = v[i - 1]
+    i -= 1
+    desl += 1
+v[i] = x
+print("Resultado:", v)
+print("Deslocamentos:", desl)
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 2: busca binária">
+  <h2>Prática 2: busca binária</h2>
+  <p class="lead">Nos dois exercícios, a primeira linha é um vetor de inteiros <strong>em ordem crescente</strong> e a segunda, o valor procurado.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>3. Busca binária passo a passo <span class="lvl l2">médio</span></h3>
+      <p>Faça a busca binária mostrando, a cada volta, <code>ini=… fim=… meio=…</code>. Ao final, mostre <code>Encontrado na posição P</code> ou <code>Não encontrado</code>, e o total de voltas em <code>Passos: K</code>. Use <code>meio = (ini + fim) // 2</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1 3 5 7 9 11 13
+11</pre></td><td><pre>ini=0 fim=6 meio=3
+ini=4 fim=6 meio=5
+Encontrado na posição 5
+Passos: 2</pre></td></tr></table></div>
+<textarea class="py" data-label="ex3_binaria_passos.py" data-stdin="1 3 5 7 9 11 13
+11" data-tests='[{"in": "1 3 5 7 9 11 13\n11", "out": ["ini=0 fim=6 meio=3", "ini=4 fim=6 meio=5", "Encontrado na posição 5", "Passos: 2"], "nao": ["Não encontrado"]}, {"in": "1 3 5 7 9 11 13\n1", "out": ["ini=0 fim=2 meio=1", "ini=0 fim=0 meio=0", "Encontrado na posição 0", "Passos: 3"]}, {"in": "1 3 5 7 9 11 13\n4", "out": ["ini=2 fim=2 meio=2", "Não encontrado", "Passos: 3"], "nao": ["Encontrado na"]}, {"in": "8\n8", "out": ["ini=0 fim=0 meio=0", "Encontrado na posição 0", "Passos: 1"]}, {"in": "2 4\n5", "out": ["ini=1 fim=1 meio=1", "Não encontrado", "Passos: 2"]}]'>
+v = [int(x) for x in input("Vetor: ").split()]
+alvo = int(input("Alvo: "))
+
+# busca binária mostrando ini, fim e meio a cada volta
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1 3 5 7 9 11 13
+11">
+v = [int(x) for x in input("Vetor: ").split()]
+alvo = int(input("Alvo: "))
+ini, fim = 0, len(v) - 1
+passos = 0
+pos = -1
+while ini <= fim:
+    meio = (ini + fim) // 2
+    passos += 1
+    print(f"ini={ini} fim={fim} meio={meio}")
+    if v[meio] == alvo:
+        pos = meio
+        break
+    elif v[meio] < alvo:
+        ini = meio + 1
+    else:
+        fim = meio - 1
+if pos >= 0:
+    print("Encontrado na posição", pos)
+else:
+    print("Não encontrado")
+print("Passos:", passos)
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>4. Primeira ocorrência <span class="lvl l2">médio</span></h3>
+      <p>O vetor pode ter valores <strong>repetidos</strong>. Mostre a posição da <strong>primeira</strong> ocorrência do alvo (<code>Primeira posição: P</code>) ou <code>Não encontrado</code>. Use busca binária: ao achar o alvo, guarde a posição e <strong>continue procurando à esquerda</strong>. Não use <code>index()</code>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1 2 2 2 3 5
+2</pre></td><td><pre>Primeira posição: 1</pre></td></tr></table></div>
+<textarea class="py" data-label="ex4_primeira_ocorrencia.py" data-stdin="1 2 2 2 3 5
+2" data-tests='[{"in": "1 2 2 2 3 5\n2", "out": ["Primeira posição: 1"]}, {"in": "7 7 7 7\n7", "out": ["Primeira posição: 0"]}, {"in": "1 3 5\n4", "out": ["Não encontrado"], "nao": ["Primeira posição"]}, {"in": "1 1 2 4 4 4 9\n4", "out": ["Primeira posição: 3"]}, {"in": "5\n5", "out": ["Primeira posição: 0"]}, {"in": "1 2 3 3\n3", "out": ["Primeira posição: 2"]}]'>
+v = [int(x) for x in input("Vetor: ").split()]
+alvo = int(input("Alvo: "))
+
+# busca binária que encontra a PRIMEIRA ocorrência
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1 2 2 2 3 5
+2">
+v = [int(x) for x in input("Vetor: ").split()]
+alvo = int(input("Alvo: "))
+ini, fim = 0, len(v) - 1
+resp = -1
+while ini <= fim:
+    meio = (ini + fim) // 2
+    if v[meio] == alvo:
+        resp = meio          # candidata; pode haver outra antes
+        fim = meio - 1
+    elif v[meio] < alvo:
+        ini = meio + 1
+    else:
+        fim = meio - 1
+if resp >= 0:
+    print("Primeira posição:", resp)
+else:
+    print("Não encontrado")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Prática 3: eficiência">
+  <h2>Prática 3: eficiência</h2>
+  <p class="lead">Os dois problemas têm uma solução óbvia e lenta (testar todas as combinações). Encontre a solução que aproveita a <strong>ordem</strong> dos dados.</p>
+  <div class="cols even">
+    <div><div class="exercise">
+      <h3>5. Par com soma <span class="lvl l2">médio</span></h3>
+      <p>Leia um vetor em ordem crescente e um alvo. Encontre dois elementos <strong>de posições diferentes</strong> cuja soma seja o alvo e mostre <code>Par: a + b</code> (menor primeiro), ou <code>Nenhum par</code>. Testar todos os pares é O(n²); use dois índices, um em cada ponta, e resolva em <strong>O(n)</strong>.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>1 2 4 7 11 15
+15</pre></td><td><pre>Par: 4 + 11</pre></td></tr></table></div>
+<textarea class="py" data-label="ex5_par_soma.py" data-stdin="1 2 4 7 11 15
+15" data-tests='[{"in": "1 2 4 7 11 15\n15", "out": ["Par: 4 + 11"], "nao": ["Nenhum par"]}, {"in": "1 3 5 8\n100", "out": ["Nenhum par"], "nao": ["Par:"]}, {"in": "-3 0 2 6 9\n3", "out": ["Par: -3 + 6"]}, {"in": "2 2\n4", "out": ["Par: 2 + 2"]}, {"in": "1 5\n5", "out": ["Nenhum par"], "nao": ["Par:"]}, {"in": "3\n6", "out": ["Nenhum par"], "nao": ["Par:"]}]'>
+v = [int(x) for x in input("Vetor: ").split()]
+alvo = int(input("Alvo: "))
+
+# i começa no início, j no fim; ajuste conforme a soma
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="1 2 4 7 11 15
+15">
+v = [int(x) for x in input("Vetor: ").split()]
+alvo = int(input("Alvo: "))
+i, j = 0, len(v) - 1
+achou = False
+while i < j:
+    s = v[i] + v[j]
+    if s == alvo:
+        print(f"Par: {v[i]} + {v[j]}")
+        achou = True
+        break
+    elif s < alvo:
+        i += 1          # precisa de uma soma maior
+    else:
+        j -= 1          # precisa de uma soma menor
+if not achou:
+    print("Nenhum par")
+</textarea>
+      </details>
+    </div></div>
+    <div><div class="exercise">
+      <h3>6. Busca em matriz ordenada <span class="lvl l3">desafio</span></h3>
+      <p>Leia <code>L C</code>, depois <code>L</code> linhas com <code>C</code> inteiros e, por fim, o alvo. Cada linha cresce da esquerda para a direita e cada coluna cresce de cima para baixo. Mostre <code>Encontrado em (i, j)</code> ou <code>Não encontrado</code>.</p>
+      <p>Dica: comece no canto <strong>superior direito</strong>. Se o valor for maior que o alvo, a coluna inteira pode ser descartada; se for menor, a linha inteira. Isso dá O(L + C), contra O(L × C) de olhar tudo.</p>
+<textarea class="py" data-label="ex6_matriz_ordenada.py" data-stdin="4 4
+1 4 7 11
+2 5 8 12
+3 6 9 16
+10 13 14 17
+9" data-tests='[{"in": "4 4\n1 4 7 11\n2 5 8 12\n3 6 9 16\n10 13 14 17\n9", "out": ["Encontrado em (2, 2)"]}, {"in": "4 4\n1 4 7 11\n2 5 8 12\n3 6 9 16\n10 13 14 17\n15", "out": ["Não encontrado"], "nao": ["Encontrado em"]}, {"in": "4 4\n1 4 7 11\n2 5 8 12\n3 6 9 16\n10 13 14 17\n1", "out": ["Encontrado em (0, 0)"]}, {"in": "4 4\n1 4 7 11\n2 5 8 12\n3 6 9 16\n10 13 14 17\n17", "out": ["Encontrado em (3, 3)"]}, {"in": "2 3\n1 3 5\n2 4 6\n4", "out": ["Encontrado em (1, 1)"]}, {"in": "1 1\n5\n5", "out": ["Encontrado em (0, 0)"]}]'>
+l, c = [int(x) for x in input("Linhas e colunas: ").split()]
+m = []
+for _ in range(l):
+    m.append([int(x) for x in input().split()])
+alvo = int(input("Alvo: "))
+
+# comece em (0, c - 1) e descarte uma linha ou coluna por passo
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="4 4
+1 4 7 11
+2 5 8 12
+3 6 9 16
+10 13 14 17
+9">
+l, c = [int(x) for x in input("Linhas e colunas: ").split()]
+m = []
+for _ in range(l):
+    m.append([int(x) for x in input().split()])
+alvo = int(input("Alvo: "))
+i, j = 0, c - 1
+achou = False
+while i < l and j >= 0:
+    if m[i][j] == alvo:
+        print(f"Encontrado em ({i}, {j})")
+        achou = True
+        break
+    elif m[i][j] > alvo:
+        j -= 1          # toda a coluna j é maior: descarta
+    else:
+        i += 1          # toda a linha i é menor: descarta
+if not achou:
+    print("Não encontrado")
+</textarea>
+      </details>
+    </div></div>
+  </div>
+</section>
+
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: meça o tempo de <code>v.insert(0, x)</code> e de <code>v.append(x)</code> para 10 mil elementos; conte quantas comparações a busca binária faz para cada alvo de um vetor de 16 elementos; compare <code>x in lista</code> com <code>x in conjunto</code> para n cada vez maior.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "ed-complexidade-busca",
+ "mods": {
+  "intro": { "name": "Introdução", "color": "#1f5297" },
+  "vet": { "name": "Vetores e matrizes", "color": "#0b78b0" },
+  "cplx": { "name": "Complexidade", "color": "#8e3a8f" },
+  "busca": { "name": "Busca", "color": "#0f7a62" },
+  "pratica": { "name": "Prática", "color": "#be3455" }
+ },
+ "quizzes": {
+  "complexidade": [
+   { "code": "def primeiro(v):\n    return v[0]", "opts": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "ans": 0, "why": "Acesso por índice em vetor é uma conta de endereço: não depende de n." },
+   { "code": "total = 0\nfor x in v:\n    total += x", "opts": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "ans": 2, "why": "Um laço que visita cada elemento uma vez, com corpo O(1): n operações." },
+   { "code": "c = 0\nfor a in v:\n    for b in v:\n        if a + b == 10:\n            c += 1", "opts": ["O(n)", "O(2n)", "O(n log n)", "O(n²)"], "ans": 3, "why": "Para cada um dos n elementos, o laço interno roda n vezes: n × n." },
+   { "code": "i = len(v)\nwhile i > 1:\n    i = i // 2", "opts": ["O(1)", "O(log n)", "O(n)", "O(n/2)"], "ans": 1, "why": "i é dividido por 2 a cada volta: chega a 1 depois de log₂ n voltas." },
+   { "code": "for x in v:\n    for k in range(10):\n        print(x * k)", "opts": ["O(1)", "O(n)", "O(n²)", "O(10ⁿ)"], "ans": 1, "why": "O laço interno roda 10 vezes, um número fixo: 10n operações, que é O(n)." },
+   { "code": "for i in range(len(v)):\n    for j in range(i):\n        print(v[i], v[j])", "opts": ["O(n)", "O(n log n)", "O(n²)", "O(n³)"], "ans": 2, "why": "0 + 1 + 2 + … + (n−1) = n(n−1)/2. Sem constantes e termos menores: O(n²)." },
+   { "code": "for x in w:\n    if x in v:\n        print(x)\n# w e v têm n elementos", "opts": ["O(n)", "O(n log n)", "O(n²)", "O(1)"], "ans": 2, "why": "Parece um laço só, mas “x in v” percorre a lista v: n × n. Com v sendo um set, cairia para O(n)." },
+   { "code": "v.insert(0, x)", "opts": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "ans": 2, "why": "Inserir no início desloca todos os n elementos uma casa para a direita." },
+   { "code": "v.append(x)", "opts": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "ans": 0, "why": "No fim não há deslocamento. Às vezes o vetor dinâmico precisa crescer, mas em média é O(1) (amortizado)." },
+   { "q": "Busca binária em uma lista ordenada com n elementos.", "opts": ["O(1)", "O(log n)", "O(n)", "O(n log n)"], "ans": 1, "why": "Cada comparação descarta metade do trecho restante." }
+  ],
+  "saida": [
+   { "code": "v = [10, 20, 30, 40, 50, 60]\nini, fim = 0, len(v) - 1\nmeio = (ini + fim) // 2\nprint(v[meio])", "opts": ["30", "40", "35", "Erro"], "ans": 0, "why": "meio = (0 + 5) // 2 = 2, e v[2] é 30. A divisão inteira arredonda para baixo." },
+   { "code": "c = 0\nfor i in range(4):\n    for j in range(3):\n        c += 1\nprint(c)", "opts": ["7", "12", "16", "9"], "ans": 1, "why": "4 voltas externas × 3 internas = 12." },
+   { "code": "c = 0\ni = 64\nwhile i > 1:\n    i //= 2\n    c += 1\nprint(c)", "opts": ["6", "7", "32", "64"], "ans": 0, "why": "64 → 32 → 16 → 8 → 4 → 2 → 1: seis divisões. log₂ 64 = 6." },
+   { "code": "m = [[1, 2, 3], [4, 5, 6]]\nplano = [1, 2, 3, 4, 5, 6]\ni, j = 1, 2\nprint(plano[i * 3 + j] == m[i][j])", "opts": ["True", "False", "6", "Erro"], "ans": 0, "why": "i × colunas + j = 1 × 3 + 2 = 5; plano[5] e m[1][2] são ambos 6." },
+   { "code": "c = 0\nfor i in range(5):\n    for j in range(i):\n        c += 1\nprint(c)", "opts": ["25", "10", "15", "5"], "ans": 1, "why": "0 + 1 + 2 + 3 + 4 = 10, que é 5 × 4 / 2." },
+   { "q": "No pior caso, quantas comparações a busca binária faz em um vetor ordenado com 1.000 elementos?", "opts": ["10", "500", "1000", "100"], "ans": 0, "why": "2¹⁰ = 1024 ≥ 1000: depois de 10 divisões pela metade sobra um único elemento." }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/estruturas-viz.js"></script>
+<script src="../../assets/js/ed-viz/complexidade-busca.js"></script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

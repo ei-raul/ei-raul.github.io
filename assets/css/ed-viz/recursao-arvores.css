@@ -1,0 +1,19 @@
+/* Aula "Recursão e árvores binárias de busca" — pilha de chamadas (complementa estruturas-viz.css) */
+.rc-stack { display: flex; flex-direction: column; gap: .3rem; max-width: 30rem; }
+.rc-frame {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 7px;
+  background: #fff;
+  padding: .4rem .8rem;
+  font-family: var(--mono);
+  font-size: .9rem;
+}
+.rc-frame.top { border-color: var(--mod); background: color-mix(in srgb, var(--mod) 12%, #fff); }
+.rc-frame.ret { border-color: var(--ev-done); background: #e3f5ec; }
+.rc-call { font-weight: 600; color: var(--primary-dark); }
+.rc-st { font-size: .78rem; color: var(--text-muted); text-align: right; }
+.rc-base { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); border-top: 3px solid var(--border); padding-top: .2rem; text-align: center; }
