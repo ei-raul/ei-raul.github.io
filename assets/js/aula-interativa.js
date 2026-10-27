@@ -598,7 +598,10 @@ function go(i, scroll){
   slides[cur].classList.remove('active');
   slides[i].classList.add('active');
   mark(i);
-  const top = $('#deck').getBoundingClientRect().top + window.scrollY - $('.aula-bar').offsetHeight;
+  /* O deck é a área rolável; em telas baixas (sem rolagem própria) quem rola é a janela */
+  const deck = $('#deck');
+  deck.scrollTop = 0;
+  const top = deck.getBoundingClientRect().top + window.scrollY - $('.aula-bar').offsetHeight;
   if (window.scrollY > top) window.scrollTo(0, top);
   $$('textarea.src', slides[i]).forEach(autosize);
 }
@@ -650,17 +653,19 @@ document.addEventListener('keydown', e => {
 
 /* Em página única, a etapa atual acompanha a rolagem */
 let ticking = false;
-window.addEventListener('scroll', () => {
+function onScroll(){
   if (!isAll() || ticking) return;
   ticking = true;
   requestAnimationFrame(() => {
     ticking = false;
-    const lim = $('.aula-bar').offsetHeight + 60;
+    const lim = $('.aula-bar').getBoundingClientRect().bottom + 60;
     let k = 0;
     slides.forEach((s, i) => { if (s.getBoundingClientRect().top <= lim) k = i; });
     if (k !== cur) mark(k);
   });
-}, { passive: true });
+}
+$('#deck').addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('scroll', onScroll, { passive: true });
 
 /* ---------- Inicialização ---------- */
 const savedScale = store.get(KEY + 'escala'); if (savedScale) document.documentElement.style.setProperty('--scale', savedScale);

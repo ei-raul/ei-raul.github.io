@@ -11,15 +11,22 @@
   --bg-section:   #f5f8fd;
   --text:         #272829;
   --text-muted:   #666;
+  --shell-width:  1140px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/*
+  Estrutura comum a todas as páginas de disciplina e de aula:
+  cabeçalho e rodapé com altura fixa e só a área central (main) rola.
+*/
 body {
   font-family: "Open Sans", sans-serif;
   color: var(--text);
   background: var(--bg-section);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -29,17 +36,18 @@ a:hover { color: #37b3ed; }
 
 /* ── Header ─────────────────────────────────────────── */
 .disc-header {
+  flex: none;
   background: #040b14;
   color: #fff;
   padding: 14px 0;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
   box-shadow: 0 2px 10px rgba(0,0,0,0.4);
 }
 
 .disc-header-inner {
-  max-width: 860px;
+  max-width: var(--shell-width);
+  height: 45px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -48,8 +56,10 @@ a:hover { color: #37b3ed; }
 }
 
 .back-link {
+  width: 168px;
   color: #a8a9b4;
   font-size: 13px;
+  line-height: 18px;
   white-space: nowrap;
   flex-shrink: 0;
   transition: color 0.2s;
@@ -58,7 +68,9 @@ a:hover { color: #37b3ed; }
   gap: 6px;
 }
 .back-link svg { flex-shrink: 0; }
+.back-text { overflow: hidden; text-overflow: ellipsis; }
 .back-link:hover { color: var(--primary); }
+.back-link:hover svg { stroke: var(--primary); }
 
 .disc-header-divider {
   width: 1px;
@@ -74,7 +86,7 @@ a:hover { color: #37b3ed; }
   font-size: 20px;
   font-weight: 700;
   color: #fff;
-  line-height: 1.2;
+  line-height: 24px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -82,19 +94,22 @@ a:hover { color: #37b3ed; }
 
 .disc-meta {
   font-size: 12px;
+  line-height: 18px;
   color: #a8a9b4;
   margin-top: 3px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .disc-badge {
   display: inline-block;
+  vertical-align: top;
+  margin-right: 8px;
   background: var(--primary);
   color: #fff;
   font-size: 10px;
+  line-height: 14px;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 10px;
@@ -102,9 +117,14 @@ a:hover { color: #37b3ed; }
   text-transform: uppercase;
 }
 
-/* ── Main ────────────────────────────────────────────── */
+/* ── Main (área rolável) ─────────────────────────────── */
 .disc-main {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
   padding: 36px 24px 48px;
 }
 
@@ -347,11 +367,13 @@ a:hover { color: #37b3ed; }
 
 /* ── Footer ──────────────────────────────────────────── */
 .disc-footer {
+  flex: none;
   background: #040b14;
   color: #a8a9b4;
   text-align: center;
   padding: 14px 24px;
   font-size: 12px;
+  line-height: 18px;
 }
 .disc-footer a { color: var(--primary); }
 
@@ -605,13 +627,29 @@ details[open] .video-accordion-icon { transform: rotate(180deg); }
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 600px) {
-  .disc-header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  /* Cabeçalho compacto: voltar vira só ícone, título e meta em uma linha cada */
+  .disc-header { padding: 10px 0; }
+  .disc-header-inner { padding: 0 16px; gap: 12px; height: 42px; }
+  .back-link {
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    border: 1px solid #2c2f3f;
+    border-radius: 8px;
+  }
+  .back-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
   .disc-header-divider { display: none; }
-  .disc-title { font-size: 17px; white-space: normal; }
+  .disc-title { font-size: 16px; line-height: 21px; }
+  .disc-meta { font-size: 11px; margin-top: 3px; }
+  .disc-main { padding: 20px 12px 32px; }
+  .disc-footer { padding: 10px 16px; font-size: 11px; }
   .material-group-title { font-size: 14px; padding: 12px 16px; }
   .material-link { padding: 12px 16px; }
   .material-empty { padding: 16px; }
@@ -676,3 +714,15 @@ details[open] .video-accordion-icon { transform: rotate(180deg); }
   .schedule-date { font-size: 12px; padding: 2px 8px; }
   .schedule-lesson { margin-left: 0; margin-top: 6px; }
 }
+
+/* ── Telas baixas e impressão: volta à rolagem da página inteira ── */
+@media (max-height: 480px) {
+  body { height: auto; min-height: 100vh; overflow: visible; }
+  .disc-main { overflow: visible; }
+}
+@media print {
+  body { height: auto; overflow: visible; }
+  .disc-main { overflow: visible; }
+}
+
+.disc-main:focus { outline: none; }
