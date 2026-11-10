@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funções em Python — Lógica de Programação</title>
+  <meta name="description" content="Aula interativa de Lógica de Programação: funções em Python. Definição, parâmetros, return, escopo, argumentos padrão e nomeados. Exemplos que podem ser editados e executados no navegador.">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700|Raleway:600,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="../../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../../assets/css/disciplina.css" rel="stylesheet">
+  <link href="../../assets/css/aula-interativa.css" rel="stylesheet">
+</head>
+<body class="aula">
+
+  <header class="disc-header">
+    <div class="disc-header-inner">
+      <a href="../logica-de-programacao.html#aulas" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a8a9b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="back-text">Lógica de Programação</span>
+      </a>
+      <div class="disc-header-divider"></div>
+      <div class="disc-info">
+        <h1 class="disc-title">Funções em Python</h1>
+        <p class="disc-meta">
+          <span class="disc-badge">Aula interativa</span>
+          Prof. Raul de Araújo Lima · Sistemas de Informação · UniCatólica
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="aula-bar">
+    <div class="aula-bar-inner">
+      <span class="chip" id="chip"></span>
+      <span class="slide-name" id="slideName"></span>
+      <span class="pystatus" id="pystatus" title="Interpretador Python rodando no navegador"><i></i><span>Python carregando…</span></span>
+      <div class="tools">
+        <button type="button" id="btnToc" title="Sumário (M)"><i class="bx bx-list-ul"></i><span class="lbl">Sumário</span></button>
+        <button type="button" id="btnProg" title="Salvar ou carregar seu progresso"><i class="bx bx-save"></i><span class="lbl">Progresso</span></button>
+        <button type="button" id="btnView" title="Alternar entre etapas e página única (V)"><i class="bx bx-spreadsheet"></i><span class="lbl">Página única</span></button>
+        <button type="button" id="btnSmaller" title="Diminuir texto (-)">A−</button>
+        <button type="button" id="btnBigger" title="Aumentar texto (+)">A+</button>
+        <button type="button" id="btnFull" title="Tela cheia (F)"><i class="bx bx-fullscreen"></i></button>
+      </div>
+    </div>
+    <div class="progress"><span id="bar"></span></div>
+  </div>
+
+  <main class="aula-main" id="deck" tabindex="-1" autofocus>
+
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" data-mod="intro" data-title="Abertura">
+  <h1>Funções: dividir para conquistar</h1>
+  <p class="sub">Até agora nossos programas foram uma sequência única de comandos. Hoje vamos dar nome a pedaços de código, reaproveitá-los quantas vezes quisermos e montar programas maiores a partir de partes pequenas e testáveis.</p>
+  <div class="cells-hero">
+    <a href="#" data-goto="def" style="color:var(--c-def)"><span class="sym">def f(x):</span><span class="nm">Definindo funções</span><span class="ds">nome, parâmetros e corpo</span></a>
+    <a href="#" data-goto="ret" style="color:var(--c-ret)"><span class="sym">return x</span><span class="nm">Retorno</span><span class="ds">a função devolve uma resposta</span></a>
+    <a href="#" data-goto="esc" style="color:var(--c-esc)"><span class="sym">local × global</span><span class="nm">Escopo</span><span class="ds">onde cada variável existe</span></a>
+    <a href="#" data-goto="arg" style="color:var(--c-arg)"><span class="sym">f(x, n=2)</span><span class="nm">Argumentos</span><span class="ds">valores padrão e nomeados</span></a>
+    <a href="#" data-goto="org" style="color:var(--c-org)"><span class="sym">f(g(x))</span><span class="nm">Organizando programas</span><span class="ds">funções que usam funções</span></a>
+    <a href="#" data-goto="pratica" style="color:var(--c-pratica)"><span class="sym">✓ 6</span><span class="nm">Prática</span><span class="ds">exercícios com correção automática</span></a>
+  </div>
+  <p class="keys">Navegação: <kbd>←</kbd> <kbd>→</kbd> trocam de etapa · <kbd>V</kbd> alterna entre etapas e página única · <kbd>M</kbd> sumário · <kbd>F</kbd> tela cheia · <kbd>+</kbd> <kbd>−</kbd> tamanho do texto · dentro do código, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> executa.</p>
+  <p class="keys">Todo código desta aula pode ser editado e executado aqui mesmo. Altere os exemplos à vontade; o botão ↺ restaura o original. Suas alterações ficam salvas neste navegador; em <strong>Progresso</strong> você pode baixá-las em um arquivo e continuar em outro computador.</p>
+  <p class="keys">Nos exercícios, o botão <strong>✓ Verificar</strong> testa seu código com várias entradas e mostra o que está certo e o que falta.</p>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Por que precisamos de funções?">
+  <h2>Por que precisamos de funções?</h2>
+  <div class="cols">
+    <div>
+      <p>Veja o primeiro programa ao lado: o mesmo cálculo de média aparece três vezes. Se a regra mudar (por exemplo, a segunda prova passar a valer o dobro), teremos de corrigir três lugares e torcer para não esquecer nenhum.</p>
+      <p>Uma <strong>função</strong> é um bloco de código com <strong>nome</strong>. Escrevemos o bloco uma vez e o <strong>chamamos</strong> pelo nome sempre que precisarmos.</p>
+      <ul>
+        <li><strong>Reaproveitamento</strong>: escreve uma vez, usa muitas.</li>
+        <li><strong>Organização</strong>: cada função resolve um pedaço do problema.</li>
+        <li><strong>Correção</strong>: um erro corrigido na função fica corrigido em todos os usos.</li>
+      </ul>
+      <div class="note">Antes de executar, pergunte à turma: para trocar a regra da média, quantas linhas mudam em cada versão?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="sem_funcao.py">
+# Sem função: o mesmo cálculo repetido
+n1, n2 = 8.0, 6.0
+print("Ana:", (n1 + n2) / 2)
+n1, n2 = 5.5, 9.0
+print("Bruno:", (n1 + n2) / 2)
+n1, n2 = 7.0, 7.5
+print("Carla:", (n1 + n2) / 2)
+</textarea>
+<textarea class="py" data-label="com_funcao.py">
+# Com função: o cálculo tem um nome e fica em um só lugar
+def media(n1, n2):
+    return (n1 + n2) / 2
+
+print("Ana:", media(8.0, 6.0))
+print("Bruno:", media(5.5, 9.0))
+print("Carla:", media(7.0, 7.5))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Você já usa funções">
+  <h2>Você já usa funções</h2>
+  <div class="cols">
+    <div>
+      <p>Desde a primeira aula usamos funções prontas do Python. Toda chamada tem a mesma forma: <code>nome(argumentos)</code>. A função recebe valores, faz um trabalho e, quase sempre, <strong>devolve</strong> um resultado.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Função</th><th>Recebe</th><th>Devolve</th></tr>
+        <tr><td><code>len(x)</code></td><td>uma sequência</td><td>o tamanho</td></tr>
+        <tr><td><code>max(a, b)</code></td><td>valores</td><td>o maior</td></tr>
+        <tr><td><code>round(x, 1)</code></td><td>número e casas</td><td>número arredondado</td></tr>
+        <tr><td><code>input(msg)</code></td><td>a pergunta</td><td>o texto digitado</td></tr>
+        <tr><td><code>int(texto)</code></td><td>um texto</td><td>o número inteiro</td></tr>
+        <tr><td><code>print(x)</code></td><td>valores</td><td><strong>nada</strong> (<code>None</code>): só mostra</td></tr>
+      </table></div>
+      <div class="minis"><span class="mini">len("abc") <b>→</b> 3</span><span class="mini">max(4, 9) <b>→</b> 9</span><span class="mini">round(2.567, 1) <b>→</b> 2.6</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="prontas.py">
+tamanho = len("Quixadá")        # o valor devolvido vai para a variável
+print(tamanho)
+print(max(4, 9, 2) + 1)         # o valor devolvido entra em uma conta
+print(round(3.14159, 2))
+print(abs(-7))                  # valor absoluto
+
+x = print("Olá")                # print mostra, mas devolve o quê?
+print("print devolveu:", x)
+</textarea>
+      <div class="note">Hoje vamos criar <strong>nossas próprias</strong> funções, que se usam exatamente do mesmo jeito.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DEFININDO ===================== -->
+<section class="slide" data-mod="def" data-title="Definindo uma função">
+  <h2>Definindo uma função</h2>
+  <div class="cols">
+    <div>
+      <div class="runner"><div class="rbar"><span class="rlabel">anatomia.py</span><span class="rhint">estrutura de uma definição</span></div><div class="editor"><pre class="stat">def saudacao(nome):
+    texto = "Olá, " + nome + "!"
+    print(texto)</pre></div></div>
+      <div class="kv">
+        <span class="k">def</span><span class="a">→</span><span class="v">palavra que inicia a definição</span>
+        <span class="k">saudacao</span><span class="a">→</span><span class="v">nome da função (mesmas regras das variáveis)</span>
+        <span class="k">(nome)</span><span class="a">→</span><span class="v">parâmetros: os dados que a função recebe</span>
+        <span class="k">:</span><span class="a">→</span><span class="v">dois-pontos, como no if, for e while</span>
+        <span class="k">recuo</span><span class="a">→</span><span class="v">corpo: as linhas que pertencem à função</span>
+      </div>
+    </div>
+    <div>
+<textarea class="py" data-label="definindo.py">
+def linha():                 # sem parâmetros: parênteses vazios
+    print("-" * 30)
+
+def saudacao(nome):
+    texto = "Olá, " + nome + "!"
+    print(texto)
+
+linha()                      # chamada: nome + parênteses
+saudacao("Ana")
+saudacao("Bruno")
+linha()
+</textarea>
+      <div class="note warn">Sem os parênteses, <code>linha</code> é apenas o nome da função; nada é executado. Experimente trocar <code>linha()</code> por <code>linha</code>.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="def" data-title="Definir não é executar">
+  <h2>Definir não é executar</h2>
+  <div class="cols">
+    <div>
+      <p>Quando o Python encontra um <code>def</code>, ele apenas <strong>guarda</strong> a função com aquele nome. O corpo só roda quando a função é <strong>chamada</strong>, e roda de novo a cada chamada.</p>
+      <p>Na chamada, a execução <strong>salta</strong> para dentro da função, executa o corpo e depois <strong>volta</strong> para a linha seguinte de quem chamou.</p>
+      <p>Por isso a função precisa ser definida <strong>antes</strong> da primeira chamada. A forma mais comum de organizar: todas as definições no topo do arquivo, o programa principal embaixo.</p>
+      <div class="note">Peça para a turma prever a ordem das mensagens do primeiro exemplo antes de executar.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="ordem.py">
+print("1. início do programa")
+
+def avisar():
+    print("   dentro da função")
+
+print("2. a função foi definida, mas ainda não rodou")
+avisar()
+print("3. voltei da primeira chamada")
+avisar()
+print("4. fim")
+</textarea>
+<textarea class="py" data-label="antes_de_definir.py">
+dobro(5)              # chamada ANTES do def. Execute e veja
+
+def dobro(n):
+    print(n * 2)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="def" data-title="Parâmetros e argumentos">
+  <h2>Parâmetros e argumentos</h2>
+  <div class="cols">
+    <div>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Termo</th><th>Onde aparece</th><th>Exemplo</th></tr>
+        <tr><td><strong>parâmetro</strong></td><td>na definição: é uma variável da função</td><td><code>def area(base, altura):</code></td></tr>
+        <tr><td><strong>argumento</strong></td><td>na chamada: é o valor enviado</td><td><code>area(3, 4)</code></td></tr>
+      </table></div>
+      <p>Na chamada, cada argumento é entregue ao parâmetro <strong>na mesma posição</strong>: o 1º argumento vai para o 1º parâmetro, e assim por diante. É como se o Python fizesse <code>base = 3</code> e <code>altura = 4</code> antes de começar o corpo.</p>
+      <p>O argumento pode ser qualquer expressão: um número, uma variável, uma conta ou até o resultado de outra função.</p>
+      <div class="note warn">A quantidade de argumentos precisa bater com a de parâmetros. A última linha do exemplo passa só um. O que acontece?</div>
+    </div>
+    <div>
+<textarea class="py" data-label="parametros.py">
+def apresentar(nome, curso, semestre):
+    print(nome, "cursa", curso, "no", semestre, "º semestre")
+
+apresentar("Ana", "SI", 1)
+apresentar("Bruno", "ADS", 3)
+
+curso = "Engenharia"
+apresentar("Carla", curso, 1 + 1)     # variáveis e contas também servem
+
+apresentar("SI", 1, "Davi")           # a ORDEM importa!
+apresentar("Eva")                     # faltam argumentos. Execute e veja
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="def" data-title="Teste de mesa: o caminho de uma chamada">
+  <h2>Teste de mesa: o caminho de uma chamada</h2>
+  <p class="lead">Acompanhe o salto para dentro da função e a volta. Repare que <code>base</code>, <code>altura</code> e <code>a</code> só existem <strong>durante</strong> a chamada: quando a função termina, elas somem da tabela.</p>
+  <div class="trace" data-code="def area(base, altura):
+    a = base * altura
+    return a
+
+x = area(3, 4)
+y = area(5, 2)
+print(x + y)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;def só guarda a função; nada é calculado ainda&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;base&quot;: &quot;3&quot;, &quot;altura&quot;: &quot;4&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;chama area(3, 4): base recebe 3 e altura recebe 4&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;base&quot;: &quot;3&quot;, &quot;altura&quot;: &quot;4&quot;, &quot;a&quot;: &quot;12&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;a = 3 * 4 → 12 (a é local de area)&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;base&quot;: &quot;3&quot;, &quot;altura&quot;: &quot;4&quot;, &quot;a&quot;: &quot;12&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;return a: devolve 12 para quem chamou&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;x&quot;: &quot;12&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;de volta à linha 5: x recebe 12; base, altura e a deixam de existir&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;base&quot;: &quot;5&quot;, &quot;altura&quot;: &quot;2&quot;, &quot;x&quot;: &quot;12&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;nova chamada area(5, 2): base = 5 e altura = 2&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;base&quot;: &quot;5&quot;, &quot;altura&quot;: &quot;2&quot;, &quot;a&quot;: &quot;10&quot;, &quot;x&quot;: &quot;12&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;a = 5 * 2 → 10&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;base&quot;: &quot;5&quot;, &quot;altura&quot;: &quot;2&quot;, &quot;a&quot;: &quot;10&quot;, &quot;x&quot;: &quot;12&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;return a: devolve 10&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;x&quot;: &quot;12&quot;, &quot;y&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;de volta à linha 6: y recebe 10&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;x&quot;: &quot;12&quot;, &quot;y&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;22\n&quot;, &quot;note&quot;: &quot;x + y → 12 + 10 → 22&quot;}]" data-vars="[&quot;base&quot;, &quot;altura&quot;, &quot;a&quot;, &quot;x&quot;, &quot;y&quot;]"></div>
+  <div class="note">Cada chamada começa do zero: na segunda chamada, <code>base</code> e <code>altura</code> são criadas de novo com os valores novos.</div>
+</section>
+
+<section class="slide" data-mod="def" data-title="Desafio: moldura de texto">
+  <h2>Desafio: moldura de texto</h2>
+  <div class="cols">
+    <div>
+      <p>Crie uma função <code>moldura(texto)</code> que mostre o texto dentro de uma moldura de asteriscos, com um espaço de cada lado. A moldura deve se ajustar ao tamanho do texto.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Chamada</th><th>Saída</th></tr><tr><td><pre>moldura("Python")</pre></td><td><pre>**********
+* Python *
+**********</pre></td></tr></table></div>
+      <p>Depois, chame a função para três palavras diferentes.</p>
+      <div class="minis"><span class="mini">"*" * 5 <b>→</b> '*****'</span><span class="mini">len("Python") <b>→</b> 6</span></div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_moldura.py">
+# defina aqui a função moldura(texto)
+
+
+# chame a função para três palavras
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+def moldura(texto):
+    borda = "*" * (len(texto) + 4)    # 2 asteriscos + 2 espaços
+    print(borda)
+    print("* " + texto + " *")
+    print(borda)
+
+moldura("Python")
+moldura("Lógica")
+moldura("UniCatólica")
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RETORNO ===================== -->
+<section class="slide" data-mod="ret" data-title="return: devolvendo um valor">
+  <h2><code>return</code>: devolvendo um valor</h2>
+  <div class="cols">
+    <div>
+      <p><code>return valor</code> encerra a função e <strong>entrega</strong> o valor para quem chamou. A chamada passa a “valer” esse resultado, como <code>len("abc")</code> vale <code>3</code>.</p>
+      <p>Com o valor em mãos, quem chamou decide o que fazer: guardar em uma variável, usar em uma conta, comparar em um <code>if</code> ou passar para outra função.</p>
+      <div class="minis"><span class="mini">dobro(3) <b>→</b> 6</span><span class="mini">dobro(3) + dobro(4) <b>→</b> 14</span><span class="mini">dobro(dobro(2)) <b>→</b> 8</span></div>
+      <div class="note">Na última linha do exemplo, a chamada de dentro é resolvida primeiro: <code>dobro(2)</code> vira <code>4</code>, e então <code>dobro(4)</code> vira <code>8</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="retorno.py">
+def dobro(n):
+    return n * 2
+
+x = dobro(3)                  # guardar
+print(x)
+print(dobro(3) + dobro(4))    # usar em uma conta
+if dobro(7) &gt; 10:             # comparar
+    print("passou de 10")
+print(dobro(dobro(2)))        # passar para outra chamada
+print(dobro("ab"))            # funciona com texto também!
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="ret" data-title="print ou return?">
+  <h2><code>print</code> ou <code>return</code>?</h2>
+  <p class="lead">Esta é a confusão mais comum da aula. <code>print</code> <strong>mostra</strong> um valor na tela, para a pessoa. <code>return</code> <strong>devolve</strong> um valor para o programa, que pode continuar usando-o.</p>
+  <div class="cols even">
+    <div>
+      <h3>Mostra, mas não devolve</h3>
+<textarea class="py" data-label="com_print.py">
+def soma_mostra(a, b):
+    print(a + b)              # aparece na tela...
+
+r = soma_mostra(2, 3)
+print("r vale:", r)           # ...mas não volta nada: None
+print(r * 10)                 # Execute e veja
+</textarea>
+    </div>
+    <div>
+      <h3>Devolve: quem chamou decide</h3>
+<textarea class="py" data-label="com_return.py">
+def soma(a, b):
+    return a + b              # nada aparece aqui...
+
+r = soma(2, 3)
+print("r vale:", r)           # ...mas o valor chegou
+print(r * 10)
+print(soma(soma(1, 2), 10))
+</textarea>
+    </div>
+  </div>
+  <div class="note">Função sem <code>return</code> devolve <code>None</code>, o valor que representa “nada”. Regra prática: funções que <strong>calculam</strong> algo devem usar <code>return</code>; deixe o <code>print</code> para o programa principal, que decide como mostrar o resultado.</div>
+</section>
+
+<section class="slide" data-mod="ret" data-title="return encerra a função">
+  <h2><code>return</code> encerra a função</h2>
+  <div class="cols">
+    <div>
+      <p>Assim que um <code>return</code> é executado, a função <strong>termina na hora</strong>, mesmo que existam mais linhas depois dele ou que esteja no meio de um laço.</p>
+      <p>Isso permite escrever vários <code>return</code>, um para cada caso. Depois que um caso foi resolvido, não é preciso <code>else</code>: se a execução chegou à linha seguinte, é porque o <code>return</code> anterior não aconteceu.</p>
+      <div class="note warn">Cuidado com caminhos sem <code>return</code>. Se nenhum caso for atendido e a função chegar ao fim, ela devolve <code>None</code>. Teste <code>conceito(-1)</code> e veja.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="varios_returns.py">
+def conceito(nota):
+    if nota &gt; 10:
+        return "nota inválida"
+    if nota &gt;= 9:
+        return "A"
+    if nota &gt;= 7:
+        return "B"
+    if nota &gt;= 0:
+        return "C"
+
+print(conceito(9.5))
+print(conceito(8))
+print(conceito(3))
+print(conceito(11))
+print(conceito(-1))      # nenhum caso atendido
+
+def teste():
+    print("antes do return")
+    return 1
+    print("depois do return")   # nunca executa
+
+print(teste())
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="ret" data-title="Funções que respondem sim ou não">
+  <h2>Funções que respondem sim ou não</h2>
+  <p class="lead">Uma função pode devolver <code>True</code> ou <code>False</code>. Costumamos dar nomes que soam como pergunta: <code>eh_par</code>, <code>eh_primo</code>, <code>tem_vogal</code>. O <code>return</code> dentro do laço encerra a busca assim que a resposta é conhecida.</p>
+  <div class="trace" data-code="def eh_primo(n):
+    if n &lt; 2:
+        return False
+    for d in range(2, n):
+        if n % d == 0:
+            return False
+    return True
+
+print(eh_primo(9))" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;define eh_primo&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;chama eh_primo(9): n recebe 9&quot;}, {&quot;line&quot;: 2, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;9 &lt; 2 → False: não entra no if&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;, &quot;d&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;d recebe 2&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;, &quot;d&quot;: &quot;2&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;9 % 2 == 0 → 1 == 0 → False&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;, &quot;d&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;d recebe 3&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;, &quot;d&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;9 % 3 == 0 → 0 == 0 → True&quot;}, {&quot;line&quot;: 6, &quot;vars&quot;: {&quot;n&quot;: &quot;9&quot;, &quot;d&quot;: &quot;3&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;return False: a função termina aqui, no meio do for&quot;}, {&quot;line&quot;: 9, &quot;vars&quot;: {}, &quot;out&quot;: &quot;False\n&quot;, &quot;note&quot;: &quot;print mostra o valor devolvido. O for não chegou a d = 4 e a linha 7 nunca executou&quot;}]" data-vars="[&quot;n&quot;, &quot;d&quot;]"></div>
+  <div class="cols">
+    <div>
+      <p>Quando a função devolve um <code>bool</code>, a chamada vai direto no <code>if</code> ou no <code>while</code>, e o código fica parecido com uma frase: <code>if eh_par(n):</code>.</p>
+      <p>Uma comparação já é <code>True</code> ou <code>False</code>. Por isso <code>return n % 2 == 0</code> substitui um <code>if</code> inteiro.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="predicados.py">
+def eh_par(n):
+    return n % 2 == 0          # a comparação já é True ou False
+
+def eh_vogal(letra):
+    return letra.lower() in "aeiou"
+
+for n in range(1, 7):
+    if eh_par(n):
+        print(n, "é par")
+
+contagem = 0
+for letra in "Programação":
+    if eh_vogal(letra):
+        contagem += 1
+print("Vogais:", contagem)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="ret" data-title="Devolvendo mais de um valor">
+  <h2>Devolvendo mais de um valor</h2>
+  <div class="cols">
+    <div>
+      <p>Um <code>return</code> só pode entregar um valor, mas esse valor pode ser uma <strong>tupla</strong>. Basta separar os resultados por vírgula: <code>return a, b</code>.</p>
+      <p>Quem chamou recebe a tupla e pode <strong>desempacotá-la</strong> em várias variáveis, como vimos na aula de coleções.</p>
+      <div class="minis"><span class="mini">17 // 5 <b>→</b> 3</span><span class="mini">17 % 5 <b>→</b> 2</span><span class="mini">q, r = (3, 2) <b>→</b> q = 3, r = 2</span></div>
+      <div class="note">A função também pode receber uma lista e devolver um resumo dela. Os parâmetros e o retorno podem ser de qualquer tipo.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="varios_valores.py">
+def divisao(a, b):
+    return a // b, a % b       # devolve uma tupla (quociente, resto)
+
+resultado = divisao(17, 5)
+print(resultado)
+
+q, r = divisao(17, 5)          # desempacotando
+print("quociente:", q, "| resto:", r)
+
+def extremos(lista):
+    menor = lista[0]
+    maior = lista[0]
+    for valor in lista:
+        if valor &lt; menor:
+            menor = valor
+        if valor &gt; maior:
+            maior = valor
+    return menor, maior
+
+baixo, alto = extremos([31, 34, 29, 36, 33])
+print("Mínima:", baixo, "| Máxima:", alto)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="ret" data-title="Desafio: calculadora de IMC">
+  <h2>Desafio: calculadora de IMC</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Crie <code>calcular_imc(peso, altura)</code>, que <strong>devolve</strong> peso ÷ altura².</li>
+        <li>Crie <code>classificar_imc(imc)</code>, que <strong>devolve</strong> o texto da classificação.</li>
+        <li>No programa principal, leia peso e altura, chame as duas funções e mostre o resultado com uma casa decimal.</li>
+      </ol>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>IMC</th><th>Classificação</th></tr>
+        <tr><td>menor que 18.5</td><td>abaixo do peso</td></tr>
+        <tr><td>de 18.5 até menor que 25</td><td>peso normal</td></tr>
+        <tr><td>de 25 até menor que 30</td><td>sobrepeso</td></tr>
+        <tr><td>30 ou mais</td><td>obesidade</td></tr>
+      </table></div>
+      <div class="note">Nenhuma das duas funções deve usar <code>print</code> ou <code>input</code>: elas só calculam e devolvem.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_imc.py" data-stdin="70
+1.75">
+# 1) defina calcular_imc(peso, altura)
+
+# 2) defina classificar_imc(imc)
+
+# 3) programa principal
+peso = float(input(&quot;Peso (kg): &quot;))
+altura = float(input(&quot;Altura (m): &quot;))
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="70
+1.75">
+def calcular_imc(peso, altura):
+    return peso / altura ** 2
+
+def classificar_imc(imc):
+    if imc &lt; 18.5:
+        return &quot;abaixo do peso&quot;
+    if imc &lt; 25:
+        return &quot;peso normal&quot;
+    if imc &lt; 30:
+        return &quot;sobrepeso&quot;
+    return &quot;obesidade&quot;
+
+peso = float(input(&quot;Peso (kg): &quot;))
+altura = float(input(&quot;Altura (m): &quot;))
+imc = calcular_imc(peso, altura)
+print(f&quot;IMC: {imc:.1f} ({classificar_imc(imc)})&quot;)
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ESCOPO ===================== -->
+<section class="slide" data-mod="esc" data-title="Variáveis locais">
+  <h2>Variáveis locais</h2>
+  <div class="cols">
+    <div>
+      <p>Variáveis criadas <strong>dentro</strong> de uma função, inclusive os parâmetros, são <strong>locais</strong>: nascem quando a função é chamada e desaparecem quando ela termina.</p>
+      <p>Fora da função, esses nomes não existem. A única forma de um resultado sair da função é pelo <code>return</code>.</p>
+      <p>Duas funções podem usar o mesmo nome de variável sem conflito: cada uma tem o seu próprio espaço de nomes, chamado <strong>escopo</strong>.</p>
+      <div class="note warn">A última linha do primeiro exemplo tenta mostrar <code>total</code> fora da função. Peça para a turma prever o resultado.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="locais.py">
+def somar_lista(lista):
+    total = 0                 # total é LOCAL de somar_lista
+    for valor in lista:
+        total += valor
+    return total
+
+resultado = somar_lista([1, 2, 3])
+print(resultado)
+print(total)                  # existe aqui fora? Execute e veja
+</textarea>
+<textarea class="py" data-label="mesmo_nome.py">
+def area_quadrado(lado):
+    resultado = lado * lado
+    return resultado
+
+def perimetro_quadrado(lado):
+    resultado = 4 * lado      # outro "resultado", sem conflito
+    return resultado
+
+print(area_quadrado(5), perimetro_quadrado(5))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="esc" data-title="Locais e globais">
+  <h2>Locais e globais</h2>
+  <p class="lead">Variáveis criadas fora de qualquer função são <strong>globais</strong>. Quando uma função atribui um valor a um nome, ela cria uma variável <strong>local</strong> com esse nome, mesmo que exista uma global igual. A global não é alterada.</p>
+  <div class="trace" data-code="x = 10
+
+def dobra(x):
+    x = x * 2
+    return x
+
+y = dobra(x)
+print(x, y)" data-steps="[{&quot;line&quot;: 1, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;x global recebe 10&quot;}, {&quot;line&quot;: 3, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;define dobra&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;, &quot;x (local de dobra)&quot;: &quot;10&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;chama dobra(x): o parâmetro x (local) recebe o valor 10&quot;}, {&quot;line&quot;: 4, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;, &quot;x (local de dobra)&quot;: &quot;20&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;x local = 10 * 2 → 20; o x global não muda&quot;}, {&quot;line&quot;: 5, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;, &quot;x (local de dobra)&quot;: &quot;20&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;return x: devolve o x local, 20&quot;}, {&quot;line&quot;: 7, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;, &quot;y&quot;: &quot;20&quot;}, &quot;out&quot;: &quot;&quot;, &quot;note&quot;: &quot;de volta à linha 7: y recebe 20; o x local deixa de existir&quot;}, {&quot;line&quot;: 8, &quot;vars&quot;: {&quot;x (global)&quot;: &quot;10&quot;, &quot;y&quot;: &quot;20&quot;}, &quot;out&quot;: &quot;10 20\n&quot;, &quot;note&quot;: &quot;o x global continua 10&quot;}]" data-vars="[&quot;x (global)&quot;, &quot;x (local de dobra)&quot;, &quot;y&quot;]"></div>
+  <div class="cols">
+    <div>
+      <p>Uma função até consegue <strong>ler</strong> uma variável global, mas depender disso deixa o código difícil de entender: o resultado muda conforme coisas que estão fora da função.</p>
+      <p>E se a função <strong>atribuir</strong> a esse nome em qualquer ponto do corpo, o Python passa a considerá-lo local na função inteira. Usar antes de atribuir gera <code>UnboundLocalError</code>.</p>
+      <div class="note">Boa prática: tudo o que a função precisa entra por <strong>parâmetro</strong>; tudo o que ela produz sai pelo <strong>return</strong>. (Existe a palavra <code>global</code>, mas evite-a.)</div>
+    </div>
+    <div>
+<textarea class="py" data-label="global_erro.py">
+contador = 0
+
+def incrementar():
+    contador = contador + 1   # atribui: contador vira LOCAL
+
+incrementar()                 # Execute e veja
+print(contador)
+</textarea>
+<textarea class="py" data-label="global_ok.py">
+contador = 0
+
+def incrementar(valor):
+    return valor + 1          # recebe por parâmetro, devolve por return
+
+contador = incrementar(contador)
+contador = incrementar(contador)
+print(contador)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="esc" data-title="Listas como argumento">
+  <h2>Listas como argumento</h2>
+  <div class="cols">
+    <div>
+      <p>Lembra de “dois nomes, uma lista”? Passar uma lista para uma função funciona do mesmo jeito: o parâmetro vira <strong>outro nome para a mesma lista</strong>.</p>
+      <p>Por isso, se a função <strong>alterar</strong> a lista (<code>append</code>, <code>lista[i] = ...</code>, <code>remove</code>), a alteração aparece para quem chamou.</p>
+      <p>Com números, strings e tuplas isso não acontece: como são imutáveis, a função não tem como modificá-los.</p>
+      <div class="note">Escolha de propósito: ou a função <strong>modifica</strong> a lista recebida e não devolve nada (como <code>lista.sort()</code>), ou <strong>cria uma lista nova</strong> e a devolve (como <code>sorted(lista)</code>).</div>
+    </div>
+    <div>
+<textarea class="py" data-label="lista_parametro.py">
+def dar_bonus(notas):              # MODIFICA a lista recebida
+    for i in range(len(notas)):
+        notas[i] = notas[i] + 1
+
+def com_bonus(notas):              # cria e DEVOLVE uma lista nova
+    nova = []
+    for nota in notas:
+        nova.append(nota + 1)
+    return nova
+
+turma = [6.0, 7.5, 5.0]
+outra = com_bonus(turma)
+print("original:", turma, "| nova:", outra)
+
+dar_bonus(turma)
+print("depois de dar_bonus:", turma)
+
+def tentar_mudar(n):
+    n = n + 100                    # só muda o n local
+x = 5
+tentar_mudar(x)
+print("x continua:", x)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ARGUMENTOS ===================== -->
+<section class="slide" data-mod="arg" data-title="Parâmetros com valor padrão">
+  <h2>Parâmetros com valor padrão</h2>
+  <div class="cols">
+    <div>
+      <p>Um parâmetro pode ter um <strong>valor padrão</strong>, usado quando a chamada não envia aquele argumento: <code>def saudar(nome, saudacao="Olá"):</code>.</p>
+      <p>Você já usou isso sem perceber: <code>round(x)</code> arredonda para inteiro porque o número de casas tem padrão; <code>print</code> tem <code>sep=" "</code> e <code>end="\n"</code> como padrões.</p>
+      <div class="minis"><span class="mini">round(2.567) <b>→</b> 3</span><span class="mini">round(2.567, 2) <b>→</b> 2.57</span></div>
+      <div class="note warn">Parâmetros com valor padrão vêm <strong>depois</strong> dos parâmetros obrigatórios. <code>def f(a=1, b):</code> é erro de sintaxe.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="padrao.py">
+def saudar(nome, saudacao=&quot;Olá&quot;):
+    return saudacao + &quot;, &quot; + nome + &quot;!&quot;
+
+print(saudar(&quot;Ana&quot;))                  # usa o padrão
+print(saudar(&quot;Bruno&quot;, &quot;Bom dia&quot;))     # substitui o padrão
+
+def linha(tamanho=20, simbolo=&quot;-&quot;):
+    print(simbolo * tamanho)
+
+linha()
+linha(10)
+linha(10, &quot;=&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arg" data-title="Argumentos nomeados">
+  <h2>Argumentos nomeados</h2>
+  <div class="cols">
+    <div>
+      <p>Na chamada, podemos dizer <strong>a qual parâmetro</strong> cada valor se destina: <code>nome=valor</code>. Assim a ordem deixa de importar e a chamada fica autoexplicativa.</p>
+      <p>É muito útil quando a função tem vários parâmetros com padrão e queremos mudar só um deles, por exemplo só o <code>simbolo</code> de <code>linha</code>.</p>
+      <p>Você também já viu isso: <code>print(..., end="")</code> e <code>lista.sort(reverse=True)</code>.</p>
+      <div class="note warn">Argumentos posicionais vêm primeiro e os nomeados depois: <code>f(1, b=2)</code> funciona, <code>f(a=1, 2)</code> não.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="nomeados.py">
+def linha(tamanho=20, simbolo=&quot;-&quot;):
+    print(simbolo * tamanho)
+
+linha(simbolo=&quot;*&quot;)                 # muda só o símbolo
+linha(simbolo=&quot;~&quot;, tamanho=8)      # ordem livre
+
+def preco_final(valor, desconto=0, frete=0):
+    return valor - valor * desconto / 100 + frete
+
+print(preco_final(100))
+print(preco_final(100, frete=15))
+print(preco_final(100, desconto=10, frete=15))
+
+print(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, sep=&quot;-&quot;, end=&quot;!\n&quot;)   # print também!
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="arg" data-title="Desafio: formatando preços">
+  <h2>Desafio: formatando preços</h2>
+  <div class="cols">
+    <div>
+      <p>Crie a função <code>formatar_preco(valor, moeda="R$", casas=2)</code>, que <strong>devolve</strong> um texto com a moeda, um espaço e o valor com a quantidade de casas pedida.</p>
+      <div class="tblwrap"><table class="tbl ex-io"><tr><th>Chamada</th><th>Devolve</th></tr>
+        <tr><td><code>formatar_preco(12.5)</code></td><td><code>'R$ 12.50'</code></td></tr>
+        <tr><td><code>formatar_preco(3.456, casas=1)</code></td><td><code>'R$ 3.5'</code></td></tr>
+        <tr><td><code>formatar_preco(9.9, "US$")</code></td><td><code>'US$ 9.90'</code></td></tr>
+        <tr><td><code>formatar_preco(7, moeda="€", casas=0)</code></td><td><code>'€ 7'</code></td></tr>
+      </table></div>
+      <div class="minis"><span class="mini">round(3.456, 1) <b>→</b> 3.5</span><span class="mini">f&quot;{2.5:.2f}&quot; <b>→</b> '2.50'</span></div>
+      <p>Dica: dentro das chaves de uma f-string, a quantidade de casas pode vir de uma variável: <code>f"{valor:.{casas}f}"</code>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_preco.py">
+# defina formatar_preco(valor, moeda=&quot;R$&quot;, casas=2)
+
+
+print(formatar_preco(12.5))
+print(formatar_preco(3.456, casas=1))
+print(formatar_preco(9.9, &quot;US$&quot;))
+print(formatar_preco(7, moeda=&quot;€&quot;, casas=0))
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+def formatar_preco(valor, moeda=&quot;R$&quot;, casas=2):
+    return f&quot;{moeda} {valor:.{casas}f}&quot;
+
+print(formatar_preco(12.5))
+print(formatar_preco(3.456, casas=1))
+print(formatar_preco(9.9, &quot;US$&quot;))
+print(formatar_preco(7, moeda=&quot;€&quot;, casas=0))
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ORGANIZANDO ===================== -->
+<section class="slide" data-mod="org" data-title="Funções chamando funções">
+  <h2>Funções chamando funções</h2>
+  <div class="cols">
+    <div>
+      <p>Uma função pode chamar outras funções. Assim, um problema grande é quebrado em partes pequenas, cada uma fácil de escrever e de testar sozinha.</p>
+      <p>Durante a execução, o Python guarda uma <strong>pilha de chamadas</strong>: cada chamada em andamento fica empilhada sobre quem a chamou e, ao terminar, sai da pilha e devolve o resultado para quem está logo abaixo.</p>
+      <svg class="diagram" viewBox="0 0 520 200" role="img" aria-label="Pilha de chamadas: programa principal chama relatorio, que chama media">
+        <defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="d-ar"/></marker></defs>
+        <rect x="20" y="20" width="270" height="44" rx="8" class="d-var"/><text x="155" y="48" text-anchor="middle" class="d-vt">media(notas)</text>
+        <rect x="20" y="76" width="270" height="44" rx="8" class="d-box"/><text x="155" y="104" text-anchor="middle" class="d-t">relatorio(nome, notas)</text>
+        <rect x="20" y="132" width="270" height="44" rx="8" class="d-box"/><text x="155" y="160" text-anchor="middle" class="d-t">programa principal</text>
+        <path d="M300,42 C360,42 360,98 300,98" class="d-ln" marker-end="url(#arw)"/>
+        <text x="372" y="62" class="d-cap">executando agora;</text>
+        <text x="372" y="80" class="d-cap">ao terminar, devolve</text>
+        <text x="372" y="98" class="d-cap">para relatorio</text>
+        <text x="372" y="160" class="d-cap">base da pilha</text>
+      </svg>
+    </div>
+    <div>
+<textarea class="py" data-label="composicao.py">
+def media(notas):
+    return sum(notas) / len(notas)
+
+def situacao(m):
+    if m &gt;= 7:
+        return &quot;aprovado&quot;
+    return &quot;reprovado&quot;
+
+def relatorio(nome, notas):
+    m = media(notas)                     # relatorio chama media...
+    return f&quot;{nome}: {m:.1f} ({situacao(m)})&quot;   # ...e situacao
+
+print(relatorio(&quot;Ana&quot;, [8.0, 9.0, 7.5]))
+print(relatorio(&quot;Bruno&quot;, [6.0, 5.5, 7.0]))
+</textarea>
+      <div class="note">Uma função pode até chamar <strong>a si mesma</strong>. Esse é o tema da aula de <strong>Recursão</strong>, e a pilha de chamadas será a chave para entendê-la.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="org" data-title="Organizando um programa">
+  <h2>Organizando um programa</h2>
+  <div class="cols">
+    <div>
+      <p>Um programa com funções costuma seguir este formato:</p>
+      <ol>
+        <li><strong>Definições</strong> no topo, cada uma com um nome que diga o que ela faz (um verbo ajuda: <code>calcular_</code>, <code>ler_</code>, <code>mostrar_</code>).</li>
+        <li>Um <strong>programa principal</strong> curto no final, que lê os dados, chama as funções e mostra os resultados.</li>
+      </ol>
+      <p>A primeira linha do corpo pode ser um texto entre aspas triplas, a <strong>docstring</strong>, que documenta o que a função recebe e devolve.</p>
+      <p>Funções também evitam repetição de <code>input</code>: <code>ler_opcao</code> só devolve uma opção depois que ela for válida.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="conversor.py" data-stdin="5
+1
+100
+2
+30
+0">
+def c_para_f(c):
+    &quot;&quot;&quot;Recebe graus Celsius e devolve em Fahrenheit.&quot;&quot;&quot;
+    return c * 9 / 5 + 32
+
+def km_para_milhas(km):
+    &quot;&quot;&quot;Recebe quilômetros e devolve em milhas.&quot;&quot;&quot;
+    return km / 1.609
+
+def ler_opcao():
+    &quot;&quot;&quot;Repete a pergunta até vir 0, 1 ou 2.&quot;&quot;&quot;
+    opcao = input(&quot;1-°C→°F  2-km→milhas  0-sair: &quot;)
+    while opcao not in (&quot;0&quot;, &quot;1&quot;, &quot;2&quot;):
+        print(&quot;Opção inválida&quot;)
+        opcao = input(&quot;1-°C→°F  2-km→milhas  0-sair: &quot;)
+    return opcao
+
+# ----- programa principal -----
+opcao = ler_opcao()
+while opcao != &quot;0&quot;:
+    valor = float(input(&quot;Valor: &quot;))
+    if opcao == &quot;1&quot;:
+        print(f&quot;{c_para_f(valor):.1f} °F&quot;)
+    else:
+        print(f&quot;{km_para_milhas(valor):.1f} milhas&quot;)
+    opcao = ler_opcao()
+print(&quot;Até logo!&quot;)
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="org" data-title="Módulos: funções prontas para importar">
+  <h2>Módulos: funções prontas para importar</h2>
+  <div class="cols">
+    <div>
+      <p>Um <strong>módulo</strong> é um arquivo com funções prontas. O Python traz vários; para usar, basta importar.</p>
+      <div class="tblwrap"><table class="tbl">
+        <tr><th>Forma</th><th>Como chamar</th></tr>
+        <tr><td><code>import math</code></td><td><code>math.sqrt(16)</code></td></tr>
+        <tr><td><code>from math import sqrt</code></td><td><code>sqrt(16)</code></td></tr>
+        <tr><td><code>import random</code></td><td><code>random.randint(1, 6)</code></td></tr>
+      </table></div>
+      <div class="minis"><span class="mini">math.sqrt(16) <b>→</b> 4.0</span><span class="mini">math.pi <b>→</b> 3.14159…</span><span class="mini">random.randint(1, 6) <b>→</b> 1 a 6</span></div>
+      <div class="note">Em um projeto real, as suas funções também podem ficar em um arquivo separado (por exemplo <code>notas.py</code>) e ser importadas em outros programas com <code>import notas</code>.</div>
+    </div>
+    <div>
+<textarea class="py" data-label="modulos.py">
+import math
+import random
+
+def hipotenusa(a, b):
+    return math.sqrt(a ** 2 + b ** 2)
+
+def area_circulo(raio):
+    return math.pi * raio ** 2
+
+def lancar_dado(lados=6):
+    return random.randint(1, lados)
+
+print(hipotenusa(3, 4))
+print(round(area_circulo(2), 2))
+print(&quot;Dado:&quot;, lancar_dado(), lancar_dado(), lancar_dado())   # execute de novo!
+print(&quot;Dado de 20 lados:&quot;, lancar_dado(20))
+</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-mod="org" data-title="Desafio: refatorando com funções">
+  <h2>Desafio: refatorando com funções</h2>
+  <div class="cols">
+    <div>
+      <p>O programa ao lado funciona, mas repete o mesmo trecho para cada aluno. <strong>Refatore</strong>: reescreva-o com funções, sem mudar o que ele mostra.</p>
+      <ol>
+        <li><code>media(n1, n2, n3)</code> devolve a média.</li>
+        <li><code>situacao(m)</code> devolve <code>"aprovado"</code> ou <code>"reprovado"</code>.</li>
+        <li><code>mostrar(nome, n1, n2, n3)</code> usa as duas anteriores e mostra a linha do aluno.</li>
+      </ol>
+      <p>Depois, acrescente um quarto aluno: com funções, deve bastar <strong>uma linha</strong>.</p>
+    </div>
+    <div>
+<textarea class="py" data-label="desafio_refatorar.py">
+m = (8.0 + 7.0 + 9.0) / 3
+if m &gt;= 7:
+    print(f&quot;Ana: {m:.1f} aprovado&quot;)
+else:
+    print(f&quot;Ana: {m:.1f} reprovado&quot;)
+
+m = (5.0 + 6.5 + 4.0) / 3
+if m &gt;= 7:
+    print(f&quot;Bruno: {m:.1f} aprovado&quot;)
+else:
+    print(f&quot;Bruno: {m:.1f} reprovado&quot;)
+
+m = (10.0 + 9.0 + 8.5) / 3
+if m &gt;= 7:
+    print(f&quot;Carla: {m:.1f} aprovado&quot;)
+else:
+    print(f&quot;Carla: {m:.1f} reprovado&quot;)
+</textarea>
+      <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py">
+def media(n1, n2, n3):
+    return (n1 + n2 + n3) / 3
+
+def situacao(m):
+    if m &gt;= 7:
+        return &quot;aprovado&quot;
+    return &quot;reprovado&quot;
+
+def mostrar(nome, n1, n2, n3):
+    m = media(n1, n2, n3)
+    print(f&quot;{nome}: {m:.1f} {situacao(m)}&quot;)
+
+mostrar(&quot;Ana&quot;, 8.0, 7.0, 9.0)
+mostrar(&quot;Bruno&quot;, 5.0, 6.5, 4.0)
+mostrar(&quot;Carla&quot;, 10.0, 9.0, 8.5)
+mostrar(&quot;Davi&quot;, 7.0, 6.0, 8.0)      # o quarto aluno: uma linha
+</textarea>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FECHAMENTO ===================== -->
+<section class="slide" data-mod="intro" data-title="Resumo da aula">
+  <h2>Resumo da aula</h2>
+  <div class="tblwrap">
+    <table class="tbl">
+      <tr><th>Conceito</th><th>Sintaxe</th><th>Lembre</th></tr>
+      <tr><td style="color:var(--c-def);font-weight:700">Definição</td><td><code>def nome(p1, p2):</code></td><td>só guarda a função; o corpo roda a cada chamada</td></tr>
+      <tr><td style="color:var(--c-def);font-weight:700">Chamada</td><td><code>nome(a1, a2)</code></td><td>argumentos vão para os parâmetros na mesma ordem</td></tr>
+      <tr><td style="color:var(--c-ret);font-weight:700">Retorno</td><td><code>return valor</code></td><td>encerra a função e devolve o valor; sem return, devolve <code>None</code></td></tr>
+      <tr><td style="color:var(--c-ret);font-weight:700">Vários valores</td><td><code>return a, b</code></td><td>devolve uma tupla; desempacote com <code>x, y = f()</code></td></tr>
+      <tr><td style="color:var(--c-esc);font-weight:700">Escopo</td><td>variável criada no corpo</td><td>é local: só existe durante a chamada</td></tr>
+      <tr><td style="color:var(--c-esc);font-weight:700">Lista como argumento</td><td><code>f(lista)</code></td><td>a função pode alterar a lista original</td></tr>
+      <tr><td style="color:var(--c-arg);font-weight:700">Valor padrão</td><td><code>def f(x, n=2):</code></td><td>padrões depois dos obrigatórios</td></tr>
+      <tr><td style="color:var(--c-arg);font-weight:700">Argumento nomeado</td><td><code>f(1, n=3)</code></td><td>posicionais primeiro, nomeados depois</td></tr>
+      <tr><td style="color:var(--c-org);font-weight:700">Módulo</td><td><code>import math</code></td><td>funções prontas: <code>math.sqrt(x)</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Qual será a saída?">
+  <h2>Qual será a saída?</h2>
+  <p class="lead">Leia o código, escreva sua resposta e só então clique. Errou? Copie o código para o laboratório e execute.</p>
+  <div class="quiz" data-quiz="saida" data-label="Questão"></div>
+</section>
+
+<section class="slide" data-mod="intro" data-title="Encontre o problema">
+  <h2>Encontre o problema</h2>
+  <p class="lead">Cada trecho tem (ou não) um problema. Descubra o que acontece ao executar antes de clicar.</p>
+  <div class="quiz" data-quiz="erros" data-label="Trecho"></div>
+</section>
+
+<!-- ===================== PRÁTICA ===================== -->
+<section class="slide" data-mod="pratica" data-title="Prática 1: primeiras funções">
+  <h2>Prática 1: primeiras funções</h2>
+<p class="lead">Complete a função no editor. O programa principal, no final do código, já lê a entrada e mostra o resultado: não precisa alterá-lo. <strong>▶ Executar</strong> roda com a entrada que você quiser; <strong>✓ Verificar</strong> roda os testes automáticos. Tente antes de abrir a solução!</p><div class="cols even">
+<div><div class="exercise">
+  <h3>1. Conversor de temperatura <span class="lvl l1">básico</span></h3>
+  <p>Complete <code>celsius_para_fahrenheit(c)</code> para que ela <strong>devolva</strong> a temperatura em Fahrenheit: <code>F = C × 9 / 5 + 32</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>100</pre></td><td><pre>100.0 °C = 212.0 °F</pre></td></tr><tr><td><pre>-40</pre></td><td><pre>-40.0 °C = -40.0 °F</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex1_temperatura.py" data-stdin="100" data-tests="[{&quot;in&quot;: &quot;100&quot;, &quot;out&quot;: [&quot;100.0 °C = 212.0 °F&quot;]}, {&quot;in&quot;: &quot;0&quot;, &quot;out&quot;: [&quot;0.0 °C = 32.0 °F&quot;]}, {&quot;in&quot;: &quot;-40&quot;, &quot;out&quot;: [&quot;-40.0 °C = -40.0 °F&quot;]}, {&quot;in&quot;: &quot;36.5&quot;, &quot;out&quot;: [&quot;36.5 °C = 97.7 °F&quot;]}]">
+def celsius_para_fahrenheit(c):
+    # devolva a temperatura convertida (use return, não print)
+    return 0
+
+
+# ----- programa principal (não precisa alterar) -----
+c = float(input(&quot;Temperatura em °C: &quot;))
+f = celsius_para_fahrenheit(c)
+print(f&quot;{c:.1f} °C = {f:.1f} °F&quot;)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="100">
+def celsius_para_fahrenheit(c):
+    return c * 9 / 5 + 32
+
+
+# ----- programa principal (não precisa alterar) -----
+c = float(input(&quot;Temperatura em °C: &quot;))
+f = celsius_para_fahrenheit(c)
+print(f&quot;{c:.1f} °C = {f:.1f} °F&quot;)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>2. O maior de três <span class="lvl l1">básico</span></h3>
+  <p>Complete <code>maior(a, b, c)</code> para que ela <strong>devolva</strong> o maior dos três valores, <strong>sem usar</strong> <code>max()</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>3
+9
+4</pre></td><td><pre>Maior: 9</pre></td></tr></table></div>
+  <p>Os testes incluem números negativos e valores repetidos.</p>
+  <textarea class="py" data-label="ex2_maior.py" data-stdin="3
+9
+4" data-tests="[{&quot;in&quot;: &quot;3\n9\n4&quot;, &quot;out&quot;: [&quot;Maior: 9&quot;]}, {&quot;in&quot;: &quot;10\n2\n7&quot;, &quot;out&quot;: [&quot;Maior: 10&quot;]}, {&quot;in&quot;: &quot;1\n2\n30&quot;, &quot;out&quot;: [&quot;Maior: 30&quot;]}, {&quot;in&quot;: &quot;-5\n-2\n-9&quot;, &quot;out&quot;: [&quot;Maior: -2&quot;], &quot;nao&quot;: [&quot;Maior: -5&quot;, &quot;Maior: -9&quot;]}, {&quot;in&quot;: &quot;5\n5\n1&quot;, &quot;out&quot;: [&quot;Maior: 5&quot;], &quot;nao&quot;: [&quot;Maior: 1&quot;]}]">
+def maior(a, b, c):
+    # devolva o maior dos três valores, sem usar max()
+    return a
+
+
+# ----- programa principal (não precisa alterar) -----
+x = int(input(&quot;Primeiro: &quot;))
+y = int(input(&quot;Segundo: &quot;))
+z = int(input(&quot;Terceiro: &quot;))
+print(&quot;Maior:&quot;, maior(x, y, z))
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="3
+9
+4">
+def maior(a, b, c):
+    resposta = a
+    if b &gt; resposta:
+        resposta = b
+    if c &gt; resposta:
+        resposta = c
+    return resposta
+
+
+# ----- programa principal (não precisa alterar) -----
+x = int(input(&quot;Primeiro: &quot;))
+y = int(input(&quot;Segundo: &quot;))
+z = int(input(&quot;Terceiro: &quot;))
+print(&quot;Maior:&quot;, maior(x, y, z))
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 2: combinando funções">
+  <h2>Prática 2: combinando funções</h2>
+<div class="cols even">
+<div><div class="exercise">
+  <h3>3. Média e situação <span class="lvl l2">intermediário</span></h3>
+  <p>Complete as duas funções:</p>
+  <ul>
+    <li><code>media(n1, n2, n3)</code> devolve a média das três notas;</li>
+    <li><code>situacao(m)</code> devolve <code>"aprovado"</code> se <code>m &gt;= 7</code>, <code>"final"</code> se <code>4 &lt;= m &lt; 7</code> e <code>"reprovado"</code> se <code>m &lt; 4</code>.</li>
+  </ul>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>5
+6
+4</pre></td><td><pre>Média: 5.0
+Situação: final</pre></td></tr></table></div>
+  <textarea class="py" data-label="ex3_situacao.py" data-stdin="5
+6
+4" data-tests="[{&quot;in&quot;: &quot;7\n8\n9&quot;, &quot;out&quot;: [&quot;Média: 8.0&quot;, &quot;Situação: aprovado&quot;], &quot;nao&quot;: [&quot;Situação: final&quot;, &quot;Situação: reprovado&quot;]}, {&quot;in&quot;: &quot;5\n6\n4&quot;, &quot;out&quot;: [&quot;Média: 5.0&quot;, &quot;Situação: final&quot;], &quot;nao&quot;: [&quot;Situação: aprovado&quot;, &quot;Situação: reprovado&quot;]}, {&quot;in&quot;: &quot;2\n3\n4&quot;, &quot;out&quot;: [&quot;Média: 3.0&quot;, &quot;Situação: reprovado&quot;], &quot;nao&quot;: [&quot;Situação: aprovado&quot;, &quot;Situação: final&quot;]}, {&quot;in&quot;: &quot;7\n7\n7&quot;, &quot;out&quot;: [&quot;Média: 7.0&quot;, &quot;Situação: aprovado&quot;], &quot;nao&quot;: [&quot;Situação: final&quot;]}, {&quot;in&quot;: &quot;4\n4\n4&quot;, &quot;out&quot;: [&quot;Média: 4.0&quot;, &quot;Situação: final&quot;], &quot;nao&quot;: [&quot;Situação: reprovado&quot;]}]">
+def media(n1, n2, n3):
+    # devolva a média das três notas
+    return 0
+
+
+def situacao(m):
+    # devolva &quot;aprovado&quot;, &quot;final&quot; ou &quot;reprovado&quot;
+    return &quot;&quot;
+
+
+# ----- programa principal (não precisa alterar) -----
+n1 = float(input(&quot;Nota 1: &quot;))
+n2 = float(input(&quot;Nota 2: &quot;))
+n3 = float(input(&quot;Nota 3: &quot;))
+m = media(n1, n2, n3)
+print(f&quot;Média: {m:.1f}&quot;)
+print(&quot;Situação:&quot;, situacao(m))
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="5
+6
+4">
+def media(n1, n2, n3):
+    return (n1 + n2 + n3) / 3
+
+
+def situacao(m):
+    if m &gt;= 7:
+        return &quot;aprovado&quot;
+    if m &gt;= 4:
+        return &quot;final&quot;
+    return &quot;reprovado&quot;
+
+
+# ----- programa principal (não precisa alterar) -----
+n1 = float(input(&quot;Nota 1: &quot;))
+n2 = float(input(&quot;Nota 2: &quot;))
+n3 = float(input(&quot;Nota 3: &quot;))
+m = media(n1, n2, n3)
+print(f&quot;Média: {m:.1f}&quot;)
+print(&quot;Situação:&quot;, situacao(m))
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>4. Lendo uma nota válida <span class="lvl l2">intermediário</span></h3>
+  <p>Complete <code>ler_nota(mensagem)</code>: ela lê um número com <code>input(mensagem)</code> e, <strong>enquanto</strong> ele estiver fora do intervalo de 0 a 10, mostra <code>Nota inválida</code> e lê de novo. No fim, <strong>devolve</strong> a nota válida.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>11
+8
+-1
+6</pre></td><td><pre>Nota inválida
+Nota inválida
+Média: 7.0</pre></td></tr></table></div>
+  <p>Repare: o programa principal chama a mesma função duas vezes, e a validação fica escrita uma vez só.</p>
+  <textarea class="py" data-label="ex4_ler_nota.py" data-stdin="11
+8
+-1
+6" data-tests="[{&quot;in&quot;: &quot;8\n6&quot;, &quot;out&quot;: [&quot;Média: 7.0&quot;], &quot;nao&quot;: [&quot;Nota inválida&quot;]}, {&quot;in&quot;: &quot;11\n8\n-1\n6&quot;, &quot;out&quot;: [&quot;Nota inválida&quot;, &quot;Média: 7.0&quot;]}, {&quot;in&quot;: &quot;10\n0&quot;, &quot;out&quot;: [&quot;Média: 5.0&quot;], &quot;nao&quot;: [&quot;Nota inválida&quot;]}, {&quot;in&quot;: &quot;10.5\n12\n9\n7&quot;, &quot;out&quot;: [&quot;Nota inválida\nNota 1: 12\nNota inválida&quot;, &quot;Média: 8.0&quot;]}]">
+def ler_nota(mensagem):
+    # leia a nota; repita enquanto ela estiver fora de 0 a 10
+    nota = float(input(mensagem))
+    return nota
+
+
+# ----- programa principal (não precisa alterar) -----
+n1 = ler_nota(&quot;Nota 1: &quot;)
+n2 = ler_nota(&quot;Nota 2: &quot;)
+print(&quot;Média:&quot;, (n1 + n2) / 2)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="11
+8
+-1
+6">
+def ler_nota(mensagem):
+    nota = float(input(mensagem))
+    while nota &lt; 0 or nota &gt; 10:
+        print(&quot;Nota inválida&quot;)
+        nota = float(input(mensagem))
+    return nota
+
+
+# ----- programa principal (não precisa alterar) -----
+n1 = ler_nota(&quot;Nota 1: &quot;)
+n2 = ler_nota(&quot;Nota 2: &quot;)
+print(&quot;Média:&quot;, (n1 + n2) / 2)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Prática 3: funções com laços e listas">
+  <h2>Prática 3: funções com laços e listas</h2>
+<div class="cols even">
+<div><div class="exercise">
+  <h3>5. Números primos <span class="lvl l3">desafio</span></h3>
+  <p>Complete <code>eh_primo(n)</code>: devolve <code>True</code> se <code>n</code> for primo e <code>False</code> caso contrário. Um número é primo quando é maior que 1 e só é divisível por 1 e por ele mesmo.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>20</pre></td><td><pre>20 não é primo
+Primos até 20 : [2, 3, 5, 7, 11, 13, 17, 19]</pre></td></tr></table></div>
+  <p>O programa principal usa sua função de dois jeitos: para responder sobre <code>n</code> e para montar a lista de primos até <code>n</code>.</p>
+  <textarea class="py" data-label="ex5_primos.py" data-stdin="20" data-tests="[{&quot;in&quot;: &quot;20&quot;, &quot;out&quot;: [&quot;20 não é primo&quot;, &quot;[2, 3, 5, 7, 11, 13, 17, 19]&quot;]}, {&quot;in&quot;: &quot;17&quot;, &quot;out&quot;: [&quot;17 é primo&quot;, &quot;[2, 3, 5, 7, 11, 13, 17]&quot;], &quot;nao&quot;: [&quot;não é primo&quot;]}, {&quot;in&quot;: &quot;9&quot;, &quot;out&quot;: [&quot;9 não é primo&quot;, &quot;: [2, 3, 5, 7]&quot;]}, {&quot;in&quot;: &quot;2&quot;, &quot;out&quot;: [&quot;2 é primo&quot;, &quot;: [2]&quot;], &quot;nao&quot;: [&quot;não é primo&quot;]}, {&quot;in&quot;: &quot;1&quot;, &quot;out&quot;: [&quot;1 não é primo&quot;, &quot;: []&quot;]}]">
+def eh_primo(n):
+    # devolva True se n for primo e False caso contrário
+    return False
+
+
+# ----- programa principal (não precisa alterar) -----
+n = int(input(&quot;Número: &quot;))
+if eh_primo(n):
+    print(n, &quot;é primo&quot;)
+else:
+    print(n, &quot;não é primo&quot;)
+
+primos = []
+for i in range(1, n + 1):
+    if eh_primo(i):
+        primos.append(i)
+print(&quot;Primos até&quot;, n, &quot;:&quot;, primos)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="20">
+def eh_primo(n):
+    if n &lt; 2:
+        return False
+    for d in range(2, n):
+        if n % d == 0:
+            return False          # achou um divisor: não é primo
+    return True                   # o laço terminou sem achar divisor
+
+
+# ----- programa principal (não precisa alterar) -----
+n = int(input(&quot;Número: &quot;))
+if eh_primo(n):
+    print(n, &quot;é primo&quot;)
+else:
+    print(n, &quot;não é primo&quot;)
+
+primos = []
+for i in range(1, n + 1):
+    if eh_primo(i):
+        primos.append(i)
+print(&quot;Primos até&quot;, n, &quot;:&quot;, primos)
+</textarea>
+</details>
+</div></div>
+<div><div class="exercise">
+  <h3>6. Estatísticas de uma lista <span class="lvl l3">desafio</span></h3>
+  <p>Complete <code>estatisticas(numeros)</code>: recebe uma lista de inteiros e <strong>devolve três valores</strong>: o menor, o maior e a média. Não use <code>min()</code>, <code>max()</code> nem <code>sum()</code>.</p>
+  <div class="tblwrap"><table class="tbl ex-io"><tr><th>Entrada</th><th>Saída esperada</th></tr><tr><td><pre>4 8 15 16 23 42</pre></td><td><pre>Menor: 4
+Maior: 42
+Média: 18.00</pre></td></tr></table></div>
+  <p>Os testes incluem uma lista só com negativos: cuidado com o valor inicial do maior.</p>
+  <textarea class="py" data-label="ex6_estatisticas.py" data-stdin="4 8 15 16 23 42" data-tests="[{&quot;in&quot;: &quot;4 8 15 16 23 42&quot;, &quot;out&quot;: [&quot;Menor: 4&quot;, &quot;Maior: 42&quot;, &quot;Média: 18.00&quot;]}, {&quot;in&quot;: &quot;-5 -2 -9&quot;, &quot;out&quot;: [&quot;Menor: -9&quot;, &quot;Maior: -2&quot;, &quot;Média: -5.33&quot;], &quot;nao&quot;: [&quot;Maior: 0&quot;]}, {&quot;in&quot;: &quot;7&quot;, &quot;out&quot;: [&quot;Menor: 7&quot;, &quot;Maior: 7&quot;, &quot;Média: 7.00&quot;]}, {&quot;in&quot;: &quot;3 1 2&quot;, &quot;out&quot;: [&quot;Menor: 1&quot;, &quot;Maior: 3&quot;, &quot;Média: 2.00&quot;], &quot;nao&quot;: [&quot;Menor: 0&quot;]}]">
+def estatisticas(numeros):
+    # calcule o menor, o maior e a média, sem min, max e sum
+    return 0, 0, 0
+
+
+# ----- programa principal (não precisa alterar) -----
+numeros = []
+for parte in input(&quot;Números: &quot;).split():
+    numeros.append(int(parte))
+menor, maior, media = estatisticas(numeros)
+print(&quot;Menor:&quot;, menor)
+print(&quot;Maior:&quot;, maior)
+print(f&quot;Média: {media:.2f}&quot;)
+</textarea>
+  <details class="sol"><summary>Mostrar uma solução</summary>
+<textarea class="py" data-label="solucao.py" data-stdin="4 8 15 16 23 42">
+def estatisticas(numeros):
+    menor = numeros[0]            # começa com um valor que existe na lista
+    maior = numeros[0]
+    total = 0
+    for n in numeros:
+        if n &lt; menor:
+            menor = n
+        if n &gt; maior:
+            maior = n
+        total += n
+    return menor, maior, total / len(numeros)
+
+
+# ----- programa principal (não precisa alterar) -----
+numeros = []
+for parte in input(&quot;Números: &quot;).split():
+    numeros.append(int(parte))
+menor, maior, media = estatisticas(numeros)
+print(&quot;Menor:&quot;, menor)
+print(&quot;Maior:&quot;, maior)
+print(f&quot;Média: {media:.2f}&quot;)
+</textarea>
+</details>
+</div></div>
+</div>
+</section>
+<section class="slide" data-mod="pratica" data-title="Laboratório livre">
+  <h2>Laboratório livre</h2>
+  <p class="lead">Espaço para testar ideias durante a aula. Sugestões: uma função <code>fatorial(n)</code> com <code>for</code>; uma função <code>contar(texto, letra)</code> sem usar <code>count()</code>; uma função <code>tabuada(n, ate=10)</code> com valor padrão.</p>
+<textarea class="py" data-label="laboratorio.py" data-stdin="">
+# Espaço livre para testar durante a aula
+</textarea>
+</section>
+
+  </main>
+
+  <nav class="aula-nav" aria-label="Navegação entre etapas">
+    <div class="aula-nav-inner">
+      <button type="button" id="prev"><i class="bx bx-chevron-left"></i> Anterior</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next">Próximo <i class="bx bx-chevron-right"></i></button>
+    </div>
+  </nav>
+
+  <footer class="disc-footer">
+    <p>Prof. Raul de Araújo Lima · <a href="mailto:rauldearaujolima@gmail.com">rauldearaujolima@gmail.com</a></p>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside id="toc" aria-label="Sumário">
+    <div class="toc-head"><span>Sumário e progresso</span><button type="button" class="close" id="tocClose" aria-label="Fechar sumário">✕</button></div>
+    <section class="prog" id="progresso" aria-labelledby="progTitle">
+      <h4 id="progTitle">Seu progresso</h4>
+      <p>Seus códigos editados e respostas do quiz ficam salvos automaticamente <strong>neste navegador</strong>. Para continuar em outro computador, baixe o arquivo e carregue-o depois.</p>
+      <p class="prog-info" id="progInfo"></p>
+      <div class="prog-btns">
+        <button type="button" id="progSave"><i class="bx bx-download"></i> Baixar arquivo</button>
+        <button type="button" id="progLoad"><i class="bx bx-upload"></i> Carregar arquivo</button>
+      </div>
+      <input type="file" id="progFile" accept=".json,application/json" hidden>
+      <button type="button" class="prog-clear" id="progClear"><i class="bx bx-reset"></i> Recomeçar do zero</button>
+      <p class="prog-msg" id="progMsg" aria-live="polite"></p>
+    </section>
+    <div id="tocList"></div>
+  </aside>
+
+<script type="application/json" id="aula-config">
+{
+ "id": "funcoes",
+ "mods": {
+  "intro": {
+   "name": "Introdução",
+   "color": "#1f5297"
+  },
+  "def": {
+   "name": "Definindo funções",
+   "color": "#0b78b0"
+  },
+  "ret": {
+   "name": "Retorno",
+   "color": "#0f7a62"
+  },
+  "esc": {
+   "name": "Escopo",
+   "color": "#c2410c"
+  },
+  "arg": {
+   "name": "Argumentos",
+   "color": "#a8670c"
+  },
+  "org": {
+   "name": "Organizando programas",
+   "color": "#8e3a8f"
+  },
+  "pratica": {
+   "name": "Prática",
+   "color": "#be3455"
+  }
+ },
+ "hints": {
+  "TypeError": "Operação incompatível com o tipo do valor. Se a mensagem fala em \"positional argument\", a chamada enviou mais ou menos argumentos do que a função tem parâmetros. Se fala em \"NoneType\", você usou o resultado de uma função que não tem return.",
+  "NameError": "Nome não definido. A função precisa ser definida (def) antes de ser chamada, e variáveis criadas dentro de uma função só existem dentro dela.",
+  "UnboundLocalError": "A função atribui um valor a essa variável, então ela é local na função inteira, e foi usada antes de receber valor. Receba o valor por parâmetro e devolva o resultado com return.",
+  "SyntaxError": "Erro de escrita. Confira parênteses, aspas, vírgulas e os dois-pontos após def, for, if e while. Parâmetros com valor padrão vêm depois dos obrigatórios.",
+  "IndentationError": "Recuo incorreto. O corpo da função precisa estar recuado (4 espaços) em relação ao def."
+ },
+ "quizzes": {
+  "saida": [
+   {
+    "code": "def f(x):\n    return x + 1\n\nprint(f(2) * 2)",
+    "opts": [
+     "5",
+     "3",
+     "6",
+     "Erro"
+    ],
+    "ans": 2,
+    "why": "f(2) devolve 3, e 3 * 2 = 6."
+   },
+   {
+    "code": "def f(x):\n    print(x * 2)\n\nr = f(3)\nprint(r)",
+    "opts": [
+     "6 e depois None",
+     "6 e depois 6",
+     "None",
+     "Erro"
+    ],
+    "ans": 0,
+    "why": "A função mostra 6, mas não tem return: devolve None, que vai para r."
+   },
+   {
+    "code": "def f():\n    return 1\n    return 2\n\nprint(f())",
+    "opts": [
+     "2",
+     "1 e depois 2",
+     "Erro",
+     "1"
+    ],
+    "ans": 3,
+    "why": "O primeiro return encerra a função; a linha seguinte nunca executa."
+   },
+   {
+    "code": "x = 5\n\ndef f():\n    x = 1\n\nf()\nprint(x)",
+    "opts": [
+     "1",
+     "5",
+     "None",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "O x = 1 cria uma variável local de f; o x global continua 5."
+   },
+   {
+    "code": "def saudar(nome, s=\"Olá\"):\n    return s + \", \" + nome\n\nprint(saudar(\"Ana\", \"Oi\"))",
+    "opts": [
+     "Olá, Ana",
+     "Oi, Ana",
+     "Ana, Oi",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "O argumento \"Oi\" substitui o valor padrão de s."
+   },
+   {
+    "code": "def eh_par(n):\n    return n % 2 == 0\n\nprint(eh_par(7))",
+    "opts": [
+     "True",
+     "1",
+     "None",
+     "False"
+    ],
+    "ans": 3,
+    "why": "7 % 2 é 1; 1 == 0 é False, e esse é o valor devolvido."
+   },
+   {
+    "code": "def zerar(lista):\n    lista.append(0)\n\na = [1]\nzerar(a)\nprint(a)",
+    "opts": [
+     "[1, 0]",
+     "[1]",
+     "[0]",
+     "None"
+    ],
+    "ans": 0,
+    "why": "lista e a são dois nomes para a mesma lista: o append aparece em a."
+   },
+   {
+    "code": "def g(a, b):\n    return a - b\n\nprint(g(b=10, a=3))",
+    "opts": [
+     "7",
+     "13",
+     "-7",
+     "Erro"
+    ],
+    "ans": 2,
+    "why": "Argumentos nomeados: a = 3 e b = 10, então 3 - 10 = -7."
+   },
+   {
+    "code": "def sinal(n):\n    if n > 0:\n        return \"positivo\"\n\nprint(sinal(-1))",
+    "opts": [
+     "positivo",
+     "negativo",
+     "Erro",
+     "None"
+    ],
+    "ans": 3,
+    "why": "Nenhum return é executado para -1: a função chega ao fim e devolve None."
+   },
+   {
+    "code": "def divide(a, b):\n    return a // b, a % b\n\nq, r = divide(17, 5)\nprint(q, r)",
+    "opts": [
+     "(3, 2)",
+     "3 2",
+     "3.4",
+     "Erro"
+    ],
+    "ans": 1,
+    "why": "A função devolve a tupla (3, 2), desempacotada em q e r."
+   }
+  ],
+  "erros": [
+   {
+    "code": "print(dobro(4))\n\ndef dobro(n):\n    return n * 2",
+    "opts": [
+     "Mostra 8",
+     "Mostra None",
+     "NameError: dobro é chamada antes do def",
+     "SyntaxError"
+    ],
+    "ans": 2,
+    "why": "O Python executa de cima para baixo: na linha 1, o nome dobro ainda não existe."
+   },
+   {
+    "code": "def soma(a, b):\n    return a + b\n\nprint(soma(1))",
+    "opts": [
+     "TypeError: falta um argumento",
+     "Mostra 1",
+     "Mostra None",
+     "NameError"
+    ],
+    "ans": 0,
+    "why": "soma tem dois parâmetros e a chamada envia só um argumento."
+   },
+   {
+    "code": "def media(a, b):\n    m = (a + b) / 2\n\nprint(media(8, 6))",
+    "opts": [
+     "Mostra 7.0",
+     "Mostra None: falta o return",
+     "NameError: m não existe",
+     "TypeError"
+    ],
+    "ans": 1,
+    "why": "A média é calculada, mas não é devolvida. Sem return, a função devolve None."
+   },
+   {
+    "code": "def calcular():\n    total = 10\n\ncalcular()\nprint(total)",
+    "opts": [
+     "Mostra 10",
+     "Mostra None",
+     "Nenhum problema",
+     "NameError: total é local de calcular"
+    ],
+    "ans": 3,
+    "why": "total só existe durante a chamada. Para usar fora, devolva com return total."
+   },
+   {
+    "code": "def area(r):\nreturn 3.14 * r * r",
+    "opts": [
+     "Mostra a área",
+     "NameError",
+     "IndentationError: o corpo não está recuado",
+     "Nenhum problema"
+    ],
+    "ans": 2,
+    "why": "As linhas do corpo precisam de recuo em relação ao def."
+   },
+   {
+    "code": "contador = 0\n\ndef contar():\n    contador = contador + 1\n\ncontar()",
+    "opts": [
+     "UnboundLocalError: contador é local e ainda não tem valor",
+     "contador passa a valer 1",
+     "Nenhum problema",
+     "SyntaxError"
+    ],
+    "ans": 0,
+    "why": "Como a função atribui a contador, ele é local; ler contador antes de atribuir gera o erro."
+   },
+   {
+    "code": "def maior(a, b):\n    if a > b:\n        return a\n    return b\n\nprint(maior(3, 3))",
+    "opts": [
+     "Mostra None",
+     "Erro: falta else",
+     "Mostra 3 duas vezes",
+     "Nenhum problema: mostra 3"
+    ],
+    "ans": 3,
+    "why": "Se a > b for falso, a execução continua e chega ao return b. Não é preciso else."
+   },
+   {
+    "code": "def saudar(s=\"Olá\", nome):\n    return s + \", \" + nome",
+    "opts": [
+     "Nenhum problema",
+     "SyntaxError: parâmetro com padrão antes de um obrigatório",
+     "TypeError na chamada",
+     "NameError"
+    ],
+    "ans": 1,
+    "why": "Os parâmetros com valor padrão devem vir depois dos obrigatórios: def saudar(nome, s=\"Olá\")."
+   }
+  ]
+ }
+}
+</script>
+<script src="../../assets/js/aula-interativa.js"></script>
+
+<!-- Interpretador Python (Brython) -->
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/brython@3.14.3/brython_stdlib.js"></script>
+<script type="text/python">
+import sys
+from browser import window
+
+class _Saida:
+    def __init__(self):
+        self.partes = []
+    def write(self, texto):
+        self.partes.append(str(texto))
+    def flush(self):
+        pass
+
+def _criar_input(entrada, teste=False):
+    fila = [l for l in str(entrada).split("\n")] if entrada else []
+    if fila and fila[-1] == "":
+        fila.pop()
+    def _input(mensagem=""):
+        mensagem = str(mensagem)
+        if fila:
+            valor = fila.pop(0)
+        elif teste:
+            raise EOFError("o teste não tem mais valores de entrada")
+        else:
+            valor = window.prompt(mensagem)
+            if valor is None:
+                valor = ""
+            valor = str(valor)
+        print(mensagem + valor)
+        return valor
+    return _input
+
+def _executar(codigo, entrada="", teste=False):
+    saida = _Saida()
+    erro = ""
+    antigo_out, antigo_err = sys.stdout, sys.stderr
+    sys.stdout = saida
+    sys.stderr = saida
+    try:
+        compilado = compile(str(codigo), "<aula>", "exec")
+        exec(compilado, {"__name__": "__main__", "input": _criar_input(entrada, teste)})
+    except SyntaxError as e:
+        erro = type(e).__name__ + ": " + str(getattr(e, "msg", e))
+        if getattr(e, "lineno", None):
+            erro += " (linha " + str(e.lineno) + ")"
+    except BaseException as e:
+        erro = type(e).__name__ + ": " + str(e)
+        try:
+            tb = e.__traceback__
+            linha = None
+            while tb is not None:
+                if tb.tb_frame.f_code.co_filename == "<aula>":
+                    linha = tb.tb_lineno
+                tb = tb.tb_next
+            if linha:
+                erro += " (linha " + str(linha) + ")"
+        except Exception:
+            pass
+    finally:
+        sys.stdout, sys.stderr = antigo_out, antigo_err
+    return "".join(saida.partes) + "\u0000" + erro
+
+window.runPython = _executar
+window.pyReady()
+</script>
+</body>
+</html>

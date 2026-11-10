@@ -1,7 +1,8 @@
 /*
   Aulas interativas — motor compartilhado.
   Cada página define <script type="application/json" id="aula-config"> com:
-    { "id": "...", "mods": { chave: { "name": "...", "color": "#..." } }, "quizzes": { chave: [ ... ] } }
+    { "id": "...", "mods": { chave: { "name": "...", "color": "#..." } }, "quizzes": { chave: [ ... ] },
+      "hints": { NomeDoErro: "dica" } (opcional: substitui/acrescenta dicas de erro) }
   Cada <div class="quiz" data-quiz="chave"> usa a lista correspondente.
   Itens do quiz: { "q" e/ou "code", "opts": [...], "ans": índice, "why": "..." }
   Exercícios: <textarea class="py" data-tests='[{"in": "...", "out": [...], "nao": [...]}]'>
@@ -42,7 +43,7 @@ function hl(src){
     else if (m[3]) out += '<span class="t-num">'+m[3]+'</span>';
     else if (m[4]){
       const w = m[4];
-      const cls = KW.has(w) ? 't-kw' : (src[m.index-1] === '.' ? 't-fn' : (BI.has(w) ? 't-bi' : ''));
+      const cls = KW.has(w) ? 't-kw' : (src[m.index-1] === '.' || /\bdef\s+$/.test(src.slice(Math.max(0, m.index - 12), m.index)) ? 't-fn' : (BI.has(w) ? 't-bi' : ''));
       out += cls ? '<span class="'+cls+'">'+w+'</span>' : w;
     } else out += esc(m[5]);
   }
@@ -62,6 +63,7 @@ const HINTS = {
   ZeroDivisionError: 'Divisão por zero. Verifique se a lista não está vazia antes de dividir por len().',
   RecursionError: 'Recursão profunda demais. Confira se existe um caso base e se cada chamada se aproxima dele.'
 };
+Object.assign(HINTS, CFG.hints || {});   /* a aula pode trocar ou acrescentar dicas: "hints": { Erro: "..." } */
 function autosize(t){ t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
 function autosizeVisible(){ $$(document.body.classList.contains('view-all') ? 'textarea.src' : '.slide.active textarea.src').forEach(autosize); }
 
